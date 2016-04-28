@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>tooldlg</class>
+ <widget class="QDialog" name="tooldlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>tooldlg</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog{
+border-image: url(:/images/mainBackgound.png);
+}</string>
+  </property>
+  <widget class="QToolButton" name="hikBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>190</y>
+     <width>165</width>
+     <height>165</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>165</width>
+     <height>165</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>仿宋_GB2312</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton{background-image: url(:/images/hik.png);border-width:0px; border-radius: 5;border-style:solid; border-color: white;}
+QToolButton:hover{border-width:2px;}
+QToolButton:pressed{background-image: url(:/images/hik_pressed.png);}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="dahuaBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>190</y>
+     <width>165</width>
+     <height>165</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>165</width>
+     <height>165</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>仿宋_GB2312</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton{background-image: url(:/images/dahua.png);border-width:0px; border-radius: 5;border-style:solid; border-color: white;}
+  QToolButton:hover{border-width:2px;}
+   QToolButton:pressed{background-image: url(:/images/dahua_pressed.png);}
+QToolButton:disabled{background-image: url(:/images/dahua_disable.png);}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="videoPlayBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>430</y>
+     <width>165</width>
+     <height>165</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>165</width>
+     <height>165</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>仿宋_GB2312</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton{background-image: url(:/images/video_play.png);border-width:0px; border-radius: 5;border-style:solid; border-color: white;}
+  QToolButton:hover{border-width:2px;}
+   QToolButton:pressed{background-image: url(:/images/video_play_Pressed.png);}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="browserBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>430</y>
+     <width>165</width>
+     <height>165</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>165</width>
+     <height>165</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>仿宋_GB2312</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton{background-image: url(:/images/browser.png);border-width:0px; border-radius: 5;border-style:solid; border-color: white;}
+QToolButton:hover{border-width:2px;}
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="product_setBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>656</x>
+     <y>190</y>
+     <width>165</width>
+     <height>165</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>165</width>
+     <height>165</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>仿宋_GB2312</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton{background-image: url(:/images/product_set.png);border-width:0px; border-radius: 5;border-style:solid; border-color: white;}
+  QToolButton:hover{border-width:2px;}
+   QToolButton:pressed{background-image: url(:/images/product_set_Pressed.png);}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="netBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>430</y>
+     <width>165</width>
+     <height>165</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>165</width>
+     <height>165</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>仿宋_GB2312</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton{background-image: url(:/images/net.png);border-width:0px; border-radius: 5;border-style:solid; border-color: white;}
+  QToolButton:hover{border-width:2px;}
+   QToolButton:pressed{background-image: url(:/images/net_Pressed.png);}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="fastvideo.qrc"/>
+ </resources>
+ <connections/>
+</ui>

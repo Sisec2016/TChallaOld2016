@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormDownloadFile</class>
+ <widget class="QWidget" name="FormDownloadFile">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>977</width>
+    <height>42</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#widgetFileItemMain
+{
+	border-image: url(:/png/df_file_item_bg.png);
+	selection-border-image: url(:/png/df_file_item_bg.png);
+}
+
+QWidget
+{
+	
+	background-color: rgba(255, 255, 255, 0);
+}</string>
+  </property>
+  <widget class="QWidget" name="widgetFileItemMain" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>1</y>
+     <width>977</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>1</y>
+      <width>71</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelName">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>1</y>
+      <width>171</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>文件名称</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelChannel">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>1</y>
+      <width>171</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>通道名称</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelBeginTime">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>1</y>
+      <width>171</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>开始时间</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelEndTime">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>1</y>
+      <width>121</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>结束时间</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelSize">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>1</y>
+      <width>121</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>大小</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QWidget" name="widget_2" native="true">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>1</y>
+      <width>61</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <widget class="QPushButton" name="pushButtonPlay">
+     <property name="geometry">
+      <rect>
+       <x>29</x>
+       <y>7</y>
+       <width>17</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton
+{
+	border-image: url(:/png/df_play.png);
+}
+
+QPushButton:hover
+{
+	border-image: url(:/png/df_play_focus.png);
+}
+
+QPushButton:pressed
+{
+	border-image: url(:/png/df_play_focus.png);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

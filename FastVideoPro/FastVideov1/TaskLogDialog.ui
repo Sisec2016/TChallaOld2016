@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TaskLogDialog</class>
+ <widget class="QDialog" name="TaskLogDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>关于</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>images/logo.png</normaloff>images/logo.png</iconset>
+  </property>
+  <widget class="QTableView" name="tableView">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>178</y>
+     <width>971</width>
+     <height>571</height>
+    </rect>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::SingleSelection</enum>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectRows</enum>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>81</y>
+     <width>971</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QWidget{
+font-family:Microsoft Yahei; 
+font-size:16px; 
+
+}
+
+QGroupBox{
+font-family:Microsoft Yahei; 
+font-size:20px; 
+border:1px solid rgb(160,160,160);
+border-radius:10px;
+margin-top:2ex;
+color:white;
+}
+QGroupBox::title{
+left:20px;
+top:-15px;
+}
+
+QToolBar{font-size:18px;
+font-family:Microsoft Yahei;
+}
+
+QToolButton:checked{
+background-color:rgb(229,227,231);
+border:0px;
+color:blue;
+}
+QToolBar::separator 
+{ 
+width: 2px; 
+background-color: rgb(162,156,156);
+margin: 3px 0px;
+}
+
+
+QTabWidget#tabWidget::tab-bar {  
+     left: 330px; 
+}  
+QTabWidget#tabWidget QTabBar::tab {
+font-family:Microsoft Yahei; 
+font-size:16px; 
+background: rgb(160,160,160);
+border:2px solid  rgb(160,160,160);
+border-radius:8px;
+width:16ex;
+height:6ex;
+margin-left: 25px; 
+
+} 
+QTabWidget#tabWidget QTabBar::tab::selected{
+background: rgb(70,99,193);
+}  
+
+QTabWidget::pane{
+border:0px;
+}
+
+QLineEdit {  
+   border: 1px solid rgb(160, 160, 160);  
+   border-radius: 5px;  
+   padding: 5px 18px 1px 3px;   
+}  
+QLineEdit::hover{  
+  border-color:#5D8B9E;  
+}  
+QPushButton
+{
+	color:black;
+	border-image: url(:/VisitorSystem/png/button.png);
+    border-width: 0px;
+}
+
+QPushButton:hover
+{
+	
+	border-image: url(:/VisitorSystem/png/button-on.png);
+}
+
+QPushButton:pressed
+{
+	/*border-image: url(:/png/button.png);*/	
+}
+
+
+
+QComboBox{  
+  border: 1px solid rgb(160, 160, 160);  
+   border-radius: 5px;  
+  margin-right:5px;
+    padding-left: 5px;
+
+}  
+QComboBox:editable{  
+  border: 1px solid rgb(160, 160, 160);  
+   border-radius: 5px;  
+  margin-right:5px;
+
+}  
+
+QComboBox::drop-down {  
+subcontrol-origin: margin;  
+    subcontrol-position: top right;  
+    width:28px;   
+border-image: url(:/VisitorSystem/png/arrow.png);
+
+} 
+QComboBox::drop-down:hover {  
+border-image: url(:/VisitorSystem/png/arrow-hover.png);
+
+} 
+
+QDateTimeEdit
+{
+    border:1px solid  rgb(160, 160, 160);
+	border-radius:5px;
+	border-right:0px;
+    padding-left: 5px;
+}
+
+QDateTimeEdit::up-button
+{
+/*subcontrol-origin: margin;  */
+    subcontrol-position: top right; 
+	image: url(:/VisitorSystem/png/up.png);
+}
+
+QDateTimeEdit::up-button:hover
+{
+	image: url(:/VisitorSystem/png/up-hover.png);
+}
+QDateTimeEdit::down-button
+{
+subcontrol-origin: margin;  
+    subcontrol-position: bottom right; 
+	image: url(:/VisitorSystem/png/down.png);
+}
+
+QDateTimeEdit::down-button:hover
+{
+	image: url(:/VisitorSystem/png/down-hover.png);
+}
+
+
+QSpinBox{
+/*padding-right:15px;*//* make room for the arrows */
+border:1 solid rgb(160, 160, 160);
+border-radius:3px;
+margin-right:3px;
+    padding-left: 5px;
+}
+
+QSpinBox::up-button {
+subcontrol-origin: margin;
+subcontrol-position: top right;/* position at the top right corner */
+width:27px;
+border-image: url(:/VisitorSystem/png/up.png)1;
+border-width:1px;
+top:1px;
+}
+
+QSpinBox::up-button:hover {
+border-image: url(:/VisitorSystem/png/up-hover.png)1;
+}
+
+
+QSpinBox::down-button {
+subcontrol-origin: margin;
+subcontrol-position: bottom right;/* position at bottom right corner */
+
+width:27px;
+border-image: url(:/VisitorSystem/png/down.png);
+border-width:1px;
+border-top-width:0;
+top:-1px;
+margin-left:8px;
+}
+
+QSpinBox::down-button:hover {
+border-image: url(:/VisitorSystem/png/down-hover.png);
+}
+
+
+</string>
+   </property>
+   <property name="title">
+    <string>查询条件</string>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>327</x>
+      <y>35</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>至</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonFind">
+    <property name="geometry">
+     <rect>
+      <x>800</x>
+      <y>30</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>30</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>查询 </string>
+    </property>
+   </widget>
+   <widget class="TimeEdit" name="beginTimeEdit">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>30</y>
+      <width>141</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Microsoft Yahei</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget
+{
+	background-color: rgb(89, 107, 169);
+selection-background-color:rgb(136,150,199);	
+ 	border:1px;
+	font-size:17px;
+color:white;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>18:30</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="beginDateEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>161</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QDateTimeEdit
+{
+	border-color: rgba(255, 255, 255, 0);
+	background-color: rgb(89, 107, 169);	
+ 	border:1px;
+	font-size:17px;
+    border-right:0px;
+	border-radius:4px;
+	color:white;
+selection-background-color:rgb(136,150,199);
+}
+
+
+QDateTimeEdit::down-arrow
+{
+	image: url(:/png/date_sel.png);
+}
+
+QDateTimeEdit::down-arrow:hover
+{
+	image: url(:/png/date_sel.png);
+}
+
+QDateTimeEdit::drop-down{
+	border:none;	
+    background:transparent;
+	padding-right:2px;
+	width:30px;
+	height:30px;
+}</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="currentSection">
+     <enum>QDateTimeEdit::YearSection</enum>
+    </property>
+    <property name="displayFormat">
+     <string>yyyy-MM-dd</string>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+    <property name="currentSectionIndex">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="endDateEdit">
+    <property name="geometry">
+     <rect>
+      <x>368</x>
+      <y>30</y>
+      <width>161</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+QDateTimeEdit
+{
+	border-color: rgba(255, 255, 255, 0);
+	background-color: rgb(89, 107, 169);	
+ 	border:1px;
+	font-size:17px;
+    border-right:0px;
+	border-radius:4px;
+	color:white;
+selection-background-color:rgb(136,150,199);
+}
+
+
+QDateTimeEdit::down-arrow
+{
+	image: url(:/png/date_sel.png);
+}
+
+QDateTimeEdit::down-arrow:hover
+{
+	image: url(:/png/date_sel.png);
+}
+
+QDateTimeEdit::drop-down{
+	border:none;	
+    background:transparent;
+	padding-right:2px;
+	width:30px;
+	height:30px;
+}</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="currentSection">
+     <enum>QDateTimeEdit::YearSection</enum>
+    </property>
+    <property name="displayFormat">
+     <string>yyyy-MM-dd</string>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+    <property name="currentSectionIndex">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TimeEdit" name="endTimeEdit">
+    <property name="geometry">
+     <rect>
+      <x>519</x>
+      <y>30</y>
+      <width>141</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Microsoft Yahei</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget
+{
+	background-color: rgb(89, 107, 169);
+selection-background-color:rgb(136,150,199);	
+ 	border:1px;
+	font-size:17px;
+color:white;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>18:30</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <zorder>label</zorder>
+   <zorder>pushButtonFind</zorder>
+   <zorder>beginTimeEdit</zorder>
+   <zorder>beginDateEdit</zorder>
+   <zorder>endTimeEdit</zorder>
+   <zorder>endDateEdit</zorder>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TimeEdit</class>
+   <extends>QLineEdit</extends>
+   <header>timeedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
