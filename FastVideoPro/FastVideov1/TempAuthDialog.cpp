@@ -1,4 +1,4 @@
-#include "TempAuthDialog.h"
+ï»¿#include "TempAuthDialog.h"
 #include "ui_TempAuthDialog.h"
 
 
@@ -15,7 +15,7 @@
 #include "settings.h"
 #include "cryptopp/dll.h"
 #include "cryptopp/trap.h"
-#include "log.h"
+#include "../../VideoServer/log.h"
 
 USING_NAMESPACE(CryptoPP)
 std::shared_ptr <TempAuthDialog> TempAuthDialog::spDlg;
@@ -171,7 +171,7 @@ void TempAuthDialog::setTime(qlonglong time){
     }
     
     refersh(QDateTime::currentDateTime().toTime_t());
-    QMessageBox::information(NULL, QString::fromLocal8Bit("ÌáÊ¾"), QString::fromLocal8Bit("ÊÚÈ¨³É¹¦,ÇëÖØĞÂÔËĞĞ³ÌĞò£¡"), QMessageBox::Yes, QMessageBox::Yes);
+    QMessageBox::information(NULL, QString::fromLocal8Bit("æç¤º"), QString::fromLocal8Bit("æˆæƒæˆåŠŸ,è¯·é‡æ–°è¿è¡Œç¨‹åºï¼"), QMessageBox::Yes, QMessageBox::Yes);
 }
 
 bool  TempAuthDialog::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -193,7 +193,7 @@ void TempAuthDialog::on_pushButtonOK_clicked()
         this->accept();
     }
     else{
-        QMessageBox::information(nullptr, QStringLiteral("ÌáÊ¾"), QStringLiteral("ÃÜÂë´íÎó£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("æç¤º"), QStringLiteral("å¯†ç é”™è¯¯ï¼"));
     }
 }
 

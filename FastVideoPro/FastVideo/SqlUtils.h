@@ -11,11 +11,12 @@
 #include <QSqlError>
 #include "macro_params.h"
 #include <tuple>
-#include "log.h"
+
 #include <QDebug>
 #include <type_traits>
 #include <utility>
 #include <QString>
+#include "../../VideoServer/log.h"
 
 using std::make_pair;
 using std::make_tuple;

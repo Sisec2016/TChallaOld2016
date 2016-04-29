@@ -1,5 +1,5 @@
 #undef UNICODE
-#include <log.h>
+#include "../../VideoServer/log.h"
 
 //QT头文件
 #include <QCoreApplication>

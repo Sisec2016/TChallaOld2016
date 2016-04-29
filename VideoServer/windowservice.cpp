@@ -8,7 +8,7 @@
 
 #include "windowservice.h"
 #include <RCF/RCF.hpp>
-#include <Service.h>
+#include "Service.h"
 #include "VideoserverFactorySvrImp.h"
 #include "PublicsherServer.h"
 #include "singleapllication.h"

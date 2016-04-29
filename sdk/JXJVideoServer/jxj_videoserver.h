@@ -1,4 +1,4 @@
-#ifndef HIKAN_VIDEOSERVER_H
+Ôªø#ifndef HIKAN_VIDEOSERVER_H
 #define HIKAN_VIDEOSERVER_H
 #include "../../VideoServer/IVideoServer.h"
 #include "JNetSDK.h"
@@ -20,7 +20,7 @@ public:
 
     virtual const char* name()
     {
-        return "º—–≈Ω›";
+        return "‰Ω≥‰ø°Êç∑";
     }
 
     virtual int defaultPort()

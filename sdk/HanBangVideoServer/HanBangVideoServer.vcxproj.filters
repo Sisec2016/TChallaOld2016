@@ -8,12 +8,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Api_HanBang.h" />
     <ClInclude Include="HanBang_videoserver.h" />
     <ClInclude Include="..\..\VideoServer\IVideoServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\VideoServer\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Api_HanBang.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,4 @@
-#include "HanBang_videoserver.h"
+ï»¿#include "HanBang_videoserver.h"
 #include <iostream>
 
 #include <time.h>
@@ -20,74 +20,74 @@ std::string GetLastErrorString()
 
     switch (dwErr)
     {
-        case HB_SDVR_NOERROR: return "Ã»ÓĞ´íÎó";
-        case HB_SDVR_PASSWORD_ERROR: return "ÓÃ»§ÃûÃÜÂë´íÎó";
-        case HB_SDVR_NOENOUGHPRI: return "È¨ÏŞ²»×ã";
-        case HB_SDVR_NOINIT: return "Ã»ÓĞ³õÊ¼»¯";
-        case HB_SDVR_CHANNEL_ERROR: return "Í¨µÀºÅ´íÎó";
-        case HB_SDVR_OVER_MAXLINK: return "Á¬½Óµ½DVRµÄ¿Í»§¶Ë¸öÊı³¬¹ı×î´ó";
-        case HB_SDVR_VERSIONNOMATCH: return "°æ±¾²»Æ¥Åä";
-        case HB_SDVR_NETWORK_FAIL_CONNECT: return "Á¬½Ó·şÎñÆ÷Ê§°Ü";
-        case HB_SDVR_NETWORK_SEND_ERROR: return "Ïò·şÎñÆ÷·¢ËÍÊ§°Ü";
-        case HB_SDVR_NETWORK_RECV_ERROR: return "´Ó·şÎñÆ÷½ÓÊÕÊı¾İÊ§°Ü";
-        case HB_SDVR_NETWORK_RECV_TIMEOUT: return "´Ó·şÎñÆ÷½ÓÊÕÊı¾İ³¬Ê±";
-        case HB_SDVR_NETWORK_ERRORDATA: return "´«ËÍµÄÊı¾İÓĞÎó";
-        case HB_SDVR_ORDER_ERROR: return "µ÷ÓÃ´ÎĞò´íÎó";
-        case HB_SDVR_OPERNOPERMIT: return "ÎŞ´ËÈ¨ÏŞ";
-        case HB_SDVR_COMMANDTIMEOUT: return "DVRÃüÁîÖ´ĞĞ³¬Ê±";
-        case HB_SDVR_ERRORSERIALPORT: return "´®¿ÚºÅ´íÎó";
-        case HB_SDVR_ERRORALARMPORT: return "±¨¾¯¶Ë¿Ú´íÎó";
-        case HB_SDVR_PARAMETER_ERROR: return "²ÎÊı´íÎó";
-        case HB_SDVR_CHAN_EXCEPTION: return "·şÎñÆ÷Í¨µÀ´¦ÓÚ´íÎó×´Ì¬";
-        case HB_SDVR_NODISK: return "Ã»ÓĞÓ²ÅÌ";
-        case HB_SDVR_ERRORDISKNUM: return "Ó²ÅÌºÅ´íÎó";
-        case HB_SDVR_DISK_FULL: return "·şÎñÆ÷Ó²ÅÌÂú";
-        case HB_SDVR_DISK_ERROR: return "·şÎñÆ÷Ó²ÅÌ³ö´í";
-        case HB_SDVR_NOSUPPORT: return "·şÎñÆ÷²»Ö§³Ö";
-        case HB_SDVR_BUSY: return "·şÎñÆ÷Ã¦";
-        case HB_SDVR_MODIFY_FAIL: return "·şÎñÆ÷ĞŞ¸Ä²»³É¹¦";
-        case HB_SDVR_PASSWORD_FORMAT_ERROR: return "ÃÜÂëÊäÈë¸ñÊ½²»ÕıÈ·";
-        case HB_SDVR_DISK_FORMATING: return "Ó²ÅÌÕıÔÚ¸ñÊ½»¯£¬²»ÄÜÆô¶¯²Ù×÷";
-        case HB_SDVR_DVRNORESOURCE: return "DVR×ÊÔ´²»×ã";
-        case HB_SDVR_DVROPRATEFAILED: return "DVR²Ù×÷Ê§°Ü";
-        case HB_SDVR_OPENHOSTSOUND_FAIL: return "´ò¿ªPCÉùÒôÊ§°Ü";
-        case HB_SDVR_DVRVOICEOPENED: return "·şÎñÆ÷ÓïÒô¶Ô½²±»Õ¼ÓÃ";
-        case HB_SDVR_TIMEINPUTERROR: return "Ê±¼äÊäÈë²»ÕıÈ·";
-        case HB_SDVR_NOSPECFILE: return "»Ø·ÅÊ±·şÎñÆ÷Ã»ÓĞÖ¸¶¨µÄÎÄ¼ş";
-        case HB_SDVR_CREATEFILE_ERROR: return "´´½¨ÎÄ¼ş³ö´í";
-        case HB_SDVR_FILEOPENFAIL: return "´ò¿ªÎÄ¼ş³ö´í";
-        case HB_SDVR_OPERNOTFINISH: return "ÉÏ´ÎµÄ²Ù×÷»¹Ã»ÓĞÍê³É";
-        case HB_SDVR_GETPLAYTIMEFAIL: return "»ñÈ¡µ±Ç°²¥·ÅµÄÊ±¼ä³ö´í";
-        case HB_SDVR_PLAYFAIL: return "²¥·Å³ö´í";
-        case HB_SDVR_FILEFORMAT_ERROR: return "ÎÄ¼ş¸ñÊ½²»ÕıÈ·";
-        case HB_SDVR_DIR_ERROR: return "Â·¾¶´íÎó";
-        case HB_SDVR_ALLOC_RESOUCE_ERROR: return "×ÊÔ´·ÖÅä´íÎó";
-        case HB_SDVR_AUDIO_MODE_ERROR: return "Éù¿¨Ä£Ê½´íÎó";
-        case HB_SDVR_NOENOUGH_BUF: return "»º³åÇøÌ«Ğ¡";
-        case HB_SDVR_CREATESOCKET_ERROR: return "´´½¨SOCKET³ö´í";
-        case HB_SDVR_SETSOCKET_ERROR: return "ÉèÖÃSOCKET³ö´í";
-        case HB_SDVR_MAX_NUM: return "¸öÊı´ïµ½×î´ó";
-        case HB_SDVR_USERNOTEXIST: return "ÓÃ»§²»´æÔÚ";
-        case HB_SDVR_WRITEFLASHERROR: return "Ğ´FLASH³ö´í";
-        case HB_SDVR_UPGRADEFAIL: return "DVRÉı¼¶Ê§°Ü";
-        case HB_SDVR_CARDHAVEINIT: return "½âÂë¿¨ÒÑ¾­³õÊ¼»¯¹ı";
-        case HB_SDVR_PLAYERFAILED: return "²¥·ÅÆ÷ÖĞ´íÎó";
-        case HB_SDVR_MAX_USERNUM: return "Éè±¸¶ËÓÃ»§Êı´ïµ½×î´ó";
-        case HB_SDVR_GETLOCALIPANDMACFAIL: return "»ñµÃ¿Í»§¶ËµÄIPµØÖ·»òÎïÀíµØÖ·Ê§°Ü";
-        case HB_SDVR_NOENCODEING: return "¸ÃÍ¨µÀÃ»ÓĞ±àÂë";
-        case HB_SDVR_IPMISMATCH: return "IPµØÖ·²»Æ¥Åä";
-        case HB_SDVR_MACMISMATCH: return "MACµØÖ·²»Æ¥Åä";
-        case HB_SDVR_UPGRADELANGMISMATCH: return "Éı¼¶ÎÄ¼şÓïÑÔ²»Æ¥Åä";
-        case HB_SDVR_USERISALIVE: return "ÓÃ»§ÒÑµÇÂ½";
-        case HB_SDVR_UNKNOWNERROR: return "Î´Öª´íÎó";
-        case HB_SDVR_KEYVERIFYFAIL: return "ÃÜÔ¿ÑéÖ¤Ê§°Ü";
-        case HB_SDVR_IPERR: return "IPµØÖ·²»Æ¥Åä";
-        case HB_SDVR_MACERR: return "MACµØÖ·²»Æ¥Åä";
-        case HB_SDVR_PSWERR: return "ÓÃ»§ÃûÃÜÂë´íÎó";
-        case HB_SDVR_USERERR: return "ÓÃ»§ÃûÃÜÂë´íÎó";
-        case HB_SDVR_USERISFULL: return "µÇÂ¼ÓÃ»§¸öÊı³¬¹ıÏŞÖÆ";
-        case NO_PERMISSION: return "ÓÃ»§Ã»ÓĞÈ¨ÏŞ";
-		default: return "Î´Öª´íÎó";
+        case HB_SDVR_NOERROR: return "æ²¡æœ‰é”™è¯¯";
+        case HB_SDVR_PASSWORD_ERROR: return "ç”¨æˆ·åå¯†ç é”™è¯¯";
+        case HB_SDVR_NOENOUGHPRI: return "æƒé™ä¸è¶³";
+        case HB_SDVR_NOINIT: return "æ²¡æœ‰åˆå§‹åŒ–";
+        case HB_SDVR_CHANNEL_ERROR: return "é€šé“å·é”™è¯¯";
+        case HB_SDVR_OVER_MAXLINK: return "è¿æ¥åˆ°DVRçš„å®¢æˆ·ç«¯ä¸ªæ•°è¶…è¿‡æœ€å¤§";
+        case HB_SDVR_VERSIONNOMATCH: return "ç‰ˆæœ¬ä¸åŒ¹é…";
+        case HB_SDVR_NETWORK_FAIL_CONNECT: return "è¿æ¥æœåŠ¡å™¨å¤±è´¥";
+        case HB_SDVR_NETWORK_SEND_ERROR: return "å‘æœåŠ¡å™¨å‘é€å¤±è´¥";
+        case HB_SDVR_NETWORK_RECV_ERROR: return "ä»æœåŠ¡å™¨æ¥æ”¶æ•°æ®å¤±è´¥";
+        case HB_SDVR_NETWORK_RECV_TIMEOUT: return "ä»æœåŠ¡å™¨æ¥æ”¶æ•°æ®è¶…æ—¶";
+        case HB_SDVR_NETWORK_ERRORDATA: return "ä¼ é€çš„æ•°æ®æœ‰è¯¯";
+        case HB_SDVR_ORDER_ERROR: return "è°ƒç”¨æ¬¡åºé”™è¯¯";
+        case HB_SDVR_OPERNOPERMIT: return "æ— æ­¤æƒé™";
+        case HB_SDVR_COMMANDTIMEOUT: return "DVRå‘½ä»¤æ‰§è¡Œè¶…æ—¶";
+        case HB_SDVR_ERRORSERIALPORT: return "ä¸²å£å·é”™è¯¯";
+        case HB_SDVR_ERRORALARMPORT: return "æŠ¥è­¦ç«¯å£é”™è¯¯";
+        case HB_SDVR_PARAMETER_ERROR: return "å‚æ•°é”™è¯¯";
+        case HB_SDVR_CHAN_EXCEPTION: return "æœåŠ¡å™¨é€šé“å¤„äºé”™è¯¯çŠ¶æ€";
+        case HB_SDVR_NODISK: return "æ²¡æœ‰ç¡¬ç›˜";
+        case HB_SDVR_ERRORDISKNUM: return "ç¡¬ç›˜å·é”™è¯¯";
+        case HB_SDVR_DISK_FULL: return "æœåŠ¡å™¨ç¡¬ç›˜æ»¡";
+        case HB_SDVR_DISK_ERROR: return "æœåŠ¡å™¨ç¡¬ç›˜å‡ºé”™";
+        case HB_SDVR_NOSUPPORT: return "æœåŠ¡å™¨ä¸æ”¯æŒ";
+        case HB_SDVR_BUSY: return "æœåŠ¡å™¨å¿™";
+        case HB_SDVR_MODIFY_FAIL: return "æœåŠ¡å™¨ä¿®æ”¹ä¸æˆåŠŸ";
+        case HB_SDVR_PASSWORD_FORMAT_ERROR: return "å¯†ç è¾“å…¥æ ¼å¼ä¸æ­£ç¡®";
+        case HB_SDVR_DISK_FORMATING: return "ç¡¬ç›˜æ­£åœ¨æ ¼å¼åŒ–ï¼Œä¸èƒ½å¯åŠ¨æ“ä½œ";
+        case HB_SDVR_DVRNORESOURCE: return "DVRèµ„æºä¸è¶³";
+        case HB_SDVR_DVROPRATEFAILED: return "DVRæ“ä½œå¤±è´¥";
+        case HB_SDVR_OPENHOSTSOUND_FAIL: return "æ‰“å¼€PCå£°éŸ³å¤±è´¥";
+        case HB_SDVR_DVRVOICEOPENED: return "æœåŠ¡å™¨è¯­éŸ³å¯¹è®²è¢«å ç”¨";
+        case HB_SDVR_TIMEINPUTERROR: return "æ—¶é—´è¾“å…¥ä¸æ­£ç¡®";
+        case HB_SDVR_NOSPECFILE: return "å›æ”¾æ—¶æœåŠ¡å™¨æ²¡æœ‰æŒ‡å®šçš„æ–‡ä»¶";
+        case HB_SDVR_CREATEFILE_ERROR: return "åˆ›å»ºæ–‡ä»¶å‡ºé”™";
+        case HB_SDVR_FILEOPENFAIL: return "æ‰“å¼€æ–‡ä»¶å‡ºé”™";
+        case HB_SDVR_OPERNOTFINISH: return "ä¸Šæ¬¡çš„æ“ä½œè¿˜æ²¡æœ‰å®Œæˆ";
+        case HB_SDVR_GETPLAYTIMEFAIL: return "è·å–å½“å‰æ’­æ”¾çš„æ—¶é—´å‡ºé”™";
+        case HB_SDVR_PLAYFAIL: return "æ’­æ”¾å‡ºé”™";
+        case HB_SDVR_FILEFORMAT_ERROR: return "æ–‡ä»¶æ ¼å¼ä¸æ­£ç¡®";
+        case HB_SDVR_DIR_ERROR: return "è·¯å¾„é”™è¯¯";
+        case HB_SDVR_ALLOC_RESOUCE_ERROR: return "èµ„æºåˆ†é…é”™è¯¯";
+        case HB_SDVR_AUDIO_MODE_ERROR: return "å£°å¡æ¨¡å¼é”™è¯¯";
+        case HB_SDVR_NOENOUGH_BUF: return "ç¼“å†²åŒºå¤ªå°";
+        case HB_SDVR_CREATESOCKET_ERROR: return "åˆ›å»ºSOCKETå‡ºé”™";
+        case HB_SDVR_SETSOCKET_ERROR: return "è®¾ç½®SOCKETå‡ºé”™";
+        case HB_SDVR_MAX_NUM: return "ä¸ªæ•°è¾¾åˆ°æœ€å¤§";
+        case HB_SDVR_USERNOTEXIST: return "ç”¨æˆ·ä¸å­˜åœ¨";
+        case HB_SDVR_WRITEFLASHERROR: return "å†™FLASHå‡ºé”™";
+        case HB_SDVR_UPGRADEFAIL: return "DVRå‡çº§å¤±è´¥";
+        case HB_SDVR_CARDHAVEINIT: return "è§£ç å¡å·²ç»åˆå§‹åŒ–è¿‡";
+        case HB_SDVR_PLAYERFAILED: return "æ’­æ”¾å™¨ä¸­é”™è¯¯";
+        case HB_SDVR_MAX_USERNUM: return "è®¾å¤‡ç«¯ç”¨æˆ·æ•°è¾¾åˆ°æœ€å¤§";
+        case HB_SDVR_GETLOCALIPANDMACFAIL: return "è·å¾—å®¢æˆ·ç«¯çš„IPåœ°å€æˆ–ç‰©ç†åœ°å€å¤±è´¥";
+        case HB_SDVR_NOENCODEING: return "è¯¥é€šé“æ²¡æœ‰ç¼–ç ";
+        case HB_SDVR_IPMISMATCH: return "IPåœ°å€ä¸åŒ¹é…";
+        case HB_SDVR_MACMISMATCH: return "MACåœ°å€ä¸åŒ¹é…";
+        case HB_SDVR_UPGRADELANGMISMATCH: return "å‡çº§æ–‡ä»¶è¯­è¨€ä¸åŒ¹é…";
+        case HB_SDVR_USERISALIVE: return "ç”¨æˆ·å·²ç™»é™†";
+        case HB_SDVR_UNKNOWNERROR: return "æœªçŸ¥é”™è¯¯";
+        case HB_SDVR_KEYVERIFYFAIL: return "å¯†é’¥éªŒè¯å¤±è´¥";
+        case HB_SDVR_IPERR: return "IPåœ°å€ä¸åŒ¹é…";
+        case HB_SDVR_MACERR: return "MACåœ°å€ä¸åŒ¹é…";
+        case HB_SDVR_PSWERR: return "ç”¨æˆ·åå¯†ç é”™è¯¯";
+        case HB_SDVR_USERERR: return "ç”¨æˆ·åå¯†ç é”™è¯¯";
+        case HB_SDVR_USERISFULL: return "ç™»å½•ç”¨æˆ·ä¸ªæ•°è¶…è¿‡é™åˆ¶";
+        case NO_PERMISSION: return "ç”¨æˆ·æ²¡æœ‰æƒé™";
+		default: return "æœªçŸ¥é”™è¯¯";
     }
 }
 
@@ -120,11 +120,11 @@ bool CFactoryHanBang::init()
         if (!m_init)
         {
 			m_sLastError = GetLastErrorString();
-			g_log.AddLog(string("³õÊ¼»¯SDKÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+			g_log.AddLog(string("åˆå§‹åŒ–SDKå¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 			return false;
         }
 
-		g_log.AddLog(string("³õÊ¼»¯SDK³É¹¦"));
+		g_log.AddLog(string("åˆå§‹åŒ–SDKæˆåŠŸ"));
     }
 
     return m_init;
@@ -154,7 +154,7 @@ IVideoServer* CFactoryHanBang::create()
 // std::recursive_mutex HanBang_videoserver::sMtServers;
 
 /*
- * Îö¹¹º¯Êı
+ * ææ„å‡½æ•°
  */
 HanBang_videoserver::HanBang_videoserver()
 {
@@ -203,13 +203,13 @@ bool HanBang_videoserver::login(const char* IP, __int32 port, const char* user, 
                                    &m_deviceInfo);
 	char szLog[1024];
 	ZeroMemory(szLog, 1024);
-	sprintf(szLog, "µÇÂ¼ID:%d ip:%s port:%d user:%s psw:%s", m_lLoginHandle, IP, port, user, password);
+	sprintf(szLog, "ç™»å½•ID:%d ip:%s port:%d user:%s psw:%s", m_lLoginHandle, IP, port, user, password);
 	g_log.AddLog(string(szLog));
 
     if (m_lLoginHandle <= 0)
     {
 		m_sLastError = GetLastErrorString();
-		g_log.AddLog(string("login µÇÂ¼Ê§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+		g_log.AddLog(string("login ç™»å½•å¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
         return false;
     }
 
@@ -219,7 +219,7 @@ bool HanBang_videoserver::login(const char* IP, __int32 port, const char* user, 
     }
 
 	ZeroMemory(szLog, 1024);
-	sprintf(szLog, "login Í¨µÀ¸öÊı:%d", m_deviceInfo.byChanNum);
+	sprintf(szLog, "login é€šé“ä¸ªæ•°:%d", m_deviceInfo.byChanNum);
 	g_log.AddLog(string(szLog));
     return true;
 }
@@ -254,15 +254,15 @@ bool HanBang_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 	g_log.AddLog(string("GetRecordFileList"));
     if (m_lLoginHandle <= 0)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		g_log.AddLog(string("GetRecordFileList ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
+		g_log.AddLog(string("GetRecordFileList è¯·å…ˆç™»å½•"));
         return false;
     }
 
     if (timeStart >= timeEnd)
     {
-        m_sLastError = "Ê±¼ä·¶Î§²»¶Ô!";
-		g_log.AddLog(string("GetRecordFileList Ê±¼ä·¶Î§²»¶Ô"));
+        m_sLastError = "æ—¶é—´èŒƒå›´ä¸å¯¹!";
+		g_log.AddLog(string("GetRecordFileList æ—¶é—´èŒƒå›´ä¸å¯¹"));
         return false;
     }
 
@@ -288,7 +288,7 @@ bool HanBang_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 		if (lfind == FALSE)
 		{
 			m_sLastError = GetLastErrorString();
-			g_log.AddLog(string("GetRecordFileList ²éÑ¯Â¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+			g_log.AddLog(string("GetRecordFileList æŸ¥è¯¢å½•åƒå¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 			continue;
 		}
 		HanBang::HB_SDVR_FIND_DATA findInfo;
@@ -299,7 +299,7 @@ bool HanBang_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 		RecordFile rf;
 		while (re == HB_SDVR_ISFINDING || re == HB_SDVR_FILE_SUCCESS)
 		{
-			if (re == HB_SDVR_FILE_SUCCESS && findInfo.dwFileSize > 0)//»ñµÃÊÓÆµÎÄ¼ş±ØĞë´óÓÚ0(²âÊÔÖĞÓĞ·¢ÏÖÎÄ¼ş´óĞ¡Îª0Çé¿ö,ËùÒÔ±ØĞë¹ıÂËµô¸Ä²¿·Ö)
+			if (re == HB_SDVR_FILE_SUCCESS && findInfo.dwFileSize > 0)//è·å¾—è§†é¢‘æ–‡ä»¶å¿…é¡»å¤§äº0(æµ‹è¯•ä¸­æœ‰å‘ç°æ–‡ä»¶å¤§å°ä¸º0æƒ…å†µ,æ‰€ä»¥å¿…é¡»è¿‡æ»¤æ‰æ”¹éƒ¨åˆ†)
 			{
 				struct tm Tm;
 				Tm.tm_year = findInfo.struStartTime.dwYear - 1900;
@@ -339,14 +339,14 @@ bool HanBang_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 		if (-1 == re)
 		{
 			m_sLastError = GetLastErrorString();
-			g_log.AddLog(string("GetRecordFileList 01 ²éÑ¯Â¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+			g_log.AddLog(string("GetRecordFileList 01 æŸ¥è¯¢å½•åƒå¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 			continue;
 		}
 
 		if (FALSE == Api_HanBang::Api().m_pFindClose(lfind))
 		{
 			m_sLastError = GetLastErrorString();
-			g_log.AddLog(string("GetRecordFileList ¹Ø±Õ²éÑ¯Â¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+			g_log.AddLog(string("GetRecordFileList å…³é—­æŸ¥è¯¢å½•åƒå¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 			continue;
 		}
 	}
@@ -360,8 +360,8 @@ bool HanBang_videoserver::downLoadByRecordFile(const char* saveFileName, const R
 {
     if (m_lLoginHandle <= 0)
     {
-        m_sLastError = "ÇëÏÈµÇÂ¼!";
-		g_log.AddLog(string("downLoadByRecordFile ÇëÏÈµÇÂ¼"));
+        m_sLastError = "è¯·å…ˆç™»å½•!";
+		g_log.AddLog(string("downLoadByRecordFile è¯·å…ˆç™»å½•"));
         return false;
     }
     
@@ -380,11 +380,11 @@ bool HanBang_videoserver::downLoadByRecordFile(const char* saveFileName, const R
     g_log.AddLog(QString("m_lLoginHandle:%1, file.channel:%2, struStartTime:%3,%4,%5,%6,%7,%8")
         .arg(m_lLoginHandle).arg(file.channel).arg(struStartTime.dwYear).arg(struStartTime.dwMonth).arg(struStartTime.dwDay)
         .arg(struStartTime.dwHour).arg(struStartTime.dwMinute).arg(struStartTime.dwSecond));
-    hdl = Api_HanBang::Api().m_pDownloadByTime(m_lLoginHandle, file.channel, &struStartTime, &struStopTime, (char *)saveFileName);
+    hdl = Api_HanBang::Api().m_pDownloadByFile(m_lLoginHandle, (char *)file.name.c_str(), (char *)saveFileName);
     if (!hdl)
     {
         m_sLastError = GetLastErrorString();
-        g_log.AddLog(string("m_pDownloadByTime ´íÎóÔ­Òò£º") + m_sLastError);
+        g_log.AddLog(string("m_pDownloadByFile é”™è¯¯åŸå› ï¼š") + m_sLastError);
     }
     else
     {
@@ -398,15 +398,15 @@ bool  HanBang_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 {
     if (0 >= m_lLoginHandle)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		g_log.AddLog(string("PlayBackByRecordFile ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
+		g_log.AddLog(string("PlayBackByRecordFile è¯·å…ˆç™»å½•"));
         return false;
     }
 
 //     HB_SDVR_VOD_PARA struVodPara={0};
 //     memset(&struVodPara, 0, sizeof(HB_SDVR_VOD_PARA));
 //     dwSize=sizeof(struVodPara);
-//     struIDInfo.dwChannel = file.channel; //Í¨µÀºÅ
+//     struIDInfo.dwChannel = file.channel; //é€šé“å·
 //     hWnd = hwnd;
 // 	HanBang::HB_SDVR_FIND_DATA info;
 // 	{
@@ -414,8 +414,8 @@ bool  HanBang_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 // 		map<string, HanBang::HB_SDVR_FIND_DATA>::iterator itr = m_mapArcItem.find(file.name);
 // 		if (itr == m_mapArcItem.end())
 // 		{
-// 			m_sLastError = "¸ÃÎÄ¼ş²»´æÔÚ";
-// 			g_log.AddLog(string("PlayBackByRecordFile ¸ÃÎÄ¼ş²»´æÔÚ"));
+// 			m_sLastError = "è¯¥æ–‡ä»¶ä¸å­˜åœ¨";
+// 			g_log.AddLog(string("PlayBackByRecordFile è¯¥æ–‡ä»¶ä¸å­˜åœ¨"));
 // 			return false;
 // 		}
 // 
@@ -464,10 +464,10 @@ bool  HanBang_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 // 	sprintf(szTmp, "~%02d", info.nCh);
 // 	string strFileName = info.sFileName;
 // 	strFileName.insert(19, szTmp);
-// 	g_log.AddLog(string("PlayBackByRecordFile ÎÄ¼şÃû:") + strFileName);
+// 	g_log.AddLog(string("PlayBackByRecordFile æ–‡ä»¶å:") + strFileName);
 // 	char szLog[1024];
 // 	ZeroMemory(szLog, 1024);
-// 	sprintf(szLog, "µÇÂ¼ID:%d Í¨µÀ:%d Ê±¼ä:%d-%02d-%02d %02d:%02d:%02d %d-%02d-%02d %02d:%02d:%02d", m_lLoginHandle, info.nCh,
+// 	sprintf(szLog, "ç™»å½•ID:%d é€šé“:%d æ—¶é—´:%d-%02d-%02d %02d:%02d:%02d %d-%02d-%02d %02d:%02d:%02d", m_lLoginHandle, info.nCh,
 // 		stime.dwYear, stime.dwMonth, stime.dwDay, stime.dwHour, stime.dwMinute, stime.dwSecond,
 // 		etime.dwYear, etime.dwMonth, etime.dwDay, etime.dwHour, etime.dwMinute, etime.dwSecond);
 // 	g_log.AddLog(string(szLog));
@@ -479,14 +479,14 @@ bool  HanBang_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 	if (playbackHandle == FALSE)
     {
 		m_sLastError = GetLastErrorString();
-		g_log.AddLog(string("PlayBackByRecordFile ²¥·ÅÂ¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+		g_log.AddLog(string("PlayBackByRecordFile æ’­æ”¾å½•åƒå¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
         return false;
     }
 
 //     if (!Api_HanBang::Api().m_pPlayBackControl(playbackHandle, HB_SDVR_PLAYSTART, 0, NULL))
 //     {
 // 		m_sLastError = GetLastErrorString();
-// 		g_log.AddLog(string("PlayBackByRecordFile 01 ²¥·ÅÂ¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+// 		g_log.AddLog(string("PlayBackByRecordFile 01 æ’­æ”¾å½•åƒå¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 //         return false;
 //     }
 
@@ -503,18 +503,18 @@ bool HanBang_videoserver::StopPlayBack(download_handle_t playbackHandle, __int32
 {
     if (0 >= m_lLoginHandle)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		g_log.AddLog(string("StopPlayBack ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
+		g_log.AddLog(string("StopPlayBack è¯·å…ˆç™»å½•"));
         return false;
     }
 
 	if (mPause == 1)
 	{
-		g_log.AddLog(string("StopPlayBack ¿ªÊ¼ÔİÍ£²¥·Å"));
+		g_log.AddLog(string("StopPlayBack å¼€å§‹æš‚åœæ’­æ”¾"));
 		if (!Api_HanBang::Api().m_pPlayBackControl(playbackHandle, HB_SDVR_PLAYPAUSE, 0, NULL))
 		{
 			m_sLastError = GetLastErrorString();
-			g_log.AddLog(string("StopPlayBack ÔİÍ£²¥·ÅÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+			g_log.AddLog(string("StopPlayBack æš‚åœæ’­æ”¾å¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 			return false;
 		}
 	}
@@ -522,12 +522,12 @@ bool HanBang_videoserver::StopPlayBack(download_handle_t playbackHandle, __int32
 	{
 		char szLog[1024];
 		ZeroMemory(szLog, 1024);
-		sprintf(szLog, "StopPlayBack ¿ªÊ¼Í£Ö¹²¥·Å playbackHandle:%d", playbackHandle);
+		sprintf(szLog, "StopPlayBack å¼€å§‹åœæ­¢æ’­æ”¾ playbackHandle:%d", playbackHandle);
 		g_log.AddLog(string(szLog));
 		if (!Api_HanBang::Api().m_pStopPlayBack(playbackHandle))
 		{
 			m_sLastError = GetLastErrorString();
-			g_log.AddLog(string("StopPlayBack Í£Ö¹²¥·ÅÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+			g_log.AddLog(string("StopPlayBack åœæ­¢æ’­æ”¾å¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
 			return false;
 		}
 	}
@@ -541,19 +541,19 @@ bool HanBang_videoserver::stopDownload(download_handle_t h)
     return true;
 	if (0 >= m_lLoginHandle)
 	{
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		g_log.AddLog(string("stopDownload ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
+		g_log.AddLog(string("stopDownload è¯·å…ˆç™»å½•"));
 		return false;
 	}
-	g_log.AddLog(string("stopDownload ¿ªÊ¼Í£Ö¹ÏÂÔØ"));
+	g_log.AddLog(string("stopDownload å¼€å§‹åœæ­¢ä¸‹è½½"));
 
 	{
 		Mutex::ScopedLock lock(m_mtxdown);
 		auto itr = m_mapDownInfo.find(h);
 		if (itr == m_mapDownInfo.end())
 		{
-			m_sLastError = "¸ÃÎÄ¼ş²»´æÔÚ";
-			g_log.AddLog(string("getDownloadPos ¸ÃÎÄ¼ş²»´æÔÚ"));
+			m_sLastError = "è¯¥æ–‡ä»¶ä¸å­˜åœ¨";
+			g_log.AddLog(string("getDownloadPos è¯¥æ–‡ä»¶ä¸å­˜åœ¨"));
 			return false;
 		}
 		m_mapDownInfo.erase(itr);
@@ -561,7 +561,7 @@ bool HanBang_videoserver::stopDownload(download_handle_t h)
     if (FALSE == Api_HanBang::Api().m_pStopDownload(h))
     {
 		m_sLastError = GetLastErrorString();
-		g_log.AddLog(string("stopDownload Í£Ö¹ÏÂÔØÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+		g_log.AddLog(string("stopDownload åœæ­¢ä¸‹è½½å¤±è´¥ï¼Œé”™è¯¯åŸå› ï¼š") + m_sLastError);
         return false;
     }
 
@@ -574,14 +574,14 @@ bool HanBang_videoserver::getPlayBackPos(__int64 playbackHandle, __int32* pos)
     return false;
 	if (0 >= m_lLoginHandle)
 	{
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		g_log.AddLog(string("getDownloadPos ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
+		g_log.AddLog(string("getDownloadPos è¯·å…ˆç™»å½•"));
 		return false;
 	}
 	BOOL bRet = Api_HanBang::Api().m_pPlayBackControl(playbackHandle, HB_SDVR_PLAYGETPOS, NULL, (DWORD *)pos);
 	if (bRet < 0)
 	{
-		g_log.AddLog(string("getDownloadPos »ñÈ¡²¥·Å½ø¶ÈÊ§°Ü"));
+		g_log.AddLog(string("getDownloadPos è·å–æ’­æ”¾è¿›åº¦å¤±è´¥"));
 		return false;
 	}
 	char szLog[1024];
