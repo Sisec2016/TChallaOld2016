@@ -43,39 +43,39 @@ DisableWelcomePage=no
 Name: "chinesesimp"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; 		Description: "{cm:CreateDesktopIcon}"; 		GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
+Name: "quicklaunchicon"; 	Description: "{cm:CreateQuickLaunchIcon}"; 	GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\work\downloadVideo\bin\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\fast_video.db"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\auto.bat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\*.sys"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\*.dll"; 						DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\fast_video.db"; 				DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\auto.bat"; 						DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\*.sys"; 						DestDir: "{app}"; Flags: ignoreversion
 
-Source: "D:\work\downloadVideo\bin\CodeClient.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\CreateVolume_Client.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\download.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\FastVideo.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\MountVolume_Client.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\Start.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\work\downloadVideo\bin\VideoService.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\CodeClient.exe"; 				DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\CreateVolume_Client.exe"; 		DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\download.exe"; 					DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\FastVideo.exe"; 				DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\MountVolume_Client.exe"; 		DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\Start.exe"; 					DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\VideoService.exe"; 				DestDir: "{app}"; Flags: ignoreversion
 
-Source: "D:\work\downloadVideo\bin\DaHuaTool\*"; DestDir: "{app}\DaHuaTool"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\factorys\*"; DestDir: "{app}\factorys"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\hikPlay\*"; DestDir: "{app}\hikPlay"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\image\*"; DestDir: "{app}\image"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\screenRecord\*"; DestDir: "{app}\screenRecord"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\sqldrivers\*"; DestDir: "{app}\sqldrivers"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\work\downloadVideo\bin\tool\*"; DestDir: "{app}\tool"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\DaHuaTool\*"; 					DestDir: "{app}\DaHuaTool"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\factorys\*"; 					DestDir: "{app}\factorys"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\hikPlay\*"; 					DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\image\*"; 						DestDir: "{app}\image"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\platforms\*"; 					DestDir: "{app}\platforms"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\screenRecord\*"; 				DestDir: "{app}\screenRecord"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\sqldrivers\*"; 					DestDir: "{app}\sqldrivers"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\tool\*"; 						DestDir: "{app}\tool"; 			Flags: ignoreversion recursesubdirs createallsubdirs
 ; 注意: 不要在任何共享系统文件上使用“Flags: ignoreversion”
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
-Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
+Name: "{group}\{#MyAppName}"; 													Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; 								Filename: "{#MyAppURL}"
+Name: "{commondesktop}\{#MyAppName}"; 											Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; 	Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
 
 [Run]
-Filename: "{app}\auto.bat"; Description: "自动注册"; Flags: skipifsilent shellexec runhidden nowait postinstall
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\auto.bat"; 			Description: "自动注册"; 				Flags: skipifsilent shellexec runhidden nowait postinstall
+Filename: "{app}\{#MyAppExeName}"; 		Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

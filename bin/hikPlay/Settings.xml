@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Settings>
+    <CaptureSaveType>
+        <Value>0</Value>
+    </CaptureSaveType>
+    <CaptureSavePath>
+        <Value>C:/</Value>
+    </CaptureSavePath>
+    <ClipPackageSize>
+        <Value>1</Value>
+    </ClipPackageSize>
+    <ClipSavePath>
+        <Value>C:/</Value>
+    </ClipSavePath>
+    <DownloadPackageSize>
+        <Value>1</Value>
+    </DownloadPackageSize>
+    <DownloadSavePath>
+        <Value>C:/</Value>
+    </DownloadSavePath>
+</Settings>

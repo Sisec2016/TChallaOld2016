@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configs>
+	<Translator>
+		<Value>1</Value>
+	</Translator>
+	<LogLevel>
+		<Value>0</Value>
+	</LogLevel>
+	<VersionType>
+		<Value>1</Value>
+	</VersionType>
+</Configs>
