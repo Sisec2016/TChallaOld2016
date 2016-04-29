@@ -188,8 +188,8 @@ void ProtobufClient::replyFinished(QNetworkReply *reply)
      if(reply->error() == QNetworkReply::NoError)
      {
          qDebug()<<"no error.....";
-         //QByteArray bytes = reply->readAll();  //获取字节
-         //QString result(bytes);  //转化为字符串
+         //QByteArray bytes = reply->readAll();  //鑾峰彇瀛楄妭
+         //QString result(bytes);  //杞寲涓哄瓧绗︿覆
          //qDebug()<<result;
      }
      else{

@@ -1,4 +1,4 @@
-#include "safedisk.h"
+ï»¿#include "safedisk.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QApplication>
@@ -49,17 +49,17 @@ bool SafeDisk::init(){
             return false;
         }
 
-        char szSSDDeviceName[MAX_SAGE_SSD_COUNT][32];		//SSDÉè±¸ÎïÀíÅÌÃû³Æ
-        UINT32 nSSDDeviceNum ;//SSD Éè±¸¸öÊı
-        UINT32 retValue = EnumSageSSDDev( szSSDDeviceName , nSSDDeviceNum ); //»ñÈ¡ËùÓĞµÄÀ½¶ÜSSD
+        char szSSDDeviceName[MAX_SAGE_SSD_COUNT][32];		//SSDè®¾å¤‡ç‰©ç†ç›˜åç§°
+        UINT32 nSSDDeviceNum ;//SSD è®¾å¤‡ä¸ªæ•°
+        UINT32 retValue = EnumSageSSDDev( szSSDDeviceName , nSSDDeviceNum ); //è·å–æ‰€æœ‰çš„æ¾œç›¾SSD
         if (0 != retValue)
         {
-            qDebug()<<QStringLiteral("Î´ÕÒµ½À½¶Ü¼ÓÃÜSSD£¡");
-            QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("Î´ÕÒµ½À½¶Ü¼ÓÃÜSSD£¡"));
+            qDebug()<<QStringLiteral("æœªæ‰¾åˆ°æ¾œç›¾åŠ å¯†SSDï¼");
+            QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("æœªæ‰¾åˆ°æ¾œç›¾åŠ å¯†SSDï¼"));
             return false;
         }else if (1 < nSSDDeviceNum)
         {
-            QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("¼ì²âµ½¶à¸öÀ½¶Ü¼ÓÃÜSSD£¬Çë°Î³öÆäËûSSD"));
+            QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("æ£€æµ‹åˆ°å¤šä¸ªæ¾œç›¾åŠ å¯†SSDï¼Œè¯·æ‹”å‡ºå…¶ä»–SSD"));
             return false;
         }
 
@@ -102,7 +102,7 @@ bool SafeDisk::verifyPasswd(const QString& sPassword){
     BOOL isSuc = VerifyLoginPasswordA_SageAPI(m_szDeviceName, (char *)pw.c_str());
     if (!isSuc)
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("ÃÜÂë´íÎó£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("å¯†ç é”™è¯¯ï¼"));
         return false;
     }
 
@@ -122,12 +122,12 @@ bool SafeDisk::login(const QString& sPassword){
     if (!verifyPasswd(sPassword)){
         return false;
     }
-    //»ñÈ¡µ±Ç°SSDĞÅÏ¢
+    //è·å–å½“å‰SSDä¿¡æ¯
     ZeroMemory( (void*)&m_safeDiskInfo , sizeof( SafeDiskInfo ) ) ;
     int retValue = GetSafeDiskInfoFromDeviceA_SageAPI(m_szDeviceName , &m_safeDiskInfo ) ;
     if ( 0 != retValue )
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("»ñÈ¡SSDĞÅÏ¢Ê§°Ü£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("è·å–SSDä¿¡æ¯å¤±è´¥ï¼"));
         return false;
     }
 
@@ -135,19 +135,19 @@ bool SafeDisk::login(const QString& sPassword){
     retValue = GetSecurityDiskInfoFromDeviceA_SageAPI( m_szDeviceName , m_safeDiskInfo.m_nPCNumber , SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo ) ;
     if (0 != retValue)
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("»ñÈ¡ÅäÖÃĞÅÏ¢Ê§°Ü£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("è·å–é…ç½®ä¿¡æ¯å¤±è´¥ï¼"));
         return false;
     }
     else
     {
-        qDebug()<< (QString(QStringLiteral("µ±Ç°PCÉÏ´´½¨ÁË%1¸ö°²È«Çø£¡")).arg(m_secDiskInfo.m_nVirDiskCnt));
+        qDebug()<< (QString(QStringLiteral("å½“å‰PCä¸Šåˆ›å»ºäº†%1ä¸ªå®‰å…¨åŒºï¼")).arg(m_secDiskInfo.m_nVirDiskCnt));
     }
 
     memset( m_szPSN , 0x00 , 32 ) ;
     retValue = GetSageSSDPsn( m_szDeviceName, m_szPSN ) ;
     if (  0 != retValue )
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("»ñÈ¡PSNÊ§°Ü£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("è·å–PSNå¤±è´¥ï¼"));
         return false;
     }
 
@@ -173,18 +173,18 @@ bool SafeDisk::Mount(const QWidget& wd){
     mountExe.replace("/", "\\");
     for ( UINT i = 0 , j = 1 ; i < MAX_VIRDISK_NUM  ; i++)
     {
-        if ( EXIST_MARK != m_secDiskInfo.m_VirDiskInfo[i].m_IsExist)//Èç¹û±êÖ¾Î»²»´æÔÚÔòÌø¹ı±¾´ÎÑ­»·
+        if ( EXIST_MARK != m_secDiskInfo.m_VirDiskInfo[i].m_IsExist)//å¦‚æœæ ‡å¿—ä½ä¸å­˜åœ¨åˆ™è·³è¿‡æœ¬æ¬¡å¾ªç¯
         {
             continue;
         }
     qDebug()<< __FUNCTION__<<"  "<<__LINE__;
         MountSecurityDiskParam aMountParam ;
         aMountParam.hwnd = (HWND)wd.winId();
-        int n = strlen((char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath); //»ñÈ¡strµÄ×Ö·ûÊı
+        int n = strlen((char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath); //è·å–strçš„å­—ç¬¦æ•°
         int len = MultiByteToWideChar(CP_ACP, 0, (char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath , n , NULL, 0 );
-        WCHAR *pWChar = new WCHAR[len + 1]; //ÒÔ×Ö½ÚÎªµ¥Î»
+        WCHAR *pWChar = new WCHAR[len + 1]; //ä»¥å­—èŠ‚ä¸ºå•ä½
         MultiByteToWideChar(CP_ACP, 0, (char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath , n , pWChar, len );
-        pWChar[len] = '\0'; //¶à×Ö½Ú×Ö·ûÒÔ'\0'½áÊø
+        pWChar[len] = '\0'; //å¤šå­—èŠ‚å­—ç¬¦ä»¥'\0'ç»“æŸ
         memcpy( aMountParam.wDiskImageFilePath , (void*)pWChar , VDISK_NAME_LEN*2 );
         delete[] pWChar;
     qDebug()<< __FUNCTION__<<"  "<<__LINE__;
@@ -203,7 +203,7 @@ bool SafeDisk::Mount(const QWidget& wd){
         }
     qDebug()<< __FUNCTION__<<"  "<<__LINE__;
         std::shared_ptr<bool> bCanGoOn = std::make_shared<bool>(false);
-        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("ÕıÔÚ´´½¨°²È«ÇøÖĞ..."), [&]()
+        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("æ­£åœ¨åˆ›å»ºå®‰å…¨åŒºä¸­..."), [&]()
         {
             retValue = WaitForSingleObject(m_hEventMount, INFINITE) ;
             *bCanGoOn = true;
@@ -226,9 +226,9 @@ bool SafeDisk::Mount(const QWidget& wd){
             m_nProcessStateMount = MESSAGE_NO_COME;
             break; //break the loop
         case SAGE_API_ERR_LETTER_NO_EXIST:
-            QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("ÎŞ·¨»ñÈ¡ÏµÍ³¿ÉÓÃÅÌ·û£¬²¿·Ö°²È«ÇøÎŞ·¨¹ÒÔØ£¬\r\nÄú¿ÉÒÔ³¢ÊÔÖØÆôµçÄÔ²Ù×÷£¡"));
+            QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("æ— æ³•è·å–ç³»ç»Ÿå¯ç”¨ç›˜ç¬¦ï¼Œéƒ¨åˆ†å®‰å…¨åŒºæ— æ³•æŒ‚è½½ï¼Œ\r\næ‚¨å¯ä»¥å°è¯•é‡å¯ç”µè„‘æ“ä½œï¼"));
         default:
-            DWORD nErr = GetLastError();
+            //DWORD nErr = GetLastError();
             m_secDiskInfo.m_VirDiskInfo[i].m_nIsMount = 0 ;
             m_secDiskInfo.m_VirDiskInfo[i].m_chDiskLetter = 0 ;
             break; // unexpected failure
@@ -237,7 +237,7 @@ bool SafeDisk::Mount(const QWidget& wd){
         j++;
     }
     qDebug()<< __FUNCTION__<<"  "<<__LINE__;
-    SetSecurityDiskInfoA_SageAPI( m_szDeviceName, m_safeDiskInfo.m_nPCNumber, SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo);//ĞŞ¸Ä±¾PCÉÏµÄ°²È«ÇøĞÅÏ¢
+    SetSecurityDiskInfoA_SageAPI( m_szDeviceName, m_safeDiskInfo.m_nPCNumber, SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo);//ä¿®æ”¹æœ¬PCä¸Šçš„å®‰å…¨åŒºä¿¡æ¯
     qDebug()<< __FUNCTION__<<"  "<<__LINE__;
     return true;
 
@@ -254,12 +254,12 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     VirDiskInfo& vdi = m_secDiskInfo.m_VirDiskInfo[0];
     vdi.m_nIsMount = 0x01 ;
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
-    //´´½¨°²È«Çø¾µÏñ´æ´¢ÎÄ¼ş¼Ğ
+    //åˆ›å»ºå®‰å…¨åŒºé•œåƒå­˜å‚¨æ–‡ä»¶å¤¹
     QDir d(DISK_LETTER_DATA"/VultureSafeArea");
     if (!d.exists())
     {
         d.mkpath(DISK_LETTER_DATA"/VultureSafeArea");
-        SetFileAttributesA( DISK_LETTER_DATA"\\VultureSafeArea" , FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM ); //Òş²Ø
+        SetFileAttributesA( DISK_LETTER_DATA"\\VultureSafeArea" , FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM ); //éšè—
     }
 
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
@@ -270,10 +270,10 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
 
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
     CHAR chLetter = 0;
-    *pRetValue = GetVailLunA_SageAPI(&chLetter , 'H');//»ñÈ¡Ò»¸ö¿ÉÓÃÅÌ·û
+    *pRetValue = GetVailLunA_SageAPI(&chLetter , 'H');//è·å–ä¸€ä¸ªå¯ç”¨ç›˜ç¬¦
     if (0 != *pRetValue )
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("ÎŞ·¨»ñÈ¡ÏµÍ³¿ÉÓÃÅÌ·û£¬ÇëÖØÆôµçÄÔºó²Ù×÷£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("æ— æ³•è·å–ç³»ç»Ÿå¯ç”¨ç›˜ç¬¦ï¼Œè¯·é‡å¯ç”µè„‘åæ“ä½œï¼"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
     }
@@ -287,17 +287,17 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     ULARGE_INTEGER FreeAv, TotalBytes, FreeBytes;
     if (!GetDiskFreeSpaceExA(DISK_LETTER_DATA ,&FreeAv, &TotalBytes, &FreeBytes))
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("ĞèÒªÓĞDÅÌ·ÖÇøÀ´´´½¨°²È«Çø£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("éœ€è¦æœ‰Dç›˜åˆ†åŒºæ¥åˆ›å»ºå®‰å…¨åŒºï¼"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
     }
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
     securityDiskParam.nDiskCapacity = FreeBytes.QuadPart / 1024 / 1024;
-    int n = strlen((char*)vdi.m_chFilePath); //»ñÈ¡strµÄ×Ö·ûÊı
+    int n = strlen((char*)vdi.m_chFilePath); //è·å–strçš„å­—ç¬¦æ•°
     int len = MultiByteToWideChar(CP_ACP, 0, (char*)vdi.m_chFilePath , n , NULL, 0 );
-    WCHAR *pWChar = new WCHAR[len + 1]; //ÒÔ×Ö½ÚÎªµ¥Î»
+    WCHAR *pWChar = new WCHAR[len + 1]; //ä»¥å­—èŠ‚ä¸ºå•ä½
     MultiByteToWideChar(CP_ACP, 0, (char*)vdi.m_chFilePath , n , pWChar, len );
-    pWChar[len] = '\0'; //¶à×Ö½Ú×Ö·ûÒÔ'\0'½áÊø
+    pWChar[len] = '\0'; //å¤šå­—èŠ‚å­—ç¬¦ä»¥'\0'ç»“æŸ
     memcpy(securityDiskParam.wDiskImageFilePath , (void*)pWChar , VDISK_NAME_LEN*2 );
     delete[] pWChar;
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
@@ -312,13 +312,13 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     *pRetValue = CreateSecurityDiskW_SageAPI(createExe.toStdWString().c_str() , securityDiskParam) ;
     if (*pRetValue == 0)
     {
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("´´½¨°²È«Çø½ø³Ì³ö´í£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("åˆ›å»ºå®‰å…¨åŒºè¿›ç¨‹å‡ºé”™ï¼"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
     }
 
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
-    CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("ÕıÔÚ´´½¨°²È«ÇøÖĞ..."), [=]()
+    CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("æ­£åœ¨åˆ›å»ºå®‰å…¨åŒºä¸­..."), [=]()
     {
         *pRetValue = WaitForSingleObject(m_hEventCreate, 80000) ;
         *bCanGoOn = true;
@@ -332,30 +332,30 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     switch ( *pRetValue )
     {
     case WAIT_OBJECT_0:
-        // hProcessËù´ú±íµÄ½ø³ÌÔÚ80ÃëÄÚ½áÊø
+        // hProcessæ‰€ä»£è¡¨çš„è¿›ç¨‹åœ¨80ç§’å†…ç»“æŸ
         if (m_nProcessState != 0 )
         {
             m_nProcessState = MESSAGE_NO_COME;
-            GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//»ñÈ¡USBÉè±¸ĞÅÏ¢
+            GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//è·å–USBè®¾å¤‡ä¿¡æ¯
             *pRetValue = RETURN_FAILED;
-            QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("´´½¨Ê§°Ü£¡"));
+            QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("åˆ›å»ºå¤±è´¥ï¼"));
             goto EXIT2;
         }
         break;
     case WAIT_TIMEOUT:
-        // µÈ´ıÊ±¼ä³¬¹ı80Ãë
+        // ç­‰å¾…æ—¶é—´è¶…è¿‡80ç§’
         m_nProcessState = MESSAGE_NO_COME;
-        GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//»ñÈ¡USBÉè±¸ĞÅÏ¢
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("´´½¨³ö´í£¬³¬Ê±·µ»Ø£¡"));
+        GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//è·å–USBè®¾å¤‡ä¿¡æ¯
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("åˆ›å»ºå‡ºé”™ï¼Œè¶…æ—¶è¿”å›ï¼"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
         break;
     case WAIT_FAILED:
-        // º¯Êıµ÷ÓÃÊ§°Ü£¬±ÈÈç´«µİÁËÒ»¸öÎŞĞ§µÄ¾ä±ú
+        // å‡½æ•°è°ƒç”¨å¤±è´¥ï¼Œæ¯”å¦‚ä¼ é€’äº†ä¸€ä¸ªæ— æ•ˆçš„å¥æŸ„
         m_nProcessState = MESSAGE_NO_COME;
-        GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//»ñÈ¡USBÉè±¸ĞÅÏ¢
+        GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//è·å–USBè®¾å¤‡ä¿¡æ¯
 
-        QMessageBox::information(nullptr, QStringLiteral("ĞÅÏ¢"), QStringLiteral("´´½¨Ê§°Ü£¬³ö´í·µ»Ø£¡"));
+        QMessageBox::information(nullptr, QStringLiteral("ä¿¡æ¯"), QStringLiteral("åˆ›å»ºå¤±è´¥ï¼Œå‡ºé”™è¿”å›ï¼"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
         break;
@@ -364,10 +364,10 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
     m_safeDiskInfo.m_nCurIndex = m_safeDiskInfo.m_nPCNumber ;
     m_safeDiskInfo.m_nBlockIndex[m_safeDiskInfo.m_nPCNumber] = EXIST_MARK ;
-    SetSafeDiskInfoA_SageAPI( m_szDeviceName , &m_safeDiskInfo );//ĞŞ¸ÄUÅÌĞÅÏ¢
+    SetSafeDiskInfoA_SageAPI( m_szDeviceName , &m_safeDiskInfo );//ä¿®æ”¹Uç›˜ä¿¡æ¯
 
 
-    //ĞŞ¸Ä¾íÇøÃû³Æ
+    //ä¿®æ”¹å·åŒºåç§°
 //    USES_CONVERSION ;
     char strTemp[32];
     sprintf(strTemp, "%c:\\", chLetter);
@@ -377,25 +377,24 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     vdi.m_IsExist = EXIST_MARK ;
     memcpy( m_secDiskInfo.m_szPSN , m_szPSN , 32 ) ;
     SetSecurityDiskInfoA_SageAPI( m_szDeviceName, m_safeDiskInfo.m_nPCNumber ,
-        SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo );//ĞŞ¸Ä±¾PCÉÏµÄ°²È«ÇøĞÅÏ¢
+        SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo );//ä¿®æ”¹æœ¬PCä¸Šçš„å®‰å…¨åŒºä¿¡æ¯
     *pRetValue = securityDiskParam.iDriverNo;
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
 EXIT2:
     CloseHandle(m_hEventCreate);
     m_hEventCreate = NULL;
-    if ( m_secDiskInfo.m_nVirDiskCnt > 0 ) //°²È«Çø²»´æÔÚÊ±²»ĞèÒª¸üĞÂÅäÖÃÊı¾İ
+    if ( m_secDiskInfo.m_nVirDiskCnt > 0 ) //å®‰å…¨åŒºä¸å­˜åœ¨æ—¶ä¸éœ€è¦æ›´æ–°é…ç½®æ•°æ®
     {
         GetSecurityDiskInfoFromDeviceA_SageAPI( m_szDeviceName , m_safeDiskInfo.m_nPCNumber ,
             SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo ) ;
     }
     qDebug()<<__FUNCTION__<<" "<<__LINE__;
-EXIT1:
     return *pRetValue != RETURN_FAILED;;
 }
 
 bool SafeDisk::MyDriverAttach()
 {
-    //ÅĞ¶Ï²Ù×÷ÏµÍ³32 ¡¢64
+    //åˆ¤æ–­æ“ä½œç³»ç»Ÿ32 ã€64
     BOOL bWow64 = TRUE ;
     typedef BOOL (__stdcall *LPFN_ISWOW64PROCESS ) (HANDLE hProcess,PBOOL Wow64Process);
     LPFN_ISWOW64PROCESS fnIsWow64Process;
@@ -422,12 +421,12 @@ bool SafeDisk::MyDriverAttach()
     UINT32 retValue = MyDriverAttachW_SageAPI((WCHAR*)createDriver.toStdWString().c_str() );
     if ( 0 != retValue)
     {
-        qDebug()<<QStringLiteral("À½¶ÜÇı¶¯°²×°»ò¼ÓÔØÊ§°Ü£¡Â·¾¶£º")<<createDriver;
+        qDebug()<<QStringLiteral("æ¾œç›¾é©±åŠ¨å®‰è£…æˆ–åŠ è½½å¤±è´¥ï¼è·¯å¾„ï¼š")<<createDriver;
         return false;
     }
     else
     {
-         qDebug()<<QStringLiteral("À½¶ÜÇı¶¯°²×°»ò¼ÓÔØ³É¹¦£¡Â·¾¶£º")<<createDriver;
+         qDebug()<<QStringLiteral("æ¾œç›¾é©±åŠ¨å®‰è£…æˆ–åŠ è½½æˆåŠŸï¼è·¯å¾„ï¼š")<<createDriver;
          return true;
     }
 }
