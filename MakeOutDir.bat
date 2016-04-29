@@ -1,0 +1,11 @@
+@echo off
+MD .\bin\DaHuaTool
+MD .\bin\datas
+MD .\bin\factorys
+MD .\bin\file
+MD .\bin\hikPlay
+MD .\bin\log
+MD .\bin\platforms
+MD .\bin\screenRecord
+MD .\bin\sqldrivers
+MD .\bin\tool
