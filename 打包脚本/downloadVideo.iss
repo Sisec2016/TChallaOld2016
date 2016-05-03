@@ -2,7 +2,7 @@
 ; 有关创建 Inno Setup 脚本文件的详细资料请查阅帮助文档！
 
 #define MyAppName "VideoDownLoad"
-#define MyAppVersion "v1.2.3"
+#define MyAppVersion "v1.2.3 beta"
 #define MyAppPublisher "龙脉安信"
 #define MyAppURL "http://www.rmax.com/"
 #define MyAppExeName "FastVideo.exe"
@@ -47,27 +47,29 @@ Name: "desktopicon"; 		Description: "{cm:CreateDesktopIcon}"; 		GroupDescription
 Name: "quicklaunchicon"; 	Description: "{cm:CreateQuickLaunchIcon}"; 	GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\bin\*.dll"; 						DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\fast_video.db"; 				DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\auto.bat"; 						DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\*.sys"; 						DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\*.dll"; 												DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\fast_video.db"; 										DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\auto.bat"; 												DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\*.sys"; 												DestDir: "{app}"; Flags: ignoreversion
+								
+;Source: "..\bin\CodeClient.exe"; 										DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\CreateVolume_Client.exe"; 								DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\MountVolume_Client.exe"; 								DestDir: "{app}"; Flags: ignoreversion
+	
+Source: "..\bin\Release\download.exe"; 									DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\Release\FastVideov1.exe"; 								DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\Release\Start.exe"; 									DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\Release\VideoService.exe"; 								DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\Release\videoReg.exe"; 									DestDir: "{app}"; Flags: ignoreversion
 
-Source: "..\bin\CodeClient.exe"; 				DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\CreateVolume_Client.exe"; 		DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\download.exe"; 					DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\FastVideo.exe"; 				DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\MountVolume_Client.exe"; 		DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Start.exe"; 					DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VideoService.exe"; 				DestDir: "{app}"; Flags: ignoreversion
-
-Source: "..\bin\DaHuaTool\*"; 					DestDir: "{app}\DaHuaTool"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\factorys\*"; 					DestDir: "{app}\factorys"; 		Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\hikPlay\*"; 					DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\image\*"; 						DestDir: "{app}\image"; 		Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\platforms\*"; 					DestDir: "{app}\platforms"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\screenRecord\*"; 				DestDir: "{app}\screenRecord"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\sqldrivers\*"; 					DestDir: "{app}\sqldrivers"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\tool\*"; 						DestDir: "{app}\tool"; 			Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\DaHuaTool\*"; 					  						DestDir: "{app}\DaHuaTool"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\factorys\*"; 		Excludes:"*.lib;*.pdb";				DestDir: "{app}\factorys"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\hikPlay\*"; 											DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\images\*"; 												DestDir: "{app}\images"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\platforms\*"; 											DestDir: "{app}\platforms"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\screenRecord\*"; 										DestDir: "{app}\screenRecord"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\sqldrivers\*"; 											DestDir: "{app}\sqldrivers"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\tool\*"; 												DestDir: "{app}\tool"; 			Flags: ignoreversion recursesubdirs createallsubdirs
 ; 注意: 不要在任何共享系统文件上使用“Flags: ignoreversion”
 
 [Icons]
