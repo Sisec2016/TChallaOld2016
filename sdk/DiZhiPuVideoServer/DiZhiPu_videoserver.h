@@ -1,31 +1,34 @@
+#ifndef DiZhiPu_VIDEOSERVER_H
+#define DiZhiPu_VIDEOSERVER_H
+#include "IVideoServer.h"
+#include <memory>
+#include <string>
+#include <map>
+using std::map;
+using std::string;
+/*#include "Api_DiZhiPu.h"*/
+#include "Poco/Mutex.h"
+#include "netsdk.h"
 
-#ifndef GZLL_VIDEOSERVER_H
-#define GZLL_VIDEOSERVER_H
-#include "../../VideoServer/IVideoServer.h"
-#include <qdatetime.h>
-#include <boost/thread.hpp>
-#include <QObject>
-#include <QFileInfo>
-#include <boost/thread/recursive_mutex.hpp>
+using Poco::Mutex;
 
-#ifndef CALL_METHOD
-#define CALL_METHOD __stdcall
-#endif
-
-class CFactory : public IVideoServerFactory
+class CFactoryDiZhiPu : public IVideoServerFactory
 {
 public:
-    CFactory();
-    ~CFactory();
+    CFactoryDiZhiPu();
+    ~CFactoryDiZhiPu();
+
+    bool init();
+    void clean();
 
     virtual const char* name()
     {
-        return "µÏÖÇÆÖ";
+        return "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
     }
 
     virtual int defaultPort()
     {
-        return 34567;
+		return 34567;
     }
     virtual const char* defaultUser()
     {
@@ -36,61 +39,62 @@ public:
     {
         return "";
     }
-    bool init();
-    void clean();
     virtual DeviceFactory factory()
     {
-        return SISC_IPC_DIZHIPU;
+        return ETIM_IPC_DIZHIPU;
     }
 
-    virtual void videoFileExterns(std::vector<std::string>& externs)
+    virtual void videoFileExterns(std::vector<std::string >& externs)
     {
         externs.push_back("h264");
+        //externs.push_back("dav");
     }
 
     virtual IVideoServer* create();
 
 };
 
-class H264_DVR_FILE_DATA;
-class gzll_videoserver : public IVideoServer
+typedef struct
 {
-    friend class CFactory;
+	__time64_t iTotalSize;
+	__time64_t iCurSize;
+	int iPercent;
+}stPos_DownPlay;
+
+class dizhipu_videoserver : public IVideoServer
+{
+    friend class CFactoryDiZhiPu;
 public:
-    static boost::recursive_mutex sMtServers;
-    static std::vector<gzll_videoserver*> sServers;
-public:
-    gzll_videoserver();
-    ~gzll_videoserver();
+    dizhipu_videoserver();
+    ~dizhipu_videoserver();
 
     virtual IVideoServer* clone();
-    virtual bool login(const char* IP, __int32 port, const char* user,
-                       const char* password, std::map<__int32, std::string>& channels);
+    virtual bool login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string >& channels);
     virtual bool logout();
-    virtual bool downLoad(const char* saveFileName, int nChannelId,__time64_t timeStart,
-                          __time64_t timeEnd, download_handle_t& hdl);
-
-    virtual bool GetRecordFileList(std::vector<RecordFile>& files, __int32 nChannelId, __time64_t timeStart,
-                                   __time64_t timeEnd);
-    virtual bool GetRecordFileList(std::vector<RecordFile>& files, /*__int32 nChannelId*/const std::vector<int>& channelVec, __time64_t timeStart,
-                                    __time64_t timeEnd);
-
-    virtual void ClearRecordFileList()
-    {
-    }
+	virtual bool GetRecordFileList(std::vector<RecordFile>& files, std::vector<int>& channelVec, __time64_t timeStart,
+                                                 __time64_t timeEnd);
 
     virtual bool downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl);
     virtual bool stopDownload(download_handle_t h);
-    virtual bool PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle);
-    virtual bool SetPlayBack(__int64 playbackHandle, __int32 pos);
-    virtual bool getPlayBackPos(__int64 playbackHandle, __int32* pos);
-    virtual bool StopPlayBack(__int64 playbackHandle,__int32 mPause);
+    virtual bool  PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle);
+    bool SetPlayBack(__int64 playbackHandle, __int32 pos);
+	virtual bool StopPlayBack(__int64 playbackHandle,__int32 mPause);
+	virtual bool getPlayBackPos(__int64 playbackHandle, __int32* pos);
+	virtual bool getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed);
+private:
+    const RecordFile* m_playFile;
+    __time64_t mStartPlayTime;
 
 protected:
-    long m_lLoginHandle;
-    long m_hPlayBack;
-private:
-    bool isConnected();
+
+    H264_DVR_DEVICEINFO m_deviceInfo;
+	Mutex m_mtx;
+	map<string, H264_DVR_FILE_DATA> m_mapArcItem;
+	map<long long, RecordFile> m_mapDownloadOrPlay;
+public:
+	Mutex m_mtxPos;
+	map<long long, stPos_DownPlay> m_mapPosDownPlay;
 };
 
-#endif // GZLL_VIDEOSERVER_H
+
+#endif // HIKAN_VIDEOSERVER_H

@@ -138,11 +138,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\VideoServer\log.cpp" />
+    <ClCompile Include="Api_DiZhiPu.cpp" />
     <ClCompile Include="DiZhiPu_videoserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\VideoServer\IVideoServer.h" />
     <ClInclude Include="..\..\VideoServer\log.h" />
+    <ClInclude Include="Api_DiZhiPu.h" />
     <ClInclude Include="DiZhiPu_videoserver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

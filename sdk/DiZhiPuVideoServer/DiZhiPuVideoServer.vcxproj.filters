@@ -25,6 +25,9 @@
     <ClCompile Include="..\..\VideoServer\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Api_DiZhiPu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DiZhiPu_videoserver.h">
@@ -34,6 +37,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\VideoServer\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Api_DiZhiPu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
