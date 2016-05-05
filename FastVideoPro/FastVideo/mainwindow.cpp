@@ -58,9 +58,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
    QMenu *pMenu = new QMenu(QStringLiteral("menu"), ui->moreBtn);
 
-   QAction *updateAct = new QAction(QIcon(":/images/Update.png"), QStringLiteral("Èí¼ş¸üĞÂ"), this);
-	QAction *helpAct = new QAction(QIcon(":/images/Help.png"), QStringLiteral("°ïÖú"), this);
-	QAction *aboutAct = new QAction(QIcon(":/images/About.png"), QStringLiteral("¹ØÓÚ"), this);
+   QAction *updateAct = new QAction(QIcon(":/images/Update.png"), QStringLiteral("è½¯ä»¶æ›´æ–°"), this);
+	QAction *helpAct = new QAction(QIcon(":/images/Help.png"), QStringLiteral("å¸®åŠ©"), this);
+	QAction *aboutAct = new QAction(QIcon(":/images/About.png"), QStringLiteral("å…³äº"), this);
 
     setProductUi();
 
@@ -88,17 +88,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->fileBtn,SIGNAL(clicked()),this,SLOT(onFileBtnclicked()));
     connect(ui->userManagerBtn,SIGNAL(clicked()),this,SLOT(onuserManagerBtnclicked()));
     connect(ui->logBtn,SIGNAL(clicked()),this,SLOT(onLogBtnclicked()));
+
+	ui->diskBtn->hide();
+	ui->shareBtn->hide();
+	ui->fileBtn->hide();
+	ui->userManagerBtn->hide();
+
     mpVideoDownloadDlg = nullptr;
     qDebug()<<__FUNCTION__<<__LINE__;
 
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚ¼ÓÔØÊı¾İÖĞ..."), [=]()
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨åŠ è½½æ•°æ®ä¸­..."), [=]()
     {
         videoserverFactory::getFactorys();
 
     }, [this](bool bCancel){ });
 }
-
-
 
 MainWindow::~MainWindow()
 {
@@ -149,7 +153,7 @@ void MainWindow::setProductUi(){
         ui->labelProduct->setText(Settings::getItem(KEY_PRDUCT_NAME));
     }
     else{
-        ui->labelProduct->setText(QString::fromLocal8Bit("ÊÓÆµ¸ßËÙÏÂÔØÆ÷"));
+        ui->labelProduct->setText(QString::fromLocal8Bit("è§†é¢‘é«˜é€Ÿä¸‹è½½å™¨"));
     }
 }
 void MainWindow::changeEvent(QEvent *e)
@@ -173,27 +177,27 @@ bool MySystemShutDown()
     HANDLE hToken;
     TOKEN_PRIVILEGES tkp;
     
-    //»ñÈ¡½ø³Ì±êÖ¾
+    //è·å–è¿›ç¨‹æ ‡å¿—
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
         return false;
     
-    //»ñÈ¡¹Ø»úÌØÈ¨µÄLUID
+    //è·å–å…³æœºç‰¹æƒçš„LUID
     LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid);
     tkp.PrivilegeCount = 1;
     tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
     
-    //»ñÈ¡Õâ¸ö½ø³ÌµÄ¹Ø»úÌØÈ¨
+    //è·å–è¿™ä¸ªè¿›ç¨‹çš„å…³æœºç‰¹æƒ
     AdjustTokenPrivileges(hToken, false, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
     if (GetLastError() != ERROR_SUCCESS) return false;
     
-    // Ç¿ÖÆ¹Ø±Õ¼ÆËã»ú
+    // å¼ºåˆ¶å…³é—­è®¡ç®—æœº
     if (!ExitWindowsEx(EWX_SHUTDOWN | EWX_FORCE, 0))
         return false;
     return true;
 }
 void MainWindow::onCloseClicked()
 {
-    MessageBoxDlg msgDlg(QString::fromLocal8Bit("ÊÇ·ñÒª¹Ø»ú?"), MsgButton::Yes, MsgButton::No);
+    MessageBoxDlg msgDlg(QString::fromLocal8Bit("æ˜¯å¦è¦å…³æœº?"), MsgButton::Yes, MsgButton::No);
     msgDlg.exec();
     if (msgDlg.isConfirm() != MsgButton::Yes)
     {
@@ -209,7 +213,7 @@ void MainWindow::onCloseClicked()
 void MainWindow::onAboutClicked()
 {
 	AboutDialog aboutDlg(this);
-	//aboutDlg.setTitleName(QStringLiteral("¹ØÓÚ"));
+	//aboutDlg.setTitleName(QStringLiteral("å…³äº"));
 	aboutDlg.exec();
 }
 void MainWindow::onHelpClicked()
@@ -278,7 +282,7 @@ void MainWindow::onVideoBtnclicked()
 {
     if (nullptr == mpVideoDownloadDlg){
         mpVideoDownloadDlg = new MainDialog(this);
-        mpVideoDownloadDlg->setTitleName(QStringLiteral("ÊÓÆµÏÂÔØ"));
+        mpVideoDownloadDlg->setTitleName(QStringLiteral("è§†é¢‘ä¸‹è½½"));
     }
     execDlg(*mpVideoDownloadDlg);
 }
@@ -286,28 +290,28 @@ void MainWindow::onVideoBtnclicked()
 void MainWindow::onDiskBtnclicked()
 {
 	DiskDlg diskDlg(this);
-    diskDlg.setTitleName(QStringLiteral("´ÅÅÌµ¼³ö"));
+    diskDlg.setTitleName(QStringLiteral("ç£ç›˜å¯¼å‡º"));
     diskDlg.exec();
 }
 
 void MainWindow::onShareBtnclicked()
 {
 	ShareDlg shareDlg(this);
-    shareDlg.setTitleName(QStringLiteral("¹²Ïíµ¼³ö"));
+    shareDlg.setTitleName(QStringLiteral("å…±äº«å¯¼å‡º"));
     shareDlg.exec();
 }
 
 void MainWindow::onFTPBtnclicked()
 {
 	FTPDlg ftpDlg(this);
-   ftpDlg.setTitleName(QStringLiteral("FTPµ¼³ö"));
+   ftpDlg.setTitleName(QStringLiteral("FTPå¯¼å‡º"));
    ftpDlg.exec();
 }
 
 void MainWindow::onToolBtnclicked()
 {
 	tooldlg toolDlg1(this);
-	toolDlg1.setTitleName(QStringLiteral("ÆäËü¹¤¾ß"));
+	toolDlg1.setTitleName(QStringLiteral("å…¶å®ƒå·¥å…·"));
 	toolDlg1.exec();
     setProductUi();
 }
@@ -322,7 +326,7 @@ void MainWindow::onScreenBtnclicked()
 void MainWindow::onFileBtnclicked()
 {
 	FileManagerDlg fileDlg(this);
-	fileDlg.setTitleName(QStringLiteral("ÎÄ¼ş¹ÜÀí"));
+	fileDlg.setTitleName(QStringLiteral("æ–‡ä»¶ç®¡ç†"));
     fileDlg.exec();
 }
 
@@ -335,6 +339,6 @@ void MainWindow::onuserManagerBtnclicked()
 void MainWindow::onLogBtnclicked()
 {
      logManagerDlg logDlg(this);
-	 logDlg.setTitleName(QStringLiteral("ÈÕÖ¾¹ÜÀí"));//QLatin1String »áÏÔÊ¾ÂÒÂë
+	 logDlg.setTitleName(QStringLiteral("æ—¥å¿—ç®¡ç†"));//QLatin1String ä¼šæ˜¾ç¤ºä¹±ç 
      logDlg.exec();
 }
