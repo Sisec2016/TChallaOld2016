@@ -1,12 +1,11 @@
-#ifndef DiZhiPu_VIDEOSERVER_H
-#define DiZhiPu_VIDEOSERVER_H
+#pragma once
 #include "IVideoServer.h"
 #include <memory>
 #include <string>
 #include <map>
 using std::map;
 using std::string;
-/*#include "Api_DiZhiPu.h"*/
+
 #include "Poco/Mutex.h"
 #include "netsdk.h"
 
@@ -23,7 +22,7 @@ public:
 
     virtual const char* name()
     {
-        return "������";
+        return "dizhipu"; 
     }
 
     virtual int defaultPort()
@@ -95,6 +94,3 @@ public:
 	Mutex m_mtxPos;
 	map<long long, stPos_DownPlay> m_mapPosDownPlay;
 };
-
-
-#endif // HIKAN_VIDEOSERVER_H

@@ -18,7 +18,8 @@ pause
 
 :msbuild
 REM MSBUILD FastVideo.sln /t:%PROJECT% /p:Configuration=Debug
-MSBUILD %CD%\FastVideoPro\FastVideo.sln /t:%PROJECT% /p:Configuration=Release 2>error.log
+MSBUILD %CD%\FastVideoPro\FastVideo.sln /t:%PROJECT% /p:Configuration=Debug 2>debug.buildlog
+MSBUILD %CD%\FastVideoPro\FastVideo.sln /t:%PROJECT% /p:Configuration=Release 2>release.buildlog
 
 endlocal
 exit /b %ERRORLEVEL%

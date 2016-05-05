@@ -1,10 +1,10 @@
-#include "dizhipu_videoserver.h"
+ï»¿#include "dizhipu_videoserver.h"
 #include <iostream>
 
 #include <time.h>
 #include <io.h>
-#include "log.h"
-Log g_log("dizhipu_videoserver");
+//#include "log.h"
+//Log g_log("dizhipu_videoserver");
 
 IVideoServerFactory* VideoServerFactory()
 {
@@ -14,101 +14,74 @@ IVideoServerFactory* VideoServerFactory()
 
 DWORD ErrorTry()
 {
-	DWORD dwError;
-/*	bool bExp = false;*/
-	__try
-	{
-		//dwError = Api_DiZhiPu::Api().m_pGetLastError();
-		dwError = H264_DVR_GetLastError();
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pGetLastError()"));
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pGetLastError()"));
-// 	}
-
+	DWORD dwError = H264_DVR_GetLastError();
 	return dwError;
 }
 
 static std::string GetLastErrorString()
 {
-     DWORD dwError;
-// 	__try
-// 	{
-// 		dwError = Api_DiZhiPu::Api().m_pGetLastError();
-// 	}
-// 	__except (EXCEPTION_EXECUTE_HANDLER)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pGetLastError()"));
-// 	}
-
-	dwError = ErrorTry();
+	 DWORD dwError = ErrorTry();
 
     switch (dwError)
     {
-        case  H264_DVR_NOERROR: return "Ã»ÓĞ´íÎó";
-		case  H264_DVR_SUCCESS: return "·µ»Ø³É¹¦";
-		case  H264_DVR_SDK_NOTVALID: return "·Ç·¨ÇëÇó";
-		case  H264_DVR_NO_INIT: return "SDKÎ´¾­³õÊ¼»¯";
-		case  H264_DVR_ILLEGAL_PARAM: return "ÓÃ»§²ÎÊı²»ºÏ·¨";
-		case  H264_DVR_INVALID_HANDLE: return "¾ä±úÎŞĞ§";
-		case  H264_DVR_SDK_UNINIT_ERROR: return "SDKÇåÀí³ö´í";
-		case  H264_DVR_SDK_TIMEOUT: return "µÈ´ı³¬Ê±";
-		case  H264_DVR_SDK_MEMORY_ERROR: return "ÄÚ´æ´íÎó£¬´´½¨ÄÚ´æÊ§°Ü";
-		case  H264_DVR_SDK_NET_ERROR: return "ÍøÂç´íÎó";
-		case  H264_DVR_SDK_OPEN_FILE_ERROR: return "´ò¿ªÎÄ¼şÊ§°Ü";
-		case  H264_DVR_SDK_UNKNOWNERROR: return "Î´Öª´íÎó";
-		case  H264_DVR_DEV_VER_NOMATCH: return "ÊÕµ½Êı¾İ²»ÕıÈ·£¬¿ÉÄÜ°æ±¾²»Æ¥Åä";
-		case  H264_DVR_SDK_NOTSUPPORT: return "°æ±¾²»Ö§³Ö";
-		case  H264_DVR_OPEN_CHANNEL_ERROR: return "´ò¿ªÍ¨µÀÊ§°Ü";
-		case  H264_DVR_CLOSE_CHANNEL_ERROR: return "¹Ø±ÕÍ¨µÀÊ§°Ü";
-		case  H264_DVR_SUB_CONNECT_ERROR: return "½¨Á¢Ã½Ìå×ÓÁ¬½ÓÊ§°Ü";
-		case  H264_DVR_SUB_CONNECT_SEND_ERROR: return "Ã½Ìå×ÓÁ¬½ÓÍ¨Ñ¶Ê§°Ü";
-		case  H264_DVR_NATCONNET_REACHED_MAX: return "NatÊÓÆµÁ´½Ó´ïµ½×î´ó£¬²»ÔÊĞíĞÂµÄNatÊÓÆµÁ´½Ó";
-		case  H264_DVR_NOPOWER: return "ÎŞÈ¨ÏŞ";
-		case  H264_DVR_PASSWORD_NOT_VALID: return "ÕËºÅÃÜÂë²»¶Ô";
-		case  H264_DVR_LOGIN_USER_NOEXIST: return "ÓÃ»§²»´æÔÚ";
-		case  H264_DVR_USER_LOCKED: return "¸ÃÓÃ»§±»Ëø¶¨";
-		case  H264_DVR_USER_IN_BLACKLIST: return "¸ÃÓÃ»§²»ÔÊĞí·ÃÎÊ(ÔÚºÚÃûµ¥ÖĞ)";
-		case  H264_DVR_USER_HAS_USED: return "¸ÃÓÃ»§ÒÔµÇÂ½";
-		case  H264_DVR_USER_NOT_LOGIN: return "¸ÃÓÃ»§Ã»ÓĞµÇÂ½";
-		case  H264_DVR_CONNECT_DEVICE_ERROR: return "¿ÉÄÜÉè±¸²»´æÔÚ";
-		case  H264_DVR_ACCOUNT_INPUT_NOT_VALID: return "ÓÃ»§¹ÜÀíÊäÈë²»ºÏ·¨";
-		case  H264_DVR_ACCOUNT_OVERLAP: return "Ë÷ÒıÖØ¸´";
-		case  H264_DVR_ACCOUNT_OBJECT_NONE: return "²»´æÔÚ¶ÔÏó, ÓÃÓÚ²éÑ¯Ê±";
-		case  H264_DVR_ACCOUNT_OBJECT_NOT_VALID: return "²»´æÔÚ¶ÔÏó";
-		case  H264_DVR_ACCOUNT_OBJECT_IN_USE: return "¶ÔÏóÕıÔÚÊ¹ÓÃ";
-		case  H264_DVR_ACCOUNT_SUBSET_OVERLAP: return "×Ó¼¯³¬·¶Î§ (Èç×éµÄÈ¨ÏŞ³¬¹ıÈ¨ÏŞ±í£¬ÓÃ»§È¨ÏŞ³¬³ö×éµÄÈ¨ÏŞ·¶Î§µÈµÈ)";
-		case  H264_DVR_ACCOUNT_PWD_NOT_VALID: return "ÃÜÂë²»ÕıÈ·";
-		case  H264_DVR_ACCOUNT_PWD_NOT_MATCH: return "ÃÜÂë²»Æ¥Åä";
-		case  H264_DVR_ACCOUNT_RESERVED: return "±£ÁôÕÊºÅ";
-		case  H264_DVR_OPT_RESTART: return "±£´æÅäÖÃºóĞèÒªÖØÆôÓ¦ÓÃ³ÌĞò";
-		case  H264_DVR_OPT_REBOOT: return "ĞèÒªÖØÆôÏµÍ³";
-		case  H264_DVR_OPT_FILE_ERROR: return "Ğ´ÎÄ¼ş³ö´í";
-		case  H264_DVR_OPT_CAPS_ERROR: return "ÅäÖÃÌØĞÔ²»Ö§³Ö";
-		case  H264_DVR_OPT_VALIDATE_ERROR: return "ÅäÖÃĞ£ÑéÊ§°Ü";
-		case  H264_DVR_OPT_CONFIG_NOT_EXIST: return "ÇëÇó»òÕßÉèÖÃµÄÅäÖÃ²»´æÔÚ";
-		case  H264_DVR_CTRL_PAUSE_ERROR: return "ÔİÍ£Ê§°Ü";
-		case  H264_DVR_SDK_NOTFOUND: return "²éÕÒÊ§°Ü£¬Ã»ÓĞÕÒµ½¶ÔÓ¦ÎÄ¼ş";
-		case  H264_DVR_CFG_NOT_ENABLE: return "ÅäÖÃÎ´ÆôÓÃ";
-		case  H264_DVR_DECORD_FAIL: return "½âÂëÊ§°Ü";
-		case  H264_DVR_SOCKET_ERROR: return "´´½¨Ì×½Ú×ÖÊ§°Ü";
-		case  H264_DVR_SOCKET_CONNECT: return "Á¬½ÓÌ×½Ú×ÖÊ§°Ü";
-		case  H264_DVR_SOCKET_DOMAIN: return "ÓòÃû½âÎöÊ§°Ü";
-		case  H264_DVR_SOCKET_SEND: return "·¢ËÍÊı¾İÊ§°Ü";
-		case  H264_DVR_ARSP_NO_DEVICE: return "Ã»ÓĞ»ñÈ¡µ½Éè±¸ĞÅÏ¢£¬Éè±¸Ó¦¸Ã²»ÔÚÏß";
-		case  H264_DVR_ARSP_BUSING: return "ARSP·şÎñ·±Ã¦";
-		case  H264_DVR_ARSP_BUSING_SELECT: return "ARSP·şÎñ·±Ã¦,selectÊ§°Ü";
-		case  H264_DVR_ARSP_BUSING_RECVICE: return "ARSP·şÎñ·±Ã¦,recviceÊ§°Ü";
-		case  H264_DVR_CONNECTSERVER_ERROR: return "Á¬½Ó·şÎñÆ÷Ê§°Ü";
-		case  H264_DVR_CONNECT_FULL: return "·şÎñÆ÷Á¬½ÓÊıÒÑÂú";
-		case  H264_DVR_PIRATESOFTWARE: return "Éè±¸µÁ°æ";
-		default: return "Î´Öª´íÎó";
+        case  H264_DVR_NOERROR: return "æ²¡æœ‰é”™è¯¯";
+		case  H264_DVR_SUCCESS: return "è¿”å›æˆåŠŸ";
+		case  H264_DVR_SDK_NOTVALID: return "éæ³•è¯·æ±‚";
+		case  H264_DVR_NO_INIT: return "SDKæœªç»åˆå§‹åŒ–";
+		case  H264_DVR_ILLEGAL_PARAM: return "ç”¨æˆ·å‚æ•°ä¸åˆæ³•";
+		case  H264_DVR_INVALID_HANDLE: return "å¥æŸ„æ— æ•ˆ";
+		case  H264_DVR_SDK_UNINIT_ERROR: return "SDKæ¸…ç†å‡ºé”™";
+		case  H264_DVR_SDK_TIMEOUT: return "ç­‰å¾…è¶…æ—¶";
+		case  H264_DVR_SDK_MEMORY_ERROR: return "å†…å­˜é”™è¯¯ï¼Œåˆ›å»ºå†…å­˜å¤±è´¥";
+		case  H264_DVR_SDK_NET_ERROR: return "ç½‘ç»œé”™è¯¯";
+		case  H264_DVR_SDK_OPEN_FILE_ERROR: return "æ‰“å¼€æ–‡ä»¶å¤±è´¥";
+		case  H264_DVR_SDK_UNKNOWNERROR: return "æœªçŸ¥é”™è¯¯";
+		case  H264_DVR_DEV_VER_NOMATCH: return "æ”¶åˆ°æ•°æ®ä¸æ­£ç¡®ï¼Œå¯èƒ½ç‰ˆæœ¬ä¸åŒ¹é…";
+		case  H264_DVR_SDK_NOTSUPPORT: return "ç‰ˆæœ¬ä¸æ”¯æŒ";
+		case  H264_DVR_OPEN_CHANNEL_ERROR: return "æ‰“å¼€é€šé“å¤±è´¥";
+		case  H264_DVR_CLOSE_CHANNEL_ERROR: return "å…³é—­é€šé“å¤±è´¥";
+		case  H264_DVR_SUB_CONNECT_ERROR: return "å»ºç«‹åª’ä½“å­è¿æ¥å¤±è´¥";
+		case  H264_DVR_SUB_CONNECT_SEND_ERROR: return "åª’ä½“å­è¿æ¥é€šè®¯å¤±è´¥";
+		case  H264_DVR_NATCONNET_REACHED_MAX: return "Natè§†é¢‘é“¾æ¥è¾¾åˆ°æœ€å¤§ï¼Œä¸å…è®¸æ–°çš„Natè§†é¢‘é“¾æ¥";
+		case  H264_DVR_NOPOWER: return "æ— æƒé™";
+		case  H264_DVR_PASSWORD_NOT_VALID: return "è´¦å·å¯†ç ä¸å¯¹";
+		case  H264_DVR_LOGIN_USER_NOEXIST: return "ç”¨æˆ·ä¸å­˜åœ¨";
+		case  H264_DVR_USER_LOCKED: return "è¯¥ç”¨æˆ·è¢«é”å®š";
+		case  H264_DVR_USER_IN_BLACKLIST: return "è¯¥ç”¨æˆ·ä¸å…è®¸è®¿é—®(åœ¨é»‘åå•ä¸­)";
+		case  H264_DVR_USER_HAS_USED: return "è¯¥ç”¨æˆ·ä»¥ç™»é™†";
+		case  H264_DVR_USER_NOT_LOGIN: return "è¯¥ç”¨æˆ·æ²¡æœ‰ç™»é™†";
+		case  H264_DVR_CONNECT_DEVICE_ERROR: return "å¯èƒ½è®¾å¤‡ä¸å­˜åœ¨";
+		case  H264_DVR_ACCOUNT_INPUT_NOT_VALID: return "ç”¨æˆ·ç®¡ç†è¾“å…¥ä¸åˆæ³•";
+		case  H264_DVR_ACCOUNT_OVERLAP: return "ç´¢å¼•é‡å¤";
+		case  H264_DVR_ACCOUNT_OBJECT_NONE: return "ä¸å­˜åœ¨å¯¹è±¡, ç”¨äºæŸ¥è¯¢æ—¶";
+		case  H264_DVR_ACCOUNT_OBJECT_NOT_VALID: return "ä¸å­˜åœ¨å¯¹è±¡";
+		case  H264_DVR_ACCOUNT_OBJECT_IN_USE: return "å¯¹è±¡æ­£åœ¨ä½¿ç”¨";
+		case  H264_DVR_ACCOUNT_SUBSET_OVERLAP: return "å­é›†è¶…èŒƒå›´ (å¦‚ç»„çš„æƒé™è¶…è¿‡æƒé™è¡¨ï¼Œç”¨æˆ·æƒé™è¶…å‡ºç»„çš„æƒé™èŒƒå›´ç­‰ç­‰)";
+		case  H264_DVR_ACCOUNT_PWD_NOT_VALID: return "å¯†ç ä¸æ­£ç¡®";
+		case  H264_DVR_ACCOUNT_PWD_NOT_MATCH: return "å¯†ç ä¸åŒ¹é…";
+		case  H264_DVR_ACCOUNT_RESERVED: return "ä¿ç•™å¸å·";
+		case  H264_DVR_OPT_RESTART: return "ä¿å­˜é…ç½®åéœ€è¦é‡å¯åº”ç”¨ç¨‹åº";
+		case  H264_DVR_OPT_REBOOT: return "éœ€è¦é‡å¯ç³»ç»Ÿ";
+		case  H264_DVR_OPT_FILE_ERROR: return "å†™æ–‡ä»¶å‡ºé”™";
+		case  H264_DVR_OPT_CAPS_ERROR: return "é…ç½®ç‰¹æ€§ä¸æ”¯æŒ";
+		case  H264_DVR_OPT_VALIDATE_ERROR: return "é…ç½®æ ¡éªŒå¤±è´¥";
+		case  H264_DVR_OPT_CONFIG_NOT_EXIST: return "è¯·æ±‚æˆ–è€…è®¾ç½®çš„é…ç½®ä¸å­˜åœ¨";
+		case  H264_DVR_CTRL_PAUSE_ERROR: return "æš‚åœå¤±è´¥";
+		case  H264_DVR_SDK_NOTFOUND: return "æŸ¥æ‰¾å¤±è´¥ï¼Œæ²¡æœ‰æ‰¾åˆ°å¯¹åº”æ–‡ä»¶";
+		case  H264_DVR_CFG_NOT_ENABLE: return "é…ç½®æœªå¯ç”¨";
+		case  H264_DVR_DECORD_FAIL: return "è§£ç å¤±è´¥";
+		case  H264_DVR_SOCKET_ERROR: return "åˆ›å»ºå¥—èŠ‚å­—å¤±è´¥";
+		case  H264_DVR_SOCKET_CONNECT: return "è¿æ¥å¥—èŠ‚å­—å¤±è´¥";
+		case  H264_DVR_SOCKET_DOMAIN: return "åŸŸåè§£æå¤±è´¥";
+		case  H264_DVR_SOCKET_SEND: return "å‘é€æ•°æ®å¤±è´¥";
+		case  H264_DVR_ARSP_NO_DEVICE: return "æ²¡æœ‰è·å–åˆ°è®¾å¤‡ä¿¡æ¯ï¼Œè®¾å¤‡åº”è¯¥ä¸åœ¨çº¿";
+		case  H264_DVR_ARSP_BUSING: return "ARSPæœåŠ¡ç¹å¿™";
+		case  H264_DVR_ARSP_BUSING_SELECT: return "ARSPæœåŠ¡ç¹å¿™,selectå¤±è´¥";
+		case  H264_DVR_ARSP_BUSING_RECVICE: return "ARSPæœåŠ¡ç¹å¿™,recviceå¤±è´¥";
+		case  H264_DVR_CONNECTSERVER_ERROR: return "è¿æ¥æœåŠ¡å™¨å¤±è´¥";
+		case  H264_DVR_CONNECT_FULL: return "æœåŠ¡å™¨è¿æ¥æ•°å·²æ»¡";
+		case  H264_DVR_PIRATESOFTWARE: return "è®¾å¤‡ç›—ç‰ˆ";
+		default: return "æœªçŸ¥é”™è¯¯";
     }
 }
 
@@ -128,24 +101,7 @@ CFactoryDiZhiPu::~CFactoryDiZhiPu()
 
 bool InitTry()
 {
-	bool init = true;
-/*	bool bExp = false;*/
-	__try
-	{
-		init = H264_DVR_Init(0, 0);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pInit(0, 0)"));
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pInit(0, 0)"));
-// 	}
-
-	return init;
+	return H264_DVR_Init(0, 0);
 }
 
 
@@ -155,24 +111,10 @@ bool CFactoryDiZhiPu::init()
     {
 		m_init = InitTry();
 
-// 		__try
-// 		{
-// 			m_init = Api_DiZhiPu::Api().m_pInit(0, 0);
-// 		}
-// 		__except (EXCEPTION_EXECUTE_HANDLER)
-// 		{
-// 			g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pInit(0, 0)"));
-// 		}
-        //NET_DVR_SetConnectTime(1000, 30);
-        //NET_DVR_SetReconnect(3000);
-        //NET_DVR_SetDVRMessage()
         if (!m_init)
         {
 			m_sLastError = GetLastErrorString();
-			//g_log.AddLog(string("³õÊ¼»¯SDKÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
 		}
-
-		//g_log.AddLog(string("³õÊ¼»¯SDK³É¹¦"));
     }
 
     return m_init;
@@ -181,37 +123,11 @@ bool CFactoryDiZhiPu::init()
 
 bool cleanTry()
 {
-	bool uninit = true;
-/*	bool bExp = false;*/
-	__try
-	{
-		uninit = H264_DVR_Cleanup();
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pUninit()"));
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pUninit()"));
-// 	}
-
-	return uninit;
+	return H264_DVR_Cleanup();
 }
 
 void CFactoryDiZhiPu::clean()
 {
-    //Api_DiZhiPu::Api().m_pUninit();
-// 	__try
-// 	{
-// 		m_init = Api_DiZhiPu::Api().m_pUninit();
-// 	}
-// 	__except (EXCEPTION_EXECUTE_HANDLER)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pUninit()"));
-// 	}
 	cleanTry();
 	m_init = false;
 }
@@ -229,154 +145,60 @@ IVideoServer* CFactoryDiZhiPu::create()
     return new dizhipu_videoserver();
 }
 
-// std::vector<dizhipu_videoserver*> dizhipu_videoserver::sServers;
-// std::recursive_mutex dizhipu_videoserver::sMtServers;
-
-/*
- * Îö¹¹º¯Êı
- */
 dizhipu_videoserver::dizhipu_videoserver()
 {
-//     std::lock_guard<std::recursive_mutex> lock(dizhipu_videoserver::sMtServers);
-//     sServers.push_back(this);
 }
 
 dizhipu_videoserver::~dizhipu_videoserver()
 {
 		logout();
-
-//     std::lock_guard<std::recursive_mutex> lock(dizhipu_videoserver::sMtServers);
-//     for (int i = 0; i < sServers.size(); i++)
-//     {
-//         if (sServers[i] == this)
-//         {
-//             sServers.erase(sServers.begin() + i);
-//             break;
-//         }
-//     }
 }
 
 static void CALL_METHOD PosCallBack(long lPlayHandle, long lTotalSize, long lDownLoadSize, long dwUser)
 {
-/*	bool bExp = false;*/
-	__try
+	dizhipu_videoserver * pThis = (dizhipu_videoserver *)dwUser;
+	if (pThis == NULL) return;
+	//Mutex::ScopedLock lock(pThis->m_mtxPos);
+	pThis->m_mtxPos.lock();
+	map<long long, stPos_DownPlay>::iterator itr = pThis->m_mapPosDownPlay.find(lPlayHandle);
+	if (itr != pThis->m_mapPosDownPlay.end())
 	{
-		dizhipu_videoserver * pThis = (dizhipu_videoserver *)dwUser;
-		if (pThis == NULL)
-		{
-			return;
-		}
-		//Mutex::ScopedLock lock(pThis->m_mtxPos);
-		pThis->m_mtxPos.lock();
-		map<long long, stPos_DownPlay>::iterator itr = pThis->m_mapPosDownPlay.find(lPlayHandle);
-		if (itr != pThis->m_mapPosDownPlay.end())
-		{
-			itr->second.iTotalSize = lTotalSize * 1024;
-			itr->second.iCurSize = lDownLoadSize * 1024;
-			itr->second.iPercent = ((float)lDownLoadSize/(float)lTotalSize)*100;
-		}
-		pThis->m_mtxPos.unlock();
+		itr->second.iTotalSize = lTotalSize * 1024;
+		itr->second.iCurSize = lDownLoadSize * 1024;
+		itr->second.iPercent = ((float)lDownLoadSize / (float)lTotalSize) * 100;
 	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("PosCallBack ²¶»ñÖÂÃüÒì³£"));
-/*		bExp = true;*/
-		
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("PosCallBack exception"));
-// 	}
-	return;
+	pThis->m_mtxPos.unlock();
 }
 
 IVideoServer* dizhipu_videoserver::clone()
 {
-//     dizhipu_videoserver *svr = new dizhipu_videoserver();
-// 	memcpy(svr, this, sizeof(dizhipu_videoserver));
-//     return svr;
 	return NULL;
 }
 
 long loginTry(const char* IP, __int32 port, const char* user, const char* password, H264_DVR_DEVICEINFO* ptDevInfo, int *iError)
 {
-	long lhandle = 0;
-/*	bool bExp = false;*/
-	__try
-	{
-		lhandle = H264_DVR_Login((char*)IP, port,
+	return H264_DVR_Login((char*)IP, port,
 			(char*)user, (char*)password,
 			ptDevInfo, iError, 0);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pLogin"));
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pLogin"));
-// 	}
-
-	return lhandle;
 }
 
 bool GetDevConfigTry(long lhandle, char* channelName, DWORD *dwRetLen, int nWaitTime)
 {
-	bool bSuccess = false;
-/*	bool bExp = false;*/
-	__try
-	{
-		bSuccess = H264_DVR_GetDevConfig(lhandle, E_SDK_CONFIG_CHANNEL_NAME, -1,
-			channelName, sizeof(SDK_ChannelNameConfigAll), dwRetLen, nWaitTime);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pGetConfig"));
-// 	}
-
-	return bSuccess;
+	return H264_DVR_GetDevConfig(lhandle, E_SDK_CONFIG_CHANNEL_NAME, -1,
+		channelName, sizeof(SDK_ChannelNameConfigAll), dwRetLen, nWaitTime);
 }
 
 bool dizhipu_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
-//     if (0 < m_lLoginHandle && !logout())
-// 	{
-// 		g_log.AddLog(string("login Éè±¸ÒÑµÇÂ¼£¬³¢ÊÔ·´µÇÂ½Ê§°Ü"));
-//         return false;
-//     }
-
     memset(&m_deviceInfo, 0, sizeof(m_deviceInfo));
 
 	int iError = 0;
-//     m_lLoginHandle = Api_DiZhiPu::Api().m_pLogin((char*)IP, port,
-//                                    (char*)user,(char*)password,
-//                                    &m_deviceInfo, &iError, 0);
-
-// 	try
-// 	{
-// 		m_lLoginHandle = H264_DVR_Login((char*)IP, port,
-// 			(char*)user, (char*)password,
-// 			&m_deviceInfo, &iError, 0);
-// 	}
-// 	catch (...)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pLogin"));
-// 	}
 
 	m_lLoginHandle = loginTry((char*)IP, port, (char*)user, (char*)password, &m_deviceInfo, &iError);
 
     if (m_lLoginHandle == 0)
     {
 		m_sLastError = GetLastErrorString();
-		//g_log.AddLog(string("login µÇÂ¼Ê§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
         return false;
     }
 
@@ -385,38 +207,23 @@ bool dizhipu_videoserver::login(const char* IP, __int32 port, const char* user, 
 	int nWaitTime = 1000;
 	BOOL bSuccess = FALSE;
 
-// 	bSuccess = Api_DiZhiPu::Api().m_pGetConfig(m_lLoginHandle, DiZhiPu::E_SDK_CONFIG_CHANNEL_NAME, -1,
-// 		(char *)&pChannelName, sizeof(DiZhiPu::SDK_ChannelNameConfigAll), &dwRetLen, nWaitTime);
-
-// 	try
-// 	{
-// 		bSuccess = H264_DVR_GetDevConfig(m_lLoginHandle, E_SDK_CONFIG_CHANNEL_NAME, -1,
-// 			(char *)&pChannelName, sizeof(SDK_ChannelNameConfigAll), &dwRetLen, nWaitTime);
-// 	}
-// 	catch (...)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pGetConfig"));
-// 	}
-
 	bSuccess = GetDevConfigTry(m_lLoginHandle, (char *)&pChannelName, &dwRetLen, nWaitTime);
 
 	if (!bSuccess || dwRetLen != sizeof(SDK_ChannelNameConfigAll))
 	{
 		m_sLastError = GetLastErrorString();
-		//g_log.AddLog(string("login »ñÈ¡Í¨µÀÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
 		return false;
 	}
 
 	channels.clear();
 	char szName[64+2];
 	char *pChannelNameTmp = (char *)&pChannelName;
-	//g_log.AddLog(string(pChannelNameTmp, 64));
 
 	int i = 1;
 	for ( ; i <= m_deviceInfo.byChanNum; i++)
 	{
 		ZeroMemory(szName, sizeof(szName));
-		//memcpy(szName, pChannelNameTmp + (i - 1), 64);
+
 		sprintf(szName, "CAM%02d", i);
 		string strName = szName;
 		channels.insert(std::make_pair(i, strName));
@@ -424,52 +231,22 @@ bool dizhipu_videoserver::login(const char* IP, __int32 port, const char* user, 
 	for ( ; i <= m_deviceInfo.iDigChannel + m_deviceInfo.byChanNum; i++)
 	{
 		ZeroMemory(szName, sizeof(szName));
-		//memcpy(szName, pChannelNameTmp + (i - 1), 64);
 		sprintf(szName, "CAM%02d", i);
 		string strName = szName;
 		channels.insert(std::make_pair(i, strName));
 	}
-	char szLog[1024];
-	ZeroMemory(szLog, 1024);
-	sprintf(szLog, "login Í¨µÀ¸öÊı:%d Êı×ÖÍ¨µÀ¸öÊı:%d", m_deviceInfo.byChanNum, m_deviceInfo.iDigChannel);
-	//g_log.AddLog(string(szLog));
+	
     return true;
 }
 
 bool logoutTry(long lhandle)
 {
-	bool bSuccess = false;
-/*	bool bExp = false;*/
-	__try
-	{
-		bSuccess = H264_DVR_Logout(lhandle);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pLogout"));
-		bSuccess = false;
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pLogout"));
-// 	}
-
-	return bSuccess;
+	return H264_DVR_Logout(lhandle);
 }
 
 bool dizhipu_videoserver::logout()
 {
 	bool bSuccess = false;
-// 	__try
-// 	{
-// 		bSuccess = H264_DVR_Logout(m_lLoginHandle);
-// 	}
-// 	__except (EXCEPTION_EXECUTE_HANDLER)
-// 	{
-// 		//g_log.AddLog(string("EXCEPTION : Api_DiZhiPu::Api().m_pLogout"));
-// 	}
 
 	bSuccess = logoutTry(m_lLoginHandle);
 
@@ -532,46 +309,28 @@ static void timeStdToDiZhiPu2(tm *pTimeStd, H264_DVR_TIME *pTimeDH)
 
 bool getFileTry(long lhandle, H264_DVR_FINDINFO *findInfo, H264_DVR_FILE_DATA *szSend, int icount, int *iMaxNum)
 {
-	bool bRet = false;
-/*	bool bExp = false;*/
-	__try
-	{
-		bRet = H264_DVR_FindFile(lhandle, findInfo, szSend, MAX_SEARCH_COUNT, iMaxNum, 5 * 1000);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("GetRecordFileList ÖÂÃüÒì³£"));
-		bRet = false;
-/*		bExp = true;*/
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("GetRecordFileList ÖÂÃüÒì³£"));
-// 	}
-
-	return bRet;
+	return H264_DVR_FindFile(lhandle, findInfo, szSend, MAX_SEARCH_COUNT, iMaxNum, 5 * 1000);
 }
+
 bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std::vector<int>& channelVec, __time64_t timeStart,
                                                        __time64_t timeEnd)
 {
 
     if (m_lLoginHandle <= 0)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("GetRecordFileList ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
+		//g_log.AddLog(string("GetRecordFileList è¯·å…ˆç™»å½•"));
         return false;
     }
 
     if (timeStart >= timeEnd)
     {
-		m_sLastError = "Ê±¼ä·¶Î§²»¶Ô!";
-		//g_log.AddLog(string("GetRecordFileList Ê±¼ä·¶Î§²»¶Ô"));
+		m_sLastError = "æ—¶é—´èŒƒå›´ä¸å¯¹!";
+		//g_log.AddLog(string("GetRecordFileList æ—¶é—´èŒƒå›´ä¸å¯¹"));
         return false;
     }
 
 	files.clear();
-	//m_mapArcItem.clear();
 
 	std::vector<int>::iterator itr = channelVec.begin();
 	for (; itr != channelVec.end(); itr++)
@@ -619,20 +378,10 @@ bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std:
 		{
 			continue;
 		}
-// 		try
-// 		{
-// 			bRet = H264_DVR_FindFile(m_lLoginHandle, &findInfo, szSend, MAX_SEARCH_COUNT, &iMaxNum, 5 * 1000);
-// 		}
-// 		catch (...)
-// 		{
-// 			g_log.AddLog(string("GetRecordFileList ÖÂÃüÒì³£"));
-// 			continue;
-// 		}
 
 		if (!bRet)
 		{
 			m_sLastError = GetLastErrorString();
-			//g_log.AddLog(string("GetRecordFileList ²éÑ¯Â¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
 			continue;
 		}
 		if (iMaxNum == 0)
@@ -665,16 +414,10 @@ bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std:
 					item.stEndTime.hour,
 					item.stEndTime.minute,
 					item.stEndTime.second);
-				//strcpy(szFileName, item.sFileName);
 				m_mapArcItem.insert(make_pair(string(szFileName), item));
 
 				timeDiZhiPuToStd(&item.stBeginTime, &sTm);
 				timeDiZhiPuToStd(&item.stEndTime, &eTm);
-
-				char szLog[1024];
-				ZeroMemory(szLog, 1024);
-				sprintf(szLog, "GetRecordFileList ÎÄ¼şÃû:%s ÎÄ¼ş´óĞ¡:%d", item.sFileName, item.size);
-				//g_log.AddLog(string(szLog));
 
 				info.channel = nChannelId/*item.ch*/;
 				info.size = item.size * 1024;
@@ -690,33 +433,14 @@ bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std:
 
 bool downloadTry(long lhandle, H264_DVR_FILE_DATA *info, const char* saveFileName, long ptr, download_handle_t& hdl)
 {
-/*	bool bExp = false;*/
-	__try
-	{
-		hdl = H264_DVR_GetFileByName(lhandle, info, (char *)saveFileName, PosCallBack, ptr, NULL);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		hdl = -1;
-/*		bExp = true;*/
-		//g_log.AddLog(string("downLoadByRecordFile ÖÂÃüÒì³£"));
-		return false;
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("downLoadByRecordFile ÖÂÃüÒì³£"));
-// 		return false;
-// 	}
-	return true;
+	return H264_DVR_GetFileByName(lhandle, info, (char *)saveFileName, PosCallBack, ptr, NULL);
 }
 
 bool dizhipu_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
     if (0 >= m_lLoginHandle)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("downLoadByRecordFile ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
         return false;
     }
 
@@ -726,29 +450,17 @@ bool dizhipu_videoserver::downLoadByRecordFile(const char* saveFileName, const R
 		map<string, H264_DVR_FILE_DATA>::iterator itr = m_mapArcItem.find(file.name);
 		if (itr == m_mapArcItem.end())
 		{
-			m_sLastError = "¸ÃÎÄ¼ş²»´æÔÚ";
-			//g_log.AddLog(string("downLoadByRecordFile ¸ÃÎÄ¼ş²»´æÔÚ"));
+			m_sLastError = "è¯¥æ–‡ä»¶ä¸å­˜åœ¨";
 			return false;
 		}
 
 		info = itr->second;
 	}
-	//g_log.AddLog(string("downLoadByRecordFile ÎÄ¼şÃû£º") + saveFileName);
 	bool bRet = downloadTry(m_lLoginHandle, &info, saveFileName, (long)this, hdl);
-// 	try
-// 	{
-// 		hdl = H264_DVR_GetFileByName(m_lLoginHandle, &info, (char *)saveFileName, PosCallBack, (long)this, NULL);
-// 	}
-// 	catch (...)
-// 	{
-// 		hdl = -1;
-// 		g_log.AddLog(string("downLoadByRecordFile ÖÂÃüÒì³£"));
-// 		return false;
-// 	}
-	if (hdl <= 0)//modify by tsx Ğ¡ÓÚ»òµÈÓÚ0 µÏÖÇÆÖÏµÁĞÏÂÔØ»á¹ÒµôµÄ¸ùÔ´
+
+	if (hdl <= 0)//modify by tsx å°äºæˆ–ç­‰äº0 è¿ªæ™ºæµ¦ç³»åˆ—ä¸‹è½½ä¼šæŒ‚æ‰çš„æ ¹æº
 	{
 		m_sLastError = GetLastErrorString();
-		//g_log.AddLog(string("downLoadByRecordFile ÏÂÔØÂ¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
 		return false;
 	}
 
@@ -771,33 +483,15 @@ bool dizhipu_videoserver::downLoadByRecordFile(const char* saveFileName, const R
 
 bool PlayBackloadTry(long lhandle, H264_DVR_FILE_DATA *info, long ptr, play_handle_t& playbackHandle)
 {
-/*	bool bExp = false;*/
-	__try
-	{
-		playbackHandle = H264_DVR_PlayBackByName(lhandle, info, PosCallBack, NULL, ptr);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		playbackHandle = -1;
-/*		bExp = true;*/
-		//g_log.AddLog(string("downLoadByRecordFile ÖÂÃüÒì³£"));
-		return false;
-	}
 
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("PlayBackByRecordFile ÖÂÃüÒì³£"));
-// 		return false;
-// 	}
-	return true;
+	return H264_DVR_PlayBackByName(lhandle, info, PosCallBack, NULL, ptr);
 }
 
 bool  dizhipu_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle)
 {
     if (0 >= m_lLoginHandle)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("PlayBackByRecordFile ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
         return false;
 	}
 
@@ -807,24 +501,13 @@ bool  dizhipu_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 		map<string, H264_DVR_FILE_DATA>::iterator itr = m_mapArcItem.find(file.name);
 		if (itr == m_mapArcItem.end())
 		{
-			m_sLastError = "¸ÃÎÄ¼ş²»´æÔÚ";
-			//g_log.AddLog(string("PlayBackByRecordFile ¸ÃÎÄ¼ş²»´æÔÚ"));
+			m_sLastError = "è¯¥æ–‡ä»¶ä¸å­˜åœ¨";
 			return false;
 		}
 
 		info = itr->second;
 	}
 	info.hWnd = hwnd;
-// 	try
-// 	{
-// 		playbackHandle = H264_DVR_PlayBackByName(m_lLoginHandle, &info, PosCallBack, NULL, (long)this);
-// 	}
-// 	catch (...)
-// 	{
-// 		playbackHandle = -1;
-// 		g_log.AddLog(string("PlayBackByRecordFile ÖÂÃüÒì³£"));
-// 		return false;
-// 	}
 
 	bool bRet = PlayBackloadTry(m_lLoginHandle, &info, (long)this, playbackHandle);
 	if (bRet != true)
@@ -835,7 +518,6 @@ bool  dizhipu_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 	if (playbackHandle == 0)
 	{
 		m_sLastError = GetLastErrorString();
-		//g_log.AddLog(string("PlayBackByRecordFile ²¥·ÅÂ¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
 		return false;
 	}
 
@@ -852,38 +534,13 @@ bool  dizhipu_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 		m_mapPosDownPlay.insert(std::make_pair(playbackHandle, pos));
 	}
 
-	char szLog[1024];
-	ZeroMemory(szLog, 1024);
-	sprintf(szLog, "PlayBackByRecordFile start playbackHandle:%d", playbackHandle);
-	//g_log.AddLog(string("StopPlayBack ¿ªÊ¼Í£Ö¹²¥·Å"));
-	//g_log.AddLog(string(szLog));
-
-
 	return true;
 }
 
 
 bool SetPlayBackTry(__int64 playbackHandle, __int32 pos)
 {
-	bool bRet = false;
-/*	bool bExp = false;*/
-	__try
-	{
-		bRet = H264_DVR_PlayBackControl(playbackHandle, SDK_PLAY_BACK_SEEK_PERCENT, pos);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-/*		bExp = true;*/
-		return false;
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("SetPlayBack ÖÂÃüÒì³£"));
-// 		return false;
-// 	}
-
-	return bRet;
+	return H264_DVR_PlayBackControl(playbackHandle, SDK_PLAY_BACK_SEEK_PERCENT, pos);
 }
 
 bool dizhipu_videoserver::SetPlayBack(__int64 playbackHandle, __int32 pos)
@@ -894,89 +551,42 @@ bool dizhipu_videoserver::SetPlayBack(__int64 playbackHandle, __int32 pos)
 		map<long long, RecordFile>::iterator itr = m_mapDownloadOrPlay.find(playbackHandle);
 		if (itr == m_mapDownloadOrPlay.end())
 		{
-			m_sLastError = "¸ÃÎÄ¼ş²»´æÔÚ";
-			//g_log.AddLog(string("SetPlayBack ¸ÃÎÄ¼ş²»´æÔÚ"));
+			m_sLastError = "è¯¥æ–‡ä»¶ä¸å­˜åœ¨";
 			return false;
 		}
 		file = itr->second;
 	}
-	//return FALSE != H264_DVR_PlayBackControl(playbackHandle, SDK_PLAY_BACK_SEEK_PERCENT, pos);
 
 	return SetPlayBackTry(playbackHandle, pos);
 }
 
 bool playcontrolTry(__int64 playbackHandle)
 {
-	bool bRet = false;
-/*	bool bExp = false;*/
-	__try
-	{
-		bRet = H264_DVR_PlayBackControl(playbackHandle, SDK_PLAY_BACK_PAUSE, 0);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-/*		bExp = true;*/
-		return false;
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("StopPlayBack Exception"));
-// 		return false;
-// 	}
-
-	return bRet;
+	return H264_DVR_PlayBackControl(playbackHandle, SDK_PLAY_BACK_PAUSE, 0);
 }
 
 bool stopPlayTry(__int64 playbackHandle)
 {
-	bool bRet = false;
-/*	bool bExp = false;*/
-	__try
-	{
-		bRet = H264_DVR_StopPlayBack(playbackHandle);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-/*		bExp = true;*/
-		return false;
-	}
-
-// 	if (bExp)
-// 	{
-// 		g_log.AddLog(string("StopPlayBack ÖÂÃüÒì³£"));
-// 		return false;
-// 	}
-
-	return bRet;
+	return H264_DVR_StopPlayBack(playbackHandle);
 }
 
 bool dizhipu_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 {
     if (0 >= m_lLoginHandle)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("StopPlayBack ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
         return false;
     }
 	if (mPause == 1)
 	{
-		//g_log.AddLog(string("StopPlayBack ¿ªÊ¼ÔİÍ£²¥·Å"));
 		if (!playcontrolTry(playbackHandle))
 		{
 			m_sLastError = GetLastErrorString();
-			//g_log.AddLog(string("StopPlayBack ÔİÍ£²¥·ÅÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
 			return false;
 		}
 	}
 	else
 	{
-		char szLog[1024];
-		ZeroMemory(szLog, 1024);
-		sprintf(szLog, "StopPlayBack ¿ªÊ¼Í£Ö¹²¥·Å playbackHandle:%d", playbackHandle);
-		//g_log.AddLog(string("StopPlayBack ¿ªÊ¼Í£Ö¹²¥·Å"));
-		//g_log.AddLog(string(szLog));
-
 		{
 			Mutex::ScopedLock lock(m_mtx);
 			map<long long, RecordFile>::iterator itr = m_mapDownloadOrPlay.find(playbackHandle);
@@ -993,24 +603,8 @@ bool dizhipu_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 			Mutex::ScopedLock lock2(m_mtxPos);
 			m_mapPosDownPlay.erase(playbackHandle);
 		}
-		//if (!Api_DiZhiPu::Api().m_pStopPlayBack(playbackHandle))
-		bool bRet = false;
-// 		try
-// 		{
-// 			bRet = H264_DVR_StopPlayBack(playbackHandle);
-// 		}
-// 		catch (...)
-// 		{
-// 			g_log.AddLog(string("StopPlayBack ÖÂÃüÒì³£"));
-// 			return false;
-// 		}
-		bRet = stopPlayTry(playbackHandle);
-		if (false == bRet)
-		{
-			m_sLastError = GetLastErrorString();
-			//g_log.AddLog(string("StopPlayBack Í£Ö¹²¥·ÅÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
-			return false;
-		}
+		bool bRet = stopPlayTry(playbackHandle);
+		return bRet;
 	}
 
     return true;
@@ -1019,27 +613,14 @@ bool dizhipu_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 
 bool stopDownloadTry(download_handle_t h)
 {
-	bool bRet = false;
-	__try
-	{
-		bRet = H264_DVR_StopGetFile(h);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		//g_log.AddLog(string("stopDownload ÖÂÃüÒì³£"));
-		return false;
-	}
-
-	return bRet;
+	return H264_DVR_StopGetFile(h);
 }
 
 bool dizhipu_videoserver::stopDownload(download_handle_t h)
 {
-	//g_log.AddLog(string("stopDownload ¿ªÊ¼Í£Ö¹ÏÂÔØ"));
     if (0 >= m_lLoginHandle)
     {
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("stopDownload ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
         return false;
 	}
 	{
@@ -1064,7 +645,6 @@ bool dizhipu_videoserver::stopDownload(download_handle_t h)
 	if (false == bRet)
     {
 		m_sLastError = GetLastErrorString();
-		//g_log.AddLog(string("stopDownload Í£Ö¹ÏÂÔØÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
         return false;
 	}
 
@@ -1075,8 +655,7 @@ bool dizhipu_videoserver::getPlayBackPos(__int64 playbackHandle, __int32* pos)
 {
 	if (0 >= m_lLoginHandle)
 	{
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("getPlayBackPos ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
 		return false;
 	}
 
@@ -1087,8 +666,7 @@ bool dizhipu_videoserver::getPlayBackPos(__int64 playbackHandle, __int32* pos)
 		*pos = itr->second.iPercent;
 		return true;
 	}
-	m_sLastError = "ÕÒ²»µ½¸Ã»Ø·Å";
-	//g_log.AddLog(string("getPlayBackPos ÕÒ²»µ½¸Ã»Ø·Å"));
+	m_sLastError = "æ‰¾ä¸åˆ°è¯¥å›æ”¾";
 	return false;
 }
 
@@ -1096,8 +674,7 @@ bool dizhipu_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize
 {
 	if (0 >= m_lLoginHandle)
 	{
-		m_sLastError = "ÇëÏÈµÇÂ¼!";
-		//g_log.AddLog(string("getDownloadPos ÇëÏÈµÇÂ¼"));
+		m_sLastError = "è¯·å…ˆç™»å½•!";
 		return false;
 	}
 
@@ -1111,8 +688,7 @@ bool dizhipu_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize
 		*failed = false;
 		return true;
 	}
-	m_sLastError = "ÕÒ²»µ½¸ÃÏÂÔØ";
-	//g_log.AddLog(string("getDownloadPos ÕÒ²»µ½¸ÃÏÂÔØ"));
+	m_sLastError = "æ‰¾ä¸åˆ°è¯¥ä¸‹è½½";
 	*failed = true;
 	return false;
 }

@@ -1,4 +1,4 @@
-#ifndef IVIDEOSERVER_H
+ï»¿#ifndef IVIDEOSERVER_H
 #define IVIDEOSERVER_H
 #include <Windows.h>
 #include <windef.h>
@@ -34,165 +34,165 @@
 typedef long long  download_handle_t;
 typedef long long  play_handle_t;
 
-//³§ÉÌID
-enum DeviceFactory
+//åŽ‚å•†ID
+enum DeviceFactory 
 {
-    SISC_IPC_DH = 0,                                  // ´ó»ª
-    SISC_IPC_GZLL = 1,                                // ¹ãÖÝÀûÁè
-    SISC_IPC_DIZHIPU = 2,							  // µÏÖÇÆÖ
-    SISC_IPC_HAISHITAI = 3,							  // º£ÊÓÌ©
-    SISC_IPC_XINDAGONGCHUANG = 4,					  // ÐÂ´ï¹²´´
-    SISC_IPC_XP = 5,								  // öÎÅô°²·À
-    SISC_IPC_BLUESKY = 6,							  // À¶É«ÐÇ¼Ê
-    SISC_IPC_DEJIALA = 7,							  // µÂ¼ÓÀ­
-    SISC_IPC_JUNMINGSHI = 8,                          // ¿¡Ã÷ÊÓ
-    SISC_IPC_JIUAN = 9,							      // ¾Å°²¹âµç
-    SISC_IPC_LIANDA = 10,							  // Á¢°²´ï
-    SISC_IPC_SILANG = 11,							  // ÉîÛÚË¼ÀË
-    SISC_IPC_JIRUI = 12,							  // ¼ªÈñ
-    SISC_IPC_TAIKANGWEIYE = 13,					      // Ì©¿µÎ°Òµ
-    SISC_IPC_XINWANGRUIJIE = 14,				      // ÐÇÍøÈñ½Ý
-    SISC_IPC_ZHONGTIANANBAO = 15,				      // ÖÐÌï°²±£
-    SISC_IPC_TIANSHIDA = 16,			    	      // ÌìÊÓ´ï
-    SISC_IPC_DOANGYANG = 17,			    	      // ¶«Ñô¹ú¼Ê
-    SISC_IPC_YUNDIANSHI = 18,			    	      // ÔÆµäÊÓ
-    SISC_IPC_KUANGSHIAN = 19,			    	      // ¿õÊÓ°²
-    SISC_IPC_HONGKANGWEISHI = 20,			    	  // ºê¿µÍþÊÓ
-    SISC_IPC_SHENZHENTONGWEI = 21,			    	  // ÉîÛÚÍ¬Îª
-    SISC_IPC_DALIKEJI = 22,			    	          // ´óÁ¢¿Æ¼¼
-    SISC_IPC_SHIXINGANFANG = 23,			    	  // ÊÀÐÇ°²·À
-    SISC_IPC_SHOUWEIZHE = 24,			         	  // ÊØÎÀÕß
-    SISC_IPC_HUONIWEIER = 25,			         	  // »ôÄáÎ¤¶û
-    SISC_IPC_NANNINGGUANGTAI = 26,			          // ÄÏÄþ¹ÚÌ©
-    SISC_IPC_GUANGDONGLINYU = 27,			          // ¹ã¶«ÁìÓò
-    SISC_IPC_HANGJINGKEJI = 28,		     	          // º½¾°¿Æ¼¼
+    SISC_IPC_DH = 0,                                  // å¤§åŽ
+    SISC_IPC_GZLL = 1,                                // å¹¿å·žåˆ©å‡Œ
+    SISC_IPC_DIZHIPU = 2,							  // è¿ªæ™ºæµ¦
+    SISC_IPC_HAISHITAI = 3,							  // æµ·è§†æ³°
+    SISC_IPC_XINDAGONGCHUANG = 4,					  // æ–°è¾¾å…±åˆ›
+    SISC_IPC_XP = 5,								  // é‘«é¹å®‰é˜²
+    SISC_IPC_BLUESKY = 6,							  // è“è‰²æ˜Ÿé™…
+    SISC_IPC_DEJIALA = 7,							  // å¾·åŠ æ‹‰
+    SISC_IPC_JUNMINGSHI = 8,                          // ä¿Šæ˜Žè§†
+    SISC_IPC_JIUAN = 9,							      // ä¹å®‰å…‰ç”µ
+    SISC_IPC_LIANDA = 10,							  // ç«‹å®‰è¾¾
+    SISC_IPC_SILANG = 11,							  // æ·±åœ³æ€æµª
+    SISC_IPC_JIRUI = 12,							  // å‰é”
+    SISC_IPC_TAIKANGWEIYE = 13,					      // æ³°åº·ä¼Ÿä¸š
+    SISC_IPC_XINWANGRUIJIE = 14,				      // æ˜Ÿç½‘é”æ·
+    SISC_IPC_ZHONGTIANANBAO = 15,				      // ä¸­ç”°å®‰ä¿
+    SISC_IPC_TIANSHIDA = 16,			    	      // å¤©è§†è¾¾
+    SISC_IPC_DOANGYANG = 17,			    	      // ä¸œé˜³å›½é™…
+    SISC_IPC_YUNDIANSHI = 18,			    	      // äº‘å…¸è§†
+    SISC_IPC_KUANGSHIAN = 19,			    	      // æ—·è§†å®‰
+    SISC_IPC_HONGKANGWEISHI = 20,			    	  // å®åº·å¨è§†
+    SISC_IPC_SHENZHENTONGWEI = 21,			    	  // æ·±åœ³åŒä¸º
+    SISC_IPC_DALIKEJI = 22,			    	          // å¤§ç«‹ç§‘æŠ€
+    SISC_IPC_SHIXINGANFANG = 23,			    	  // ä¸–æ˜Ÿå®‰é˜²
+    SISC_IPC_SHOUWEIZHE = 24,			         	  // å®ˆå«è€…
+    SISC_IPC_HUONIWEIER = 25,			         	  // éœå°¼éŸ¦å°”
+    SISC_IPC_NANNINGGUANGTAI = 26,			          // å—å®å† æ³°
+    SISC_IPC_GUANGDONGLINYU = 27,			          // å¹¿ä¸œé¢†åŸŸ
+    SISC_IPC_HANGJINGKEJI = 28,		     	          // èˆªæ™¯ç§‘æŠ€
 
-    SISC_IPC_BAOXINGSHENG = 29,		     	          // ±¦ÐÀÊ¢
-    SISC_IPC_LANDAOEMHK = 30,		     	          // Á¢°²´ïOEMº£¿µ
-    SISC_IPC_XIANHAIFANG = 31,		     	          // Î÷°²º£·½OEMº£¿µ
-    SISC_IPC_BEIJINGZHENGFANG = 32,		     	      // ±±¾©Õý·½Ê±´úOEMº£¿µ
-    SISC_IPC_TAIKANGWEIYEOEMHK = 33,		     	  // Ì©¿µÎ°ÒµOEMº£¿µ
-    SISC_IPC_TIANMIN = 34,		     	              // ÌìÃô
-    SISC_IPC_KEEN = 35,		     	                  // ¿Æ¶÷
-    SISC_IPC_MEIFANGWEIYE = 36,		     	          // ÃÀ·ÀÎ°Òµ
-    SISC_IPC_GUANGZHOUBANGSHI = 37,		     	      // ¹ãÖÝ°îÊÀµç×Ó
-    SISC_IPC_GUANGZHOUSHIAN = 38,		     	      // ¹ãÖÝÊÓ°²°²·À
-    SISC_IPC_QIAOAN = 39,		     	              // ÇÇ°²
-    SISC_IPC_LANGSHIXIN = 40,		     	          // ÀÊÊÓÐË
-    SISC_IPC_YAAN = 41,		     	                  // ÑÇ°²
-    SISC_IPC_TAIWEIGAOKE = 42,		     	          // Ì©Íþ¸ß¿Æ
-    SISC_IPC_HUABANGHAISHI = 43,		     	      // »ª°îº£ÊÓ
-    SISC_IPC_GUANGZHOUYISHI = 44,		     	      // ¹ãÖÝÒÚÊÓ
-    SISC_IPC_HONGKANGWEISHIOEMXM = 45,		     	  // ÉîÛÚºê¿µÍþÊÓOEMÐÛÂõ
-    SISC_IPC_ANJULIAO = 46,		     	              // °²¾ÓÄñ
-    SISC_IPC_YIRONGGUANSHI = 47,		     	      // ±±¾©ÒæÈÚ¹ÚÊÀ
-    SISC_IPC_DONGDAJIZHI = 48,		     	          // ¶«´ó½ðÖÇÆ½Ì¨
-    SISC_IPC_GERECORDER = 49,		     	          // GEÓ²ÅÌÂ¼Ïñ»ú
+    SISC_IPC_BAOXINGSHENG = 29,		     	          // å®æ¬£ç››
+    SISC_IPC_LANDAOEMHK = 30,		     	          // ç«‹å®‰è¾¾OEMæµ·åº·
+    SISC_IPC_XIANHAIFANG = 31,		     	          // è¥¿å®‰æµ·æ–¹OEMæµ·åº·
+    SISC_IPC_BEIJINGZHENGFANG = 32,		     	      // åŒ—äº¬æ­£æ–¹æ—¶ä»£OEMæµ·åº·
+    SISC_IPC_TAIKANGWEIYEOEMHK = 33,		     	  // æ³°åº·ä¼Ÿä¸šOEMæµ·åº·
+    SISC_IPC_TIANMIN = 34,		     	              // å¤©æ•
+    SISC_IPC_KEEN = 35,		     	                  // ç§‘æ©
+    SISC_IPC_MEIFANGWEIYE = 36,		     	          // ç¾Žé˜²ä¼Ÿä¸š
+    SISC_IPC_GUANGZHOUBANGSHI = 37,		     	      // å¹¿å·žé‚¦ä¸–ç”µå­
+    SISC_IPC_GUANGZHOUSHIAN = 38,		     	      // å¹¿å·žè§†å®‰å®‰é˜²
+    SISC_IPC_QIAOAN = 39,		     	              // ä¹”å®‰
+    SISC_IPC_LANGSHIXIN = 40,		     	          // æœ—è§†å…´
+    SISC_IPC_YAAN = 41,		     	                  // äºšå®‰
+    SISC_IPC_TAIWEIGAOKE = 42,		     	          // æ³°å¨é«˜ç§‘
+    SISC_IPC_HUABANGHAISHI = 43,		     	      // åŽé‚¦æµ·è§†
+    SISC_IPC_GUANGZHOUYISHI = 44,		     	      // å¹¿å·žäº¿è§†
+    SISC_IPC_HONGKANGWEISHIOEMXM = 45,		     	  // æ·±åœ³å®åº·å¨è§†OEMé›„è¿ˆ
+    SISC_IPC_ANJULIAO = 46,		     	              // å®‰å±…é¸Ÿ
+    SISC_IPC_YIRONGGUANSHI = 47,		     	      // åŒ—äº¬ç›Šèžå† ä¸–
+    SISC_IPC_DONGDAJIZHI = 48,		     	          // ä¸œå¤§é‡‘æ™ºå¹³å°
+    SISC_IPC_GERECORDER = 49,		     	          // GEç¡¬ç›˜å½•åƒæœº
 
-    SISC_IPC_MIKA61 = 50,		     	              // ¹ãÖÝÃ×¿¨61ÏµÁÐ
-    SISC_IPC_MIKA8081 = 51,		     	              // ¹ãÖÝÃ×¿¨8081ÏµÁÐNVR
-    SISC_IPC_HENGYI = 52,		     	              // ºãÒä
-    SISC_IPC_BAAN = 53,		         	              // ÉîÛÚ°Ë°²
-    SISC_IPC_BAIHUI = 54,		         	          // ÉîÛÚ°Ù»ã
-    SISC_IPC_HAISHIAN = 55,		         	          // ÉîÛÚº£ÊÓ°²
-    SISC_IPC_JUFU = 56,		            	          // ÉîÛÚ¾ÞÁJ
-    SISC_IPC_SAIQING = 57,		         	          // ÉîÛÚÈüÇå
-    SISC_IPC_XINGKEAN = 58,		         	          // ÉîÛÚÐË¿Æ°²
-    SISC_IPC_TIANTIANYOU = 59,		         	      // ÌìÌìÓÓ
+    SISC_IPC_MIKA61 = 50,		     	              // å¹¿å·žç±³å¡61ç³»åˆ—
+    SISC_IPC_MIKA8081 = 51,		     	              // å¹¿å·žç±³å¡8081ç³»åˆ—NVR
+    SISC_IPC_HENGYI = 52,		     	              // æ’å¿†
+    SISC_IPC_BAAN = 53,		         	              // æ·±åœ³å…«å®‰
+    SISC_IPC_BAIHUI = 54,		         	          // æ·±åœ³ç™¾æ±‡
+    SISC_IPC_HAISHIAN = 55,		         	          // æ·±åœ³æµ·è§†å®‰
+    SISC_IPC_JUFU = 56,		            	          // æ·±åœ³å·¨ç½¦
+    SISC_IPC_SAIQING = 57,		         	          // æ·±åœ³èµ›æ¸…
+    SISC_IPC_XINGKEAN = 58,		         	          // æ·±åœ³å…´ç§‘å®‰
+    SISC_IPC_TIANTIANYOU = 59,		         	      // å¤©å¤©ä½‘
 
-    SISC_IPC_HB = 60,                                 // ºº°î
-    SISC_IPC_TDWY = 61,                               // ÌìµØÎ°Òµ
-    SISC_IPC_XM = 62,                                 // ÐÛÂõ
-    SISC_IPC_GZHX = 63,   						      // ¹ãÖÝºêÏè
-    SISC_IPC_SNA = 64,   						      // Ê©ÄÍ°²
-    SISC_IPC_JF = 65,   						      // ¾Þ·å
-    SISC_IPC_SALX = 66,   						      // Ê¨°²ÁªÑ¶
-    SISC_IPC_WSD = 67,   						      // ÎÖÊË´ï
-    SISC_IPC_JXJ = 68,   						      // ¼ÑÐÅ½Ý
-    SISC_IPC_BOLI = 69,   						      // ²¨Á£
-    SISC_IPC_HIKVISION = 100,                         // º£¿µ
-    SISC_IPC_ZHONGWEI = 101,                          // ÖÐÎ¬
-    SISC_IPC_YUSHIKEJI = 102,                          // ÓîÊÓ¿Æ¼¼
+    SISC_IPC_HB = 60,                                 // æ±‰é‚¦
+    SISC_IPC_TDWY = 61,                               // å¤©åœ°ä¼Ÿä¸š
+    SISC_IPC_XM = 62,                                 // é›„è¿ˆ
+    SISC_IPC_GZHX = 63,   						      // å¹¿å·žå®ç¿”
+    SISC_IPC_SNA = 64,   						      // æ–½è€å®‰
+    SISC_IPC_JF = 65,   						      // å·¨å³°
+    SISC_IPC_SALX = 66,   						      // ç‹®å®‰è”è®¯
+    SISC_IPC_WSD = 67,   						      // æ²ƒä»•è¾¾
+    SISC_IPC_JXJ = 68,   						      // ä½³ä¿¡æ·
+    SISC_IPC_BOLI = 69,   						      // æ³¢ç²’
+    SISC_IPC_HIKVISION = 100,                         // æµ·åº·
+    SISC_IPC_ZHONGWEI = 101,                          // ä¸­ç»´
+    SISC_IPC_YUSHIKEJI = 102,                          // å®‡è§†ç§‘æŠ€
 
-    SISC_IPC_ZHENSHISHUN = 1001,                      // ÕéÊÓË³
-    SISC_IPC_JINSHANPINKE,                            // ½ðÉ½Æ·¿Æ
-    SISC_IPC_XUFENGWS,                                // Ðñ·åÍþÊÓ
-    SISC_IPC_XINGSHIBAO,                              // ÐÀÊÓ±¦
+    SISC_IPC_ZHENSHISHUN = 1001,                      // è‡»è§†é¡º
+    SISC_IPC_JINSHANPINKE,                            // é‡‘å±±å“ç§‘
+    SISC_IPC_XUFENGWS,                                // æ—­å³°å¨è§†
+    SISC_IPC_XINGSHIBAO,                              // æ¬£è§†å®
 
-    SISC_IPC_ZSB,                                  // ¼ÑÊÓ°²
-    SISC_IPC_KER,                            // ¿ª¶ûÈð
-    SISC_IPC_AN,                                // °²Äá
-    SISC_IPC_AWT,                              // °ÂÍþÍØ
+    SISC_IPC_ZSB,                                  // ä½³è§†å®‰
+    SISC_IPC_KER,                            // å¼€å°”ç‘ž
+    SISC_IPC_AN,                                // å®‰å°¼
+    SISC_IPC_AWT,                              // å¥¥å¨æ‹“
 
-    SISC_IPC_JAA,                      // ¾ý°²°²
-    SISC_IPC_XJX,                            // öÎ½ÝÑ¶
-    SISC_IPC_HY,                                // »ªÑó
-    SISC_IPC_QX,                              // ÇÉÐ¾
+    SISC_IPC_JAA,                      // å›å®‰å®‰
+    SISC_IPC_XJX,                            // é‘«æ·è®¯
+    SISC_IPC_HY,                                // åŽæ´‹
+    SISC_IPC_QX,                              // å·§èŠ¯
 
-    SISC_IPC_YK,                      // ÓÊ¿Æ
-    SISC_IPC_JAB,                            // ¾Ó°²±¦
-    SISC_IPC_NZ,                                // ÄÏÖÐ
-    SISC_IPC_LZJ,                              // ÁúÖ®¾»
+    SISC_IPC_YK,                      // é‚®ç§‘
+    SISC_IPC_JAB,                            // å±…å®‰å®
+    SISC_IPC_NZ,                                // å—ä¸­
+    SISC_IPC_LZJ,                              // é¾™ä¹‹å‡€
 
-    SISC_IPC_SX,                      // ÊÀÐÇ
-    SISC_IPC_WTS,                            // çâÌØÊÓ
-    SISC_IPC_AZX,                                // °²Ö®Ñ¶
-    SISC_IPC_BKB,                              // °Ù¿Æ²©
+    SISC_IPC_SX,                      // ä¸–æ˜Ÿ
+    SISC_IPC_WTS,                            // çŽ®ç‰¹è§†
+    SISC_IPC_AZX,                                // å®‰ä¹‹è®¯
+    SISC_IPC_BKB,                              // ç™¾ç§‘åš
 
-    SISC_IPC_DTHQ,                      // ´óÌÆ»ªÇ¿
-    SISC_IPC_HAIY,                            // º£ÒÁ
-    SISC_IPC_ALKJ,                                // °²ÁªÈñÊÓ
-    SISC_IPC_XTKJ,                              // Ðñöª¿Æ¼¼
+    SISC_IPC_DTHQ,                      // å¤§å”åŽå¼º
+    SISC_IPC_HAIY,                            // æµ·ä¼Š
+    SISC_IPC_ALKJ,                                // å®‰è”é”è§†
+    SISC_IPC_XTKJ,                              // æ—­éœ†ç§‘æŠ€
 
-    SISC_IPC_HXGJ,                      // »ªÏè¹ú¼Ê
-    SISC_IPC_ERJIA,                            // ¶û¼Ñ
-    SISC_IPC_HWSX,                                // ºêÎªÊÓÑ¶
-    SISC_IPC_XINGRQ,                              // ÐÀÈÙÈª
+    SISC_IPC_HXGJ,                      // åŽç¿”å›½é™…
+    SISC_IPC_ERJIA,                            // å°”ä½³
+    SISC_IPC_HWSX,                                // å®ä¸ºè§†è®¯
+    SISC_IPC_XINGRQ,                              // æ¬£è£æ³‰
 
-    SISC_IPC_XMDZ,                      // Ð³ÃÀµç×Ó
-    SISC_IPC_AOKS,                            // °Ä¿ÆÉ­
-    SISC_IPC_HRRS,                                // ºãÈóî£ÊÓ
-    SISC_IPC_AJKJ,                              // °²¼Î¿Æ¼¼
+    SISC_IPC_XMDZ,                      // è°ç¾Žç”µå­
+    SISC_IPC_AOKS,                            // æ¾³ç§‘æ£®
+    SISC_IPC_HRRS,                                // æ’æ¶¦ç¿è§†
+    SISC_IPC_AJKJ,                              // å®‰å˜‰ç§‘æŠ€
 
-    SISC_IPC_NAKJ,                      // Äá°²¿Æ¼¼
-    SISC_IPC_LTSX,                            // À¶Í¼ÊÓÑ¶
-    SISC_IPC_WEIDS,                                // ÍþµÏË¹
-    SISC_IPC_SZSBD,                              // ÉîÛÚÊÐ±¾µÂ
+    SISC_IPC_NAKJ,                      // å°¼å®‰ç§‘æŠ€
+    SISC_IPC_LTSX,                            // è“å›¾è§†è®¯
+    SISC_IPC_WEIDS,                                // å¨è¿ªæ–¯
+    SISC_IPC_SZSBD,                              // æ·±åœ³å¸‚æœ¬å¾·
 
-    SISC_IPC_YMKJ,                      // Ó¡ÃÎ¿Æ¼¼
-    SISC_IPC_RUILT,                            // ÈñÀÉÌØ
-    SISC_IPC_YINGFT,                                // Ó¢·ÉÍØ
-    SISC_IPC_LATX,                              // Áú°²ÌìÏÂ
+    SISC_IPC_YMKJ,                      // å°æ¢¦ç§‘æŠ€
+    SISC_IPC_RUILT,                            // é”éƒŽç‰¹
+    SISC_IPC_YINGFT,                                // è‹±é£žæ‹“
+    SISC_IPC_LATX,                              // é¾™å®‰å¤©ä¸‹
 
-    SISC_IPC_WBDZ,                      // Î¬°îµç×Ó
-    SISC_IPC_XRHK,                            // ÐÂÈñ»ª¿Æ
-    SISC_IPC_DBDZ,                                // µã²©µç×Ó
-    SISC_IPC_FEIHX,                              // ·ÉºèÐÅ
+    SISC_IPC_WBDZ,                      // ç»´é‚¦ç”µå­
+    SISC_IPC_XRHK,                            // æ–°é”åŽç§‘
+    SISC_IPC_DBDZ,                                // ç‚¹åšç”µå­
+    SISC_IPC_FEIHX,                              // é£žé¸¿ä¿¡
 
-    SISC_IPC_CHAOBL,                      // ³¬±¾ÀÖ
-    SISC_IPC_YSSM,                            // ÓîË¸ÉÌÃ³
-    SISC_IPC_PANK,                                // ÅÁÄá¿Â
-    SISC_IPC_BAOJS,                              // ±¦ÊÓ¼Ñ
+    SISC_IPC_CHAOBL,                      // è¶…æœ¬ä¹
+    SISC_IPC_YSSM,                            // å®‡çƒå•†è´¸
+    SISC_IPC_PANK,                                // å¸•å°¼æŸ¯
+    SISC_IPC_BAOJS,                              // å®è§†ä½³
 
-    SISC_IPC_KELAN,                      // ¿ÆÀ¼
-    SISC_IPC_BEIST,                            // ±±ÊÓÍ¨
-    SISC_IPC_KDKJ,                                // ¿Æ´ï¿Æ¼¼
-    SISC_IPC_SBZN,                              // É½±¾ÖÇÄÜ
+    SISC_IPC_KELAN,                      // ç§‘å…°
+    SISC_IPC_BEIST,                            // åŒ—è§†é€š
+    SISC_IPC_KDKJ,                                // ç§‘è¾¾ç§‘æŠ€
+    SISC_IPC_SBZN,                              // å±±æœ¬æ™ºèƒ½
 
-    SISC_IPC_JINGDR,                      // ¾«´ïÈñ
-    SISC_IPC_HZSS,                            // º¼ÖÝÊ¥ÉÐ
-    SISC_IPC_HTDF,                                // ºººÍ¶«·½
-    SISC_IPC_XBWS,                              // ÐÇ±¦ÍþÊÓ
+    SISC_IPC_JINGDR,                      // ç²¾è¾¾é”
+    SISC_IPC_HZSS,                            // æ­å·žåœ£å°š
+    SISC_IPC_HTDF,                                // æ±‰å’Œä¸œæ–¹
+    SISC_IPC_XBWS,                              // æ˜Ÿå®å¨è§†
 
-    SISC_IPC_BJYKJY,                      // ±±¾©Ó¢¿µ¼ÎÒµ
-    SISC_IPC_GZSTH,                            // ¹ãÖÝÊÐÌ©ºÀ
-    SISC_IPC_SZSAY,                                // ÉîÛÚÊÐ°²Ô£
-    SISC_IPC_GZZT,                              // ¹ãÖÝ×óÌï
+    SISC_IPC_BJYKJY,                      // åŒ—äº¬è‹±åº·å˜‰ä¸š
+    SISC_IPC_GZSTH,                            // å¹¿å·žå¸‚æ³°è±ª
+    SISC_IPC_SZSAY,                                // æ·±åœ³å¸‚å®‰è£•
+    SISC_IPC_GZZT,                              // å¹¿å·žå·¦ç”°
 
-    SISC_IPC_UNDEFINE = 9999,                         // Î´¶¨Òå
+    SISC_IPC_UNDEFINE = 9999,                         // æœªå®šä¹‰
 };
 
-// Éè±¸ÐÅÏ¢
+// è®¾å¤‡ä¿¡æ¯
 struct DeviceInfo
 {
     DeviceInfo()
@@ -240,29 +240,29 @@ struct IVideoServerFactory
         delete this;
     }
 
-    //³õÊ¼»¯SDK
+    //åˆå§‹åŒ–SDK
     virtual bool init() = 0;
     /*
-     * ÊÍ·ÅSDK
+     * é‡Šæ”¾SDK
      */
     virtual void clean() = 0;
-    //´´½¨ÊÓÆµ·þÎñÆ÷
+    //åˆ›å»ºè§†é¢‘æœåŠ¡å™¨
     virtual IVideoServer* create() = 0;
-    //³§ÉÌÃû³Æ
+    //åŽ‚å•†åç§°
     virtual const char* name() = 0;
-    //³§ÉÌID
+    //åŽ‚å•†ID
     virtual DeviceFactory factory() = 0;
-    //ÊÓÆµºó×º
+    //è§†é¢‘åŽç¼€
     virtual void videoFileExterns(std::vector<std::string>& externs) = 0;
     virtual const char* getLastError()
     {
         return m_sLastError.c_str();
     }
-    //Ä¬ÈÏ¶Ë¿Ú
+    //é»˜è®¤ç«¯å£
     virtual int defaultPort() = 0;
-    //Ä¬ÈÏÓÃ»§
+    //é»˜è®¤ç”¨æˆ·
     virtual const char* defaultUser() = 0;
-    //Ä¬ÈÏÃÜÂë
+    //é»˜è®¤å¯†ç 
     virtual const char* defaultPasswords() = 0;
 
     virtual bool IsOEMFac()
@@ -276,7 +276,7 @@ protected:
 protected:
     bool m_OemFlag;
 };
-//µ¥¸öÊÓÆµÎÄ¼þÐÅÏ¢
+//å•ä¸ªè§†é¢‘æ–‡ä»¶ä¿¡æ¯
 struct RecordFile
 {
     RecordFile()
@@ -341,7 +341,7 @@ struct RecordFile
             memcpy(pPrivateData, pData, size);
         }
     }
-    //È¡µÃË½ÓÐÊý¾Ý
+    //å–å¾—ç§æœ‰æ•°æ®
     void* getPrivateData() const
     {
         return pPrivateData;
@@ -351,13 +351,13 @@ struct RecordFile
         return PrivateDataDataSize;
     }
 
-    __int32 channel;      //Í¨µÀ
-    __int64 size;         //ÎÄ¼þ´óÐ¡(byte)
-    std::string  name;    //ÎÄ¼þÃû³Æ
-    __time64_t beginTime; //±¾µØÊ±¼ä
-    __time64_t endTime;   //±¾µØÊ±¼ä
-    char* pPrivateData;   //Ë½ÓÐÊý¾Ý
-    __int32 PrivateDataDataSize;//Ë½ÓÐÊý¾Ý´óÐ¡
+    __int32 channel;      //é€šé“
+    __int64 size;         //æ–‡ä»¶å¤§å°(byte)
+    std::string  name;    //æ–‡ä»¶åç§°
+    __time64_t beginTime; //æœ¬åœ°æ—¶é—´
+    __time64_t endTime;   //æœ¬åœ°æ—¶é—´
+    char* pPrivateData;   //ç§æœ‰æ•°æ®
+    __int32 PrivateDataDataSize;//ç§æœ‰æ•°æ®å¤§å°
 };
 
 struct IVideoServer
@@ -381,66 +381,66 @@ struct IVideoServer
     {
         return m_sLastError.c_str();
     }
-    //Éî¶È¿ËÂ¡Ò»¸ö·þÎñÆ÷
+    //æ·±åº¦å…‹éš†ä¸€ä¸ªæœåŠ¡å™¨
     virtual IVideoServer* clone() = 0;
     /*
-     *  µÇÂ¼º¯Êý
-     *  @param [in] IP µÇÂ¼µÄIP
-     *  @param [in] port ¶Ë¿ÚºÅ
-     *  @param [in] user ÓÃ»§Ãû
-     *  @param [in] password ÃÜÂë
-     *  @param [out] channels Í¨µÀºÅ
-     *  @return ÊÇ·ñ³É¹¦
+     *  ç™»å½•å‡½æ•°
+     *  @param [in] IP ç™»å½•çš„IP
+     *  @param [in] port ç«¯å£å·
+     *  @param [in] user ç”¨æˆ·å
+     *  @param [in] password å¯†ç 
+     *  @param [out] channels é€šé“å·
+     *  @return æ˜¯å¦æˆåŠŸ
      */
     virtual bool login(const char* IP, __int32 port, const char* user,
         const char* password, std::map<__int32, std::string>& channels) = 0;
-    //ÍË³ö
+    //é€€å‡º
     virtual bool logout() = 0;
     /*
-     * »ñÈ¡ÎÄ¼þÁÐ±í
-     *  @param [out] files ÎÄ¼þÁÐ±í
-     *  @param [in] nChannelId Í¨µÀºÅ
-     *  @param [in] timeStart ¿ªÊ¼Ê±¼ä
-     *  @param [in] timeEnd ½áÊøÊ±¼ä
-     *  @return ÊÇ·ñ³É¹¦
+     * èŽ·å–æ–‡ä»¶åˆ—è¡¨
+     *  @param [out] files æ–‡ä»¶åˆ—è¡¨
+     *  @param [in] nChannelId é€šé“å·
+     *  @param [in] timeStart å¼€å§‹æ—¶é—´
+     *  @param [in] timeEnd ç»“æŸæ—¶é—´
+     *  @return æ˜¯å¦æˆåŠŸ
      */
     virtual bool GetRecordFileList(std::vector<RecordFile>& files, /*__int32 nChannelId*/const std::vector<int>& channelVec, __time64_t timeStart,
                                     __time64_t timeEnd) = 0;
     /*
-     * ÎÄ¼þÏÂÔØ
-     *  @param [in] saveFileName ±£´æÎÄ¼þÃû£¨È«Â·¾¶£©
-     *  @param [in] file ÊÓÆµÎÄ¼þÐÅÏ¢
-     *  @param [out] hdl ·µ»ØÏÂÔØID
-     *  @return ³É¹¦Óë·ñ
+     * æ–‡ä»¶ä¸‹è½½
+     *  @param [in] saveFileName ä¿å­˜æ–‡ä»¶åï¼ˆå…¨è·¯å¾„ï¼‰
+     *  @param [in] file è§†é¢‘æ–‡ä»¶ä¿¡æ¯
+     *  @param [out] hdl è¿”å›žä¸‹è½½ID
+     *  @return æˆåŠŸä¸Žå¦
      */
     virtual bool downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl) = 0;
     /*
-     *  Í£Ö¹ÏÂÔØ
-     *  @param [in] h downLoadByRecordFile·µ»ØµÄÏÂÔØID
-     *  @return ·µ»Øtrue/false
+     *  åœæ­¢ä¸‹è½½
+     *  @param [in] h downLoadByRecordFileè¿”å›žçš„ä¸‹è½½ID
+     *  @return è¿”å›žtrue/false
      */
     virtual bool stopDownload(download_handle_t h) = 0;
     /*
-     *  ÊÓÆµÔ¤ÀÀ
-     *  @param [in] file ÊÓÆµÎÄ¼þÐÅÏ¢
-     *  @param [in] hwnd ²¥·Å´°¿Ú¾ä±ú
-     *  @param [out] playbackHandle ·µ»Ø²¥·ÅID
-     *  @return ·µ»Øtrue/false
+     *  è§†é¢‘é¢„è§ˆ
+     *  @param [in] file è§†é¢‘æ–‡ä»¶ä¿¡æ¯
+     *  @param [in] hwnd æ’­æ”¾çª—å£å¥æŸ„
+     *  @param [out] playbackHandle è¿”å›žæ’­æ”¾ID
+     *  @return è¿”å›žtrue/false
      */
     virtual bool  PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle) = 0;
 
     /*
-     *  ÉèÖÃ²¥·ÅÎ»ÖÃ
-     *  @param [in] playbackHandle PlayBackByRecordFile·µ»ØµÄ²¥·ÅID
-     *  @param [in] pos £¨0 - 100£©
-     *  @return ·µ»Øtrue/false
+     *  è®¾ç½®æ’­æ”¾ä½ç½®
+     *  @param [in] playbackHandle PlayBackByRecordFileè¿”å›žçš„æ’­æ”¾ID
+     *  @param [in] pos ï¼ˆ0 - 100ï¼‰
+     *  @return è¿”å›žtrue/false
      */
     virtual bool SetPlayBack(__int64 playbackHandle, __int32 pos) = 0;
     /*
-     *  Í£Ö¹ÊÓÆµÔ¤ÀÀ
-     *  @param [in] playbackHandle PlayBackByRecordFile·µ»ØµÄ²¥·ÅID
-     *  @param [in] mPause ÊÇ·ñÊÇÔÝÍ£ 1ÊÇÔÝÍ£ 0²»ÊÇ
-     *  @return ·µ»Øtrue/false
+     *  åœæ­¢è§†é¢‘é¢„è§ˆ
+     *  @param [in] playbackHandle PlayBackByRecordFileè¿”å›žçš„æ’­æ”¾ID
+     *  @param [in] mPause æ˜¯å¦æ˜¯æš‚åœ 1æ˜¯æš‚åœ 0ä¸æ˜¯
+     *  @return è¿”å›žtrue/false
      */
     virtual bool StopPlayBack(__int64 playbackHandle, __int32 mPause) = 0;
     virtual bool getPlayBackPos(__int64 playbackHandle, __int32* pos)
@@ -465,9 +465,9 @@ extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory();
 
 typedef void* (*pfExternFun)(IVideoServer* server, void* externParams);
 
-//ÊÇ·ñÄÜÔ¤ÀÀÊÓÆµ
-//externParams ÀàÐÍ ºöÂÔ
-//·µ»ØÖµÀàÐÍ bool (Ä¬ÈÏtrue)
+//æ˜¯å¦èƒ½é¢„è§ˆè§†é¢‘
+//externParams ç±»åž‹ å¿½ç•¥
+//è¿”å›žå€¼ç±»åž‹ bool (é»˜è®¤true)
 #define EXTERN_FUN_CAN_PLAY_BACK "canPlayBack"
 
 
