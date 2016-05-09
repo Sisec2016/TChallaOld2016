@@ -48,19 +48,19 @@ Name: "desktopicon"; 		Description: "{cm:CreateDesktopIcon}"; 		GroupDescription
 Name: "quicklaunchicon"; 	Description: "{cm:CreateQuickLaunchIcon}"; 	GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\VideoDownLoad1\*.dll"; 												DestDir: "{app}"; Flags: ignoreversion
-;Source: "C:\VideoDownLoad1\fast_video.db"; 										DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\VideoDownLoad1\auto.bat"; 												DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\VideoDownLoad1\*.sys"; 												DestDir: "{app}"; Flags: ignoreversion
-								Source: "C:\VideoDownLoad1\*.exe"; 		Excludes:"unins000.*";		DestDir: "{app}"; Flags: ignoreversionSource: "C:\VideoDownLoad1\log\*"; 					  						DestDir: "{app}\log"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\VideoDownLoad1\DaHuaTool\*"; 					  						DestDir: "{app}\DaHuaTool"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\VideoDownLoad1\factorys\*"; 		Excludes:"*.lib;*.pdb";				DestDir: "{app}\factorys"; 		Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\VideoDownLoad1\hikPlay\*"; 											DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirs
-;Source: "C:\VideoDownLoad1\images\*"; 												DestDir: "{app}\images"; 		Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\VideoDownLoad1\platforms\*"; 											DestDir: "{app}\platforms"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-;Source: "C:\VideoDownLoad1\screenRecord\*"; 										DestDir: "{app}\screenRecord"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\VideoDownLoad1\sqldrivers\*"; 											DestDir: "{app}\sqldrivers"; 	Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\VideoDownLoad1\tool\*"; 												DestDir: "{app}\tool"; 			Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\*.dll"; 												DestDir: "{app}"; Flags: ignoreversion
+;Source: "C:\VideoDownLoad\fast_video.db"; 										DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\VideoDownLoad\auto.bat"; 												DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\VideoDownLoad\*.sys"; 												DestDir: "{app}"; Flags: ignoreversion
+								Source: "C:\VideoDownLoad\*.exe"; 		Excludes:"unins000.*";		DestDir: "{app}"; Flags: ignoreversionSource: "C:\VideoDownLoad\log"; 					  						DestDir: "{app}\log"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\DaHuaTool\*"; 					  						DestDir: "{app}\DaHuaTool"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\factorys\*"; 		Excludes:"*.lib;*.pdb";				DestDir: "{app}\factorys"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\hikPlay\*"; 											DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "C:\VideoDownLoad\images\*"; 												DestDir: "{app}\images"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\platforms\*"; 											DestDir: "{app}\platforms"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "C:\VideoDownLoad\screenRecord\*"; 										DestDir: "{app}\screenRecord"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\sqldrivers\*"; 											DestDir: "{app}\sqldrivers"; 	Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\tool\*"; 												DestDir: "{app}\tool"; 			Flags: ignoreversion recursesubdirs createallsubdirs
 ; 注意: 不要在任何共享系统文件上使用“Flags: ignoreversion”
 
 [Icons]

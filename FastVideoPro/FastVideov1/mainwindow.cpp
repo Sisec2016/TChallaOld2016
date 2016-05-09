@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "MyStyle.h"
 #include <QStandardItemModel>
@@ -296,7 +296,15 @@ void MainWindow::onToolBtnclicked()
 
 void MainWindow::onScreenBtnclicked()
 {
-	ShellExecuteA(GetDesktopWindow(), "open", "C:\\Program Files (x86)\\DV2008\\TC CARD\\TC CARD.exe",NULL, NULL, SW_SHOWNORMAL);
+	QString ProgramDir("C:\\Program Files (x86)\\DV2008\\TC CARD\\");
+	QString AppName("TC CARD.exe");
+	QString workingDirectory(ProgramDir);
+
+	if (!QProcess::startDetached(ProgramDir + AppName, QStringList(), workingDirectory)){
+		//fixed the path if start cmd failed!
+		ProgramDir = "C:\\Program Files\\DV2008\\TC CARD\\";
+		QProcess::startDetached(ProgramDir + AppName, QStringList(), workingDirectory);
+	}
 }
 
 

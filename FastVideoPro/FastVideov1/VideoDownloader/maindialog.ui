@@ -2385,7 +2385,7 @@ QLabel
      <rect>
       <x>10</x>
       <y>248</y>
-      <width>128</width>
+      <width>255</width>
       <height>496</height>
      </rect>
     </property>
