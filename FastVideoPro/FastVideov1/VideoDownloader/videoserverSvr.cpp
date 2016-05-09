@@ -60,6 +60,7 @@ void SvrFactory::startSver(){
     else{
         udp.close();
         QProcess::startDetached(QApplication::applicationDirPath() + "/VideoService.exe");
+		Log::instance().AddLog(QApplication::applicationDirPath() + "/VideoService.exe");
         Sleep(1000);
     }
 }

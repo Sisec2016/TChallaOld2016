@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>768</height>
+    <width>1280</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
     <rect>
      <x>30</x>
      <y>178</y>
-     <width>971</width>
+     <width>1231</width>
      <height>571</height>
     </rect>
    </property>
@@ -38,7 +38,7 @@
     <rect>
      <x>30</x>
      <y>81</y>
-     <width>971</width>
+     <width>1231</width>
      <height>91</height>
     </rect>
    </property>
@@ -234,7 +234,7 @@ border-image: url(:/VisitorSystem/png/down-hover.png);
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>327</x>
+      <x>460</x>
       <y>35</y>
       <width>16</width>
       <height>21</height>
@@ -247,10 +247,10 @@ border-image: url(:/VisitorSystem/png/down-hover.png);
    <widget class="QPushButton" name="pushButtonFind">
     <property name="geometry">
      <rect>
-      <x>800</x>
+      <x>990</x>
       <y>30</y>
-      <width>141</width>
-      <height>31</height>
+      <width>171</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -266,7 +266,7 @@ border-image: url(:/VisitorSystem/png/down-hover.png);
    <widget class="TimeEdit" name="beginTimeEdit">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>210</x>
       <y>30</y>
       <width>141</width>
       <height>34</height>
@@ -299,7 +299,7 @@ color:white;
    <widget class="QDateEdit" name="beginDateEdit">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>60</x>
       <y>30</y>
       <width>161</width>
       <height>34</height>
@@ -356,7 +356,7 @@ QDateTimeEdit::drop-down{
    <widget class="QDateEdit" name="endDateEdit">
     <property name="geometry">
      <rect>
-      <x>368</x>
+      <x>579</x>
       <y>30</y>
       <width>161</width>
       <height>34</height>
@@ -414,7 +414,7 @@ QDateTimeEdit::drop-down{
    <widget class="TimeEdit" name="endTimeEdit">
     <property name="geometry">
      <rect>
-      <x>519</x>
+      <x>730</x>
       <y>30</y>
       <width>141</width>
       <height>34</height>

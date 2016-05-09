@@ -5,7 +5,6 @@
 
 ChannelListWidget::ChannelListWidget(QWidget *parent) : QListWidget(parent)
 {
-
 }
 
 ChannelListWidget::~ChannelListWidget()

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>768</height>
+    <width>1280</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,8 +21,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
-     <height>768</height>
+     <width>1280</width>
+     <height>800</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -34,7 +34,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>300</x>
       <y>318</y>
       <width>165</width>
       <height>165</height>
@@ -79,7 +79,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>300</x>
       <y>504</y>
       <width>165</width>
       <height>165</height>
@@ -124,7 +124,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>352</x>
+      <x>482</x>
       <y>504</y>
       <width>165</width>
       <height>165</height>
@@ -169,7 +169,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>534</x>
+      <x>664</x>
       <y>504</y>
       <width>165</width>
       <height>165</height>
@@ -214,7 +214,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>716</x>
+      <x>846</x>
       <y>504</y>
       <width>165</width>
       <height>165</height>
@@ -259,7 +259,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>716</x>
+      <x>846</x>
       <y>318</y>
       <width>165</width>
       <height>165</height>
@@ -304,7 +304,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>352</x>
+      <x>482</x>
       <y>318</y>
       <width>165</width>
       <height>165</height>
@@ -349,7 +349,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>534</x>
+      <x>664</x>
       <y>318</y>
       <width>165</width>
       <height>165</height>
@@ -391,7 +391,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QLabel" name="logo">
     <property name="geometry">
      <rect>
-      <x>404</x>
+      <x>520</x>
       <y>8</y>
       <width>241</width>
       <height>241</height>
@@ -407,7 +407,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QPushButton" name="closeBtn">
     <property name="geometry">
      <rect>
-      <x>978</x>
+      <x>1230</x>
       <y>10</y>
       <width>45</width>
       <height>45</height>
@@ -433,7 +433,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QPushButton" name="minBtn">
     <property name="geometry">
      <rect>
-      <x>934</x>
+      <x>1186</x>
       <y>10</y>
       <width>45</width>
       <height>45</height>
@@ -459,7 +459,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QPushButton" name="moreBtn">
     <property name="geometry">
      <rect>
-      <x>890</x>
+      <x>1143</x>
       <y>10</y>
       <width>45</width>
       <height>45</height>
@@ -485,7 +485,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QLabel" name="labelProduct">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>300</x>
       <y>242</y>
       <width>707</width>
       <height>41</height>
