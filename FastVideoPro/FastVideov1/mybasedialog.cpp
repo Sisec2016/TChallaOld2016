@@ -12,7 +12,7 @@ MyBaseDialog::MyBaseDialog(QWidget *parent):QDialog(parent)
 	
 	this->setStyleSheet(QLatin1String("QDialog\n"
 		"{\n"
-		"	background-image: url(:/images/mainBackgound.png);\n"
+		"	border-image: url(:/images/mainBackgound.png);\n"
 		"}\n"
 		"QWidget\n"
 		"{\n"
@@ -96,10 +96,10 @@ MyBaseDialog::MyBaseDialog(QWidget *parent):QDialog(parent)
 			"background-color: rgb(175, 211, 237);"
 		"}"
 		));
-
+	this->setGeometry(QRect(0, 0, 1270, 798));
     closeBtn = new QPushButton(this);
     closeBtn->setObjectName(QString::fromUtf8("closeBtn"));
-    closeBtn->setGeometry(QRect(970, 4, 45, 45));
+    closeBtn->setGeometry(QRect(1225, 4, 45, 45));
     QIcon icon;
     icon.addFile(QString::fromUtf8(":/images/close.png"), QSize(), QIcon::Normal, QIcon::Off);
     closeBtn->setIcon(icon);
@@ -126,10 +126,10 @@ MyBaseDialog::MyBaseDialog(QWidget *parent):QDialog(parent)
 
    title_label = new QLabel(this);
    title_label->setObjectName(QString::fromUtf8("title_label"));
-   title_label->setGeometry(QRect(430, 5, 165, 40));
+   title_label->setGeometry(QRect(this->width() /2 - 80, 5, 165, 40));
   // QFont font;
  //  font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
- // font.setPointSize(22);//ui setStyleSheetÉèÖÃUI
+ // font.setPointSize(22);//ui setStyleSheetè®¾ç½®UI
  //  title_label->setFont(font);
    title_label->setStyleSheet("color:white;font-size:35px");
 
@@ -205,7 +205,7 @@ void MyBaseDialog::showEvent(QShowEvent* event)
 	{
 		pParent = (QWidget*)QApplication::desktop();
 	}
-	this->move((pParent->width() -this->width()) / 2, (pParent->height() - this->height()) / 2);
+	this->move((pParent->width() -this->width()) / 2, (pParent->height() - this->height()) / 2 );
 	
 }
 
