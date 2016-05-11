@@ -14,6 +14,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QString>
 
 #include "videoserversSvr.h"
 #include "dialog.h"
@@ -216,10 +217,10 @@ int main(int argc, char *argv[])
     initDb();
 	MD5 md5_toApply;//用于生成申请码
 
-	unsigned char address[1024];
-	if (getLocalMac(address) > 0)
+	QString PhysicalAddr;
+	if (getLocalMac(PhysicalAddr))
 	{
-		md5_toApply.update((const char *)address);//生成申请码
+		md5_toApply.update(PhysicalAddr.toStdString());//生成申请码
 	}
 	else
 	{

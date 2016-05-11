@@ -12,7 +12,7 @@ using namespace std;
 
 #define AuthorFile "AuthorFile"
 void byte2Hex(unsigned char bData, unsigned char hex[]);
-int getLocalMac(unsigned char *mac);
+bool getLocalMac(QString& PhysicalAddr);
 bool ReadAuthorizationFile(string &filedat);
 
 #endif

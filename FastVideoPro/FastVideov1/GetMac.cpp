@@ -1,4 +1,5 @@
 #include "GetMac.h"
+#include <QtNetwork/QNetworkInterface>
 
 void byte2Hex(unsigned char bData, unsigned char hex[])
 {
@@ -7,41 +8,28 @@ void byte2Hex(unsigned char bData, unsigned char hex[])
 	hex[1] = (low < 10) ? ('0' + low) : ('A' + low - 10);
 }
 
-int getLocalMac(unsigned char *mac) //获取本机MAC址 
+//obtain the Physical Address of Local NIC
+bool getLocalMac(QString& PhysicalAddr) 
 {
-	ULONG ulSize = 0;
-	PIP_ADAPTER_INFO pInfo = NULL;
-	int temp = 0;
-	temp = GetAdaptersInfo(pInfo, &ulSize);//第一处调用，获取缓冲区大小
-	pInfo = (PIP_ADAPTER_INFO)malloc(ulSize);
-	temp = GetAdaptersInfo(pInfo, &ulSize);
+	bool bSuccess = false;
 
-	int iCount = 0;
-	while (pInfo)//遍历每一张网卡
+	foreach(QNetworkInterface nif, QNetworkInterface::allInterfaces())
 	{
-		//  pInfo->Address MAC址
-		for (int i = 0; i < (int)pInfo->AddressLength; i++)
-		{
-			byte2Hex(pInfo->Address[i], &mac[iCount]);
-			iCount += 2;
-			if (i < (int)pInfo->AddressLength - 1)
-			{
-				//mac[iCount++] = '-';
-			}
-			else
-			{
-				mac[iCount++] = '#';
-			}
+		const QString LocalAdpterName("鏈湴杩炴帴");
+		QString msg("flags:%1, mac:%2, humanRN:%3, index:%4, isValid:%5, name:%6");
+		if (LocalAdpterName == nif.humanReadableName()){
+			PhysicalAddr = nif.hardwareAddress();
+			bSuccess = true; break;
+			qDebug() << msg.arg(nif.flags())
+				.arg(nif.hardwareAddress())
+				.arg(nif.humanReadableName())
+				.arg(nif.index())
+				.arg(nif.isValid())
+				.arg(nif.name());
 		}
-		pInfo = pInfo->Next;
 	}
 
-	if (iCount > 0)
-	{
-		mac[--iCount] = '\0';
-		return iCount;
-	}
-	else return -1;
+	return bSuccess;
 }
 
 bool ReadAuthorizationFile(string &filedat)
