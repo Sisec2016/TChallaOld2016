@@ -372,6 +372,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="stylesheet.qss" />
+    <None Include="..\..\translations\zh.ts">
+      <Filter>Translation Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -388,6 +391,11 @@
       <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
       <Extensions>ui</Extensions>
       <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+      <ParseFiles>false</ParseFiles>
     </Filter>
   </ItemGroup>
 </Project>

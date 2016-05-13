@@ -85,6 +85,8 @@
       <AdditionalDependencies>wpcap.lib;ws2_32.lib;VirDisk_SageAPI.lib;diskid32.lib;libprotobuf.lib;RCF.lib;cryptopp.lib;qtmain.lib;Qt5Core.lib;Qt5Sql.lib;Qt5Gui.lib;Qt5Network.lib;Qt5Xml.lib;iphlpapi.lib;Qt5Widgets.lib;boostlib/libboost_log_setup-vc120-mt-1_57.lib;boostlib/libboost_log-vc120-mt-1_57.lib;boostlib/libboost_thread-vc120-mt-1_57.lib;boostlib/libboost_system-vc120-mt-1_57.lib;boostlib/libboost_date_time-vc120-mt-1_57.lib;boostlib/libboost_chrono-vc120-mt-1_57.lib;boostlib/libboost_filesystem-vc120-mt-1_57.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateMapFile>true</GenerateMapFile>
+      <EnableUAC>true</EnableUAC>
+      <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
       <Command>copy  D:\work\downloadVideo\bin\FastVideo.exe D:\work\downloadVideo\patch\binv1\FastVideo.exe</Command>
@@ -1329,6 +1331,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
+    <None Include="..\..\translations\zh.ts" />
     <None Include="stylesheet.qss" />
     <CustomBuild Include="VideoDownloader\channelwidget.ui">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
