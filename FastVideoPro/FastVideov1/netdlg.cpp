@@ -1,4 +1,4 @@
-#include "netdlg.h"
+ï»¿#include "netdlg.h"
 #include "ui_netdlg.h"
 #include "qss.h"
 #include "PING.h"
@@ -17,6 +17,7 @@
 #include <Iphlpapi.h>
 #include <IPTypes.h>
 #include "pcap.h"
+#include <QtCore/QCoreApplication>
 
 #pragma comment(lib, "NetConfigModule.lib")
 
@@ -34,7 +35,8 @@
         "QPushButton:hover{background-color: rgb(255,0,0);}"\
         "QPushButton:pressed{background-color: rgb(0,255,0);}"
 
-#define IPListFile "file/ipListAddress.txt"
+#define IPFolder "/file/"
+#define IPListFile "ipListAddress.txt"
 
 netDlg::netDlg(QWidget *parent) :
     MyBaseDialog(parent),
@@ -53,12 +55,18 @@ netDlg::netDlg(QWidget *parent) :
     ui->groupBox_2->setStyleSheet("QGroupBox{color:white}");
     ui->groupBox_3->setStyleSheet("QGroupBox{color:white}");
 
-   // ui->ip_tableWidget->horizontalHeader()->setFixedHeight(35); //ÉèÖÃ±íÍ·µÄ¸ß¶È
+   // ui->ip_tableWidget->horizontalHeader()->setFixedHeight(35); //è®¾ç½®è¡¨å¤´çš„é«˜åº¦
     ui->ip_tableWidget->horizontalHeader()->setSectionsClickable(false);
 
     ui->ip_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 	//ui->ip_tableWidget->setAlternatingRowColors(true);
 	ui->ip_tableWidget->setFocusPolicy(Qt::NoFocus);
+
+	QDir d(QCoreApplication::applicationDirPath() + IPFolder);
+	
+	if (!d.exists())
+		d.mkdir(d.absolutePath());
+
 
     readIPListFile();
 
@@ -98,19 +106,19 @@ void netDlg::changeEvent(QEvent *e)
 void netDlg::getIPInterfaces()
 {
 #if 0
-    //»ñÈ¡ËùÓĞÍøÂç½Ó¿ÚµÄÁĞ±í
+    //è·å–æ‰€æœ‰ç½‘ç»œæ¥å£çš„åˆ—è¡¨
     foreach (m_netInterface, QNetworkInterface::allInterfaces())
     {
-        //Éè±¸Ãû
+        //è®¾å¤‡å
        // qDebug() << "Device:" << netInterface.name();
 
-        //MACµØÖ·
+        //MACåœ°å€
       //  qDebug() << "HardwareAddress:" << netInterface.hardwareAddress();
 
         QList<QNetworkAddressEntry> entryList = m_netInterface.addressEntries();
 
         bool bFind  = false;
-        //±éÀúÃ¿Ò»¸öIPµØÖ·(Ã¿¸ö°üº¬Ò»¸öIPµØÖ·£¬Ò»¸ö×ÓÍøÑÚÂëºÍÒ»¸ö¹ã²¥µØÖ·)
+        //éå†æ¯ä¸€ä¸ªIPåœ°å€(æ¯ä¸ªåŒ…å«ä¸€ä¸ªIPåœ°å€ï¼Œä¸€ä¸ªå­ç½‘æ©ç å’Œä¸€ä¸ªå¹¿æ’­åœ°å€)
         foreach(QNetworkAddressEntry entry, entryList)
         {
             QHostAddress address = entry.ip();
@@ -127,7 +135,7 @@ void netDlg::getIPInterfaces()
             }
         }
 
-            //¹ã²¥µØÖ·
+            //å¹¿æ’­åœ°å€
            // qDebug() << "Broadcast:" << entry.broadcast().toString();
         if(bFind)
         {
@@ -149,13 +157,13 @@ void netDlg::getIPInterfaces()
 
 void netDlg::refreshIPAddress()
 {
-    //IPµØÖ·
+    //IPåœ°å€
     ui->curip_label->setText(m_strIp);
 
-    //×ÓÍøÑÚÂë
+    //å­ç½‘æ©ç 
     ui->curmaskip_label->setText(m_strNetMask);
 
-	//Íø¹Ø  ±àÒë²»¹ı
+	//ç½‘å…³  ç¼–è¯‘ä¸è¿‡
  	ui->curgateip_label->setText(m_strGate);
 
 }
@@ -234,13 +242,13 @@ void netDlg::writeIPListFile()
 void netDlg::onSearchClicked()
 {
     std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÊ¶±ğ£¬ÇëÉÔµÈ..."), [=, this]()
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½è¯†åˆ«ï¼Œè¯·ç¨ç­‰..."), [=, this]()
     {
-        CWaitDlg::setShowMsg(QString::fromLocal8Bit("ÕıÔÚÊ¶±ğÍø¹Ø..."));
+        CWaitDlg::setShowMsg(QString::fromLocal8Bit("æ­£åœ¨è¯†åˆ«ç½‘å…³..."));
         *bResult = WindowUtils::setIPByDHCP(m_strIp, m_strNetMask, m_strGate);
-        QString sName = QString::fromLocal8Bit("±¾µØÁ¬½Ó");
+        QString sName = QString::fromLocal8Bit("æœ¬åœ°è¿æ¥");
 
-        CWaitDlg::setShowMsg(QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÊ¶±ğ..."));
+        CWaitDlg::setShowMsg(QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½è¯†åˆ«..."));
         if ((!*bResult) && WindowUtils::getDirectDevice(m_strIp, m_strGate))
         {
             m_strNetMask = "255.255.255.0";
@@ -253,7 +261,7 @@ void netDlg::onSearchClicked()
 //             QString sIP = QString("192.168.%1.1").arg(i);
 //             WindowUtils::setNetConfig(sName, sIP, "255.255.255.0", "", true);
 // 
-//             CWaitDlg::setShowMsg(QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÊ¶±ğÖ±Á¬Éè±¸(192.168.%1.0)...").arg(i));
+//             CWaitDlg::setShowMsg(QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½è¯†åˆ«ç›´è¿è®¾å¤‡(192.168.%1.0)...").arg(i));
 //             if (CPing::instance().ScanOneIP(sRIP, sIP, true))
 //             {
 //                 WindowUtils::setNetConfig(sName, sIP, "255.255.255.0", sRIP);
@@ -269,12 +277,12 @@ void netDlg::onSearchClicked()
         if (*bResult)
         {
             UIUtils::showTip(*ui->searchBtn,
-                QString::fromLocal8Bit("ÖÇÄÜÊ¶±ğÍø¶Î³É¹¦£¡"));
+                QString::fromLocal8Bit("æ™ºèƒ½è¯†åˆ«ç½‘æ®µæˆåŠŸï¼"));
             this->refreshIPAddress();
         }
         else{
             UIUtils::showTip(*ui->searchBtn,
-                QString::fromLocal8Bit("ÖÇÄÜÊ¶±ğÍø¶ÎÊ§°Ü£¡Çë¼ì²éÍøÂçÔÙÖØÊÔ£¬»òÕßÊÖ¹¤½øĞĞÅäÖÃ¡£"));
+                QString::fromLocal8Bit("æ™ºèƒ½è¯†åˆ«ç½‘æ®µå¤±è´¥ï¼è¯·æ£€æŸ¥ç½‘ç»œå†é‡è¯•ï¼Œæˆ–è€…æ‰‹å·¥è¿›è¡Œé…ç½®ã€‚"));
         }
 
     });
@@ -282,13 +290,13 @@ void netDlg::onSearchClicked()
 
 void netDlg::onAddClicked()
 {
-    // IPµØÖ·ÑéÖ¤
+    // IPåœ°å€éªŒè¯
     QString strIP = ui->IPEdit->text();
     QRegExp regexp("((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)");
     QRegExpValidator regexp_validator(regexp, this);
     int nPos = 0;
     QValidator::State state = regexp_validator.validate(strIP, nPos);
-    // IP²»ºÏ·¨
+    // IPä¸åˆæ³•
     if (state != QValidator::Acceptable)
     {
         QMessageBox msg;
@@ -296,7 +304,7 @@ void netDlg::onAddClicked()
         msg.exec();
         return;
     }
- // ×ÓÍøÑÚÂëÑéÖ¤
+ // å­ç½‘æ©ç éªŒè¯
     QString strMaskIP = ui->MaskIPEdit->text();
     state = regexp_validator.validate(strMaskIP, nPos);
     if (state != QValidator::Acceptable)
@@ -308,7 +316,7 @@ void netDlg::onAddClicked()
     }
 
 
- // Ä¬ÈÏÍø¹ØÑéÖ¤
+ // é»˜è®¤ç½‘å…³éªŒè¯
 
     QString strGateIP = ui->GateIPEdit->text();
     state = regexp_validator.validate(strGateIP, nPos);
@@ -320,11 +328,11 @@ void netDlg::onAddClicked()
         return;
     }
 
-    //±È½ÏÊÇ·ñº¬ÓĞÏàÍ¬µÄIPµØÖ·
+    //æ¯”è¾ƒæ˜¯å¦å«æœ‰ç›¸åŒçš„IPåœ°å€
     int count = m_listHostIPAddress.count();
     if(count!=0)
     {
-        //±È½ÏÊÇ·ñº¬ÓĞÏàÍ¬µÄIP
+        //æ¯”è¾ƒæ˜¯å¦å«æœ‰ç›¸åŒçš„IP
         for(int i = 0;i<count;i++)
         {
             T_Host_IPAddress t_HostIPAddress = m_listHostIPAddress.at(i);
@@ -347,7 +355,7 @@ void netDlg::onAddClicked()
     m_listHostIPAddress.append(t_HostIPAddress);
     addToTableWidget(&t_HostIPAddress);
     writeIPListFile();
-    Logdata::WriteLog(LOG_NetConfig_STR, QStringLiteral("Ìí¼ÓIP%1³É¹¦!").arg(strIP));
+    Logdata::WriteLog(LOG_NetConfig_STR, QStringLiteral("æ·»åŠ IP%1æˆåŠŸ!").arg(strIP));
 }
 
 void netDlg::addToTableWidget(T_Host_IPAddress *phostIPAddress)
@@ -378,13 +386,13 @@ void netDlg::onDeleteClicked()
     int row = ui->ip_tableWidget->currentRow();
     if(row>-1)
     {
-		if (QMessageBox::No == QMessageBox::question(this, QStringLiteral("ÌáÊ¾"),
-			QStringLiteral("È·¶¨ÒªÉ¾³ı %1 ?"  ).arg(m_listHostIPAddress.at(row).strIP), QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+		if (QMessageBox::No == QMessageBox::question(this, QStringLiteral("æç¤º"),
+			QStringLiteral("ç¡®å®šè¦åˆ é™¤ %1 ?"  ).arg(m_listHostIPAddress.at(row).strIP), QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
 		{
 			return;
 		}
 
-        Logdata::WriteLog(LOG_NetConfig_STR, QStringLiteral("É¾³ıIP%1³É¹¦!").arg(m_listHostIPAddress.at(row).strIP));
+        Logdata::WriteLog(LOG_NetConfig_STR, QStringLiteral("åˆ é™¤IP%1æˆåŠŸ!").arg(m_listHostIPAddress.at(row).strIP));
 
         m_listHostIPAddress.removeAt(row);
         ui->ip_tableWidget->removeRow(row);
@@ -399,7 +407,7 @@ void netDlg::onConfigClicked()
     {
         T_Host_IPAddress t_HostIPAddress = m_listHostIPAddress.at(row);
 		
-        Logdata::WriteLog(LOG_NetConfig_STR, QStringLiteral("ÉèÖÃIP%1³É¹¦!").arg(m_listHostIPAddress.at(row).strIP));
+        Logdata::WriteLog(LOG_NetConfig_STR, QStringLiteral("è®¾ç½®IP%1æˆåŠŸ!").arg(m_listHostIPAddress.at(row).strIP));
        //add by liyongxing
 		bool bRet = netconfig_SetIP((char *)t_HostIPAddress.strIP.toLatin1().constData(),
 			(char *)t_HostIPAddress.strMaskIP.toLatin1().constData(),
@@ -407,7 +415,7 @@ void netDlg::onConfigClicked()
         QString addr = QString("addr=%1").arg(t_HostIPAddress.strIP);
         QString mask = QString("mask=%1").arg(t_HostIPAddress.strMaskIP);
         QString gateway = QString("gateway=%1").arg(t_HostIPAddress.strGateIP);
-        QString sName = QString("name=\"%1\"").arg(QString::fromLocal8Bit("±¾µØÁ¬½Ó"));
+        QString sName = QString("name=\"%1\"").arg(QString::fromLocal8Bit("æœ¬åœ°è¿æ¥"));
         QProcess::execute("netsh", QStringList() <<
             "interface" << "ip" << "set" << "address"
             << sName << "source=static" << addr << mask << gateway);

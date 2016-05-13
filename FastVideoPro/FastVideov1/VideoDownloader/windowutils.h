@@ -14,7 +14,8 @@ class WindowUtils
 {
 public:
     static bool isValidNetMacaddress(const QString& macaddress);
-    static void getLocalIPs(std::vector<QString> &IPs);
+	static void GetIPfromLocalNIC(std::vector<QString> &IPs);
+	static void getLocalIPs(std::vector<QString> &IPs);
     static void getLocalIPs(const QString& sHostName, std::vector<QString> &IPs);
     static bool findProcessByName(const char* szFileName);
     static void terminateProcess(const char* szFileName);
