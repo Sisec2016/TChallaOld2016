@@ -1,4 +1,4 @@
-#include "dialog.h"
+﻿#include "dialog.h"
 #include "GetMac.h"
 #include "md5.h"
 
@@ -81,12 +81,12 @@ void Dialog::ClickButn()
 		{
 			return;
 		}
-		QMessageBox::information(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("授权成功,请重新运行程序！"), QMessageBox::Yes, QMessageBox::Yes);
+		QMessageBox::information(NULL, QString::fromStdWString(L"提示"), QString::fromStdWString(L"授权成功,请重新运行程序！"), QMessageBox::Yes, QMessageBox::Yes);
 		exit(0);
 	}
 	else
 	{
-		QMessageBox::information(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("授权失败"), QMessageBox::Yes, QMessageBox::Yes);
+		QMessageBox::information(NULL, QString::fromStdWString(L"提示"), QString::fromStdWString(L"授权失败"), QMessageBox::Yes, QMessageBox::Yes);
 	}
 	return;
 }
