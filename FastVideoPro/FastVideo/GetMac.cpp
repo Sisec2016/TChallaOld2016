@@ -15,10 +15,10 @@ bool getLocalMac(QString& PhysicalAddr)
 
 	foreach(QNetworkInterface nif, QNetworkInterface::allInterfaces())
 	{
-		const QString LocalAdpterName("本地连接");
+		const QString LocalAdpterName(QStringLiteral("本地连接"));
 		QString msg("flags:%1, mac:%2, humanRN:%3, index:%4, isValid:%5, name:%6");
 		if (LocalAdpterName == nif.humanReadableName()){
-			PhysicalAddr = nif.hardwareAddress();
+			PhysicalAddr = nif.hardwareAddress().remove(":");
 			bSuccess = true; break;
 			qDebug() << msg.arg(nif.flags())
 				.arg(nif.hardwareAddress())
