@@ -10,6 +10,7 @@ class SvrFactory : public IVideoServerFactory
     std::string mDefaultUser;
     std::string mDefaultPasswords;
     int mFactory;
+
     static std::recursive_mutex sMutexService;
 	static std::shared_ptr< RcfClient<VideoserverFactorySvr> > spService;
 	static bool init_service();
@@ -27,7 +28,7 @@ public:
 	virtual int defaultPort();
 	virtual const char* defaultUser();
 
-	virtual const char* defaultPasswords();
+	virtual const char* defaultPasswords();	
 	bool init();
 	void clean();
 	virtual DeviceFactory factory();

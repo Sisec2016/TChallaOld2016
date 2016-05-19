@@ -380,6 +380,24 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 	}
 }
 
+//<<<<<<<<<<<<<add by zhangyaofa 2016/5/19
+OEMFacMap videoserverFactory::GetFakeFactory(int nDeviceFactory)
+{
+	switch (nDeviceFactory)
+	{
+	case SISC_IPC_DIZHIPU:
+		return m_OEMWSDFacMap;
+	case SISC_IPC_HIKVISION:
+	case SISC_IPC_WSD:
+	case SISC_IPC_JIUAN:
+	case SISC_IPC_DOANGYANG:
+	case SISC_IPC_ZHONGWEI:
+	default:
+		break;
+	}
+}
+//>>>>>>>>>>>add end
+
 videoserverFactory* videoserverFactory::getFactory(DeviceFactory f)
 {
     getFactorys();
@@ -891,6 +909,118 @@ bool videoserver::login(std::shared_ptr<LoginServerInfo> p, bool *pbStop)
     return false;
 }
 
+//<<<<<<<<<<<<<add by zhangyaofa 2016/5/18
+bool videoserver::loginByBroadcast(int nFactory, std::shared_ptr<LoginServerInfo> p, bool *pbStop)
+{
+	if (!p || *pbStop)
+	{
+		Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
+			.arg(__FUNCTION__).arg(__LINE__).arg(*pbStop));
+		return false;
+	}
+
+	std::vector<videoserverFactory *> factorys;
+	getCommonFactorys(factorys);
+	int nPort = 0;
+	QString sUser;
+	QString sPasswords;
+
+	for (int i = 0; i < factorys.size(); i++)
+	{
+		if (*pbStop)
+		{
+			return false;
+		}
+
+		videoserverFactory *f = factorys[i];
+		if (f == nullptr)
+		{
+			Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:f == nullptr").arg(__FILE__)
+				.arg(__FUNCTION__).arg(__LINE__));
+			continue;
+		}
+
+		if (SISC_IPC_UNDEFINE == f->factory() || f->IsOEMFac())
+		{
+			Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, oem factory:%4").arg(__FILE__)
+				.arg(__FUNCTION__).arg(__LINE__).arg(f->name()));
+			continue;
+		}
+
+		if (f->factory() != nFactory)
+		{
+			continue;
+		}
+
+		//auto pServer = f->create();
+		IVideoServer* pServer = f->createDerect();
+		if (pServer == nullptr)
+		{
+			Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:f->createDerect == nullptr").arg(__FILE__)
+				.arg(__FUNCTION__).arg(__LINE__));
+			continue;
+		}
+
+		if (p->name.trimmed().isEmpty())
+		{
+			p->name = QString("%1(%2)").arg(f->name()).arg(p->ip);
+		}
+
+		if (p->port == 0)
+		{
+			nPort = f->port();
+		}
+		else
+		{
+			nPort = p->port;
+		}
+
+		if (p->user == UNDEFIN_DEVICE_DEFAULT_USER)
+		{
+			sUser = f->defaultUser();
+		}
+		else
+		{
+			sUser = p->user;
+		}
+
+		if (p->password == UNDEFIN_DEVICE_DEFAULT_PASSWORD)
+		{
+			sPasswords = f->defaultPasswords();
+		}
+		else
+		{
+			sPasswords = p->password;
+		}
+
+		if (sheLogin(pServer, p->ip.toStdString(), nPort, sUser.toStdString(), sPasswords.toStdString()))
+		{
+			Log::instance().AddLog(QString("OK!") + mpFactory->name() + "," + f->name() + " " + p->ip);
+			mpServer = pServer;
+			this->mpFactory = f;
+			p->factory = f->factory();
+			p->name = f->name() + "(" + p->ip + ")";
+			p->user = sUser;
+			p->password = sPasswords;
+			p->port = nPort;
+			mpLoginInfo = p;
+			mpLoginInfo->ip = p->ip;
+			return true;
+		}
+		else
+		{
+			Log::instance().AddLog(QString("Failed!") + mpFactory->name() + "," + f->name() + " " + p->ip);
+			pServer->destroy();
+
+			return false;
+		}
+		
+	}	
+
+	return false;
+}
+//>>>>>>>>>>>add end
+
 
 void videoserver::DealDownLoadCallback(download_handle_t h, qint64 totalSize, qint64 size, bool failed)
 {
@@ -1301,16 +1431,30 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
         return false;
     }
 
+	
     SHE_BEGING
 
         bool r = pServer->login(IP.c_str(), port, user.c_str(), password.c_str(), m_channels);
 
     if (!r)
-    {
+	{
+		
         this->mLastError = pServer->getLastError();
+		addLog(IP.c_str(), __LINE__);			
+		char szPort[10] = { 0 };
+		itoa(port, szPort, 10);
+		addLog(szPort, __LINE__);
+		addLog(user.c_str(), __LINE__);
+		addLog(password.c_str(), __LINE__);
         addLog("videoserver::sheLogin failed", __LINE__);
     }
     else{
+		addLog(IP.c_str(), __LINE__);		
+		char szPort[10] = { 0 };
+		itoa(port, szPort, 10);
+		addLog(szPort, __LINE__);
+		addLog(user.c_str(), __LINE__);
+		addLog(password.c_str(), __LINE__);
         addLog("videoserver::sheLogin true", __LINE__);
     }
     return r;

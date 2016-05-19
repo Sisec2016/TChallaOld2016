@@ -216,11 +216,11 @@ int main(int argc, char *argv[])
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
 	SingleApplication a(argc, argv);
-#ifndef _DEBUG
+//#ifndef _DEBUG
 	qInstallMessageHandler(outputMessage);
-#else
-	qInstallMessageHandler(myMessageOutput);
-#endif
+//#else
+//	qInstallMessageHandler(myMessageOutput);
+//#endif
 	if (a.isRunning())
 	{
 		return 0;
@@ -253,6 +253,7 @@ int main(int argc, char *argv[])
 
 	}
 
+
     if (!Dialog::hasKey() && !TempAuthDialog::instance().hasAuthority())
 	{
 		//没有授权文件，运行授权面板
@@ -262,7 +263,8 @@ int main(int argc, char *argv[])
         a.exec();
         exit(0);
 	}
-	
+
+
     if (Verify::init())
     {
         checkDirectory();

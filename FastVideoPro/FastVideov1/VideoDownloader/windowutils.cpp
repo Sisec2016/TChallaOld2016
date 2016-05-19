@@ -628,6 +628,11 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
     {
         _IP_ADAPTER_INFO* pIpAdapterInfo = (PIP_ADAPTER_INFO)malloc(sizeof(PIP_ADAPTER_INFO));
         ULONG uOutBufLen = sizeof(PIP_ADAPTER_INFO);//存放网卡信息的缓冲区大小
+
+		//add by zhangyaofa 2016/5/17
+		char *pOldIpAdapterInfo = (char *)pIpAdapterInfo;
+		//add end
+				
         //第一次调用GetAdapterInfo获取ulOutBufLen大小
         int errorNo = GetAdaptersInfo(pIpAdapterInfo, &uOutBufLen);
         if (errorNo == ERROR_BUFFER_OVERFLOW)
@@ -635,6 +640,11 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
             //获取需要的缓冲区大小
             free(pIpAdapterInfo);
             pIpAdapterInfo = (PIP_ADAPTER_INFO)malloc(uOutBufLen);//分配所需要的内存
+
+			//add by zhangyaofa 2016/5/17
+			pOldIpAdapterInfo = (char *)pIpAdapterInfo;
+			//add end
+
             errorNo = (GetAdaptersInfo(pIpAdapterInfo, &uOutBufLen));
         }
 
@@ -661,7 +671,11 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
                 pIpAdapterInfo = pIpAdapterInfo->Next;
             }
         }
-        free(pIpAdapterInfo);
+		//modify by zhangyaofa 2016/5/17
+        //free(pIpAdapterInfo);
+		////////////////////////////////
+		free(pOldIpAdapterInfo);
+		//modify end
     }
 
     return r;

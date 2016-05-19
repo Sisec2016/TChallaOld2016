@@ -245,6 +245,9 @@ public:
     static videoserverFactory* getFactory(DeviceFactory f);
     static void releaseVideoServerFactory();
 	static void addFakeFactory(IVideoServerFactory *pFactory);
+    //>>>>>>>>>>>>>>>>>>>>>>add by zhangyaofa 2016/5/19
+	static OEMFacMap GetFakeFactory(int nDeviceFactory);
+    //<<<<<<<<<<<<<<<<<<<<<<<add end
 public:
     videoserverFactory(IVideoServerFactory *p);
     ~videoserverFactory();
@@ -323,6 +326,7 @@ public:
 
         return 0;
     }
+		
 
     QString defaultUser()
     {
@@ -558,6 +562,9 @@ public:
     }
 
     virtual bool login(std::shared_ptr<LoginServerInfo> p, bool *pbStop);
+	//<<<<<<<<<<<add by zhangyaofa 2016/5/18
+	virtual bool loginByBroadcast(int nFactory, std::shared_ptr<LoginServerInfo> p, bool *pbStop);
+	//>>>>>>>>>>>>add end
     bool reLogin();
     bool canPlayback()
     {
@@ -685,6 +692,8 @@ public:
 	{
 		return m_OemFlag;
 	}
+
+
 
 private:
 
