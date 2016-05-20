@@ -204,10 +204,11 @@ void LogindDeviceDialog::initFactory()
 	}
 
 	//<<<<<<<<<add init factory  string by zhangyaofa 2016/5/18
+    m_DHFactorys.clear();
 	QString sFactory = QString::fromLocal8Bit("大华");
 	m_DHFactorys.push_back(sFactory);
 
-
+    m_DZPFactorys.clear();
 	sFactory = QString::fromLocal8Bit("迪智浦");
 	m_DZPFactorys.push_back(sFactory);
 	OEMFacMap DZPMap = videoserverFactory::GetFakeFactory(SISC_IPC_DIZHIPU);
@@ -218,6 +219,7 @@ void LogindDeviceDialog::initFactory()
 		m_DZPFactorys.push_back(sFactory);
 	}
 
+    m_JxjFactorys.clear();
 	sFactory = QString::fromLocal8Bit("佳信捷");
 	m_JxjFactorys.push_back(sFactory);
 	//>>>>>>>> add end
@@ -300,16 +302,17 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 	bool bCheckBroadcast = FALSE;
 	vector <QString>::iterator itrFactory;
 
-	if (ui->checkBoxSearchIp->isChecked())
-	{
-		for (itrFactory = m_DHFactorys.begin(); itrFactory != m_DHFactorys.end(); itrFactory++)
-		{
-			if ((*itrFactory) == pFactory->name())
-			{
-				bCheckBroadcast = TRUE;
-				checkDeviceByBroadcast(DH_SDK);
-			}
-		}
+    if (ui->checkBoxSearchIp->isChecked())
+    {
+        for (itrFactory = m_DHFactorys.begin(); itrFactory != m_DHFactorys.end(); itrFactory++)
+        {
+            if ((*itrFactory) == pFactory->name())
+            {
+                bCheckBroadcast = TRUE;
+                checkDeviceByBroadcast(DH_SDK);
+                break;
+            }
+        }
 
 		for (itrFactory = m_DZPFactorys.begin(); itrFactory != m_DZPFactorys.end(); itrFactory++)
 		{
@@ -317,18 +320,20 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 			{
 				bCheckBroadcast = TRUE;
 				checkDeviceByBroadcast(DZP_SDK);
+				break;
 			}
 		}
 
-		for (itrFactory = m_JxjFactorys.begin(); itrFactory != m_JxjFactorys.end(); itrFactory++)
-		{
-			if ((*itrFactory) == pFactory->name())
-			{
-				bCheckBroadcast = TRUE;
-				checkDeviceByBroadcast(JXJ_SDK);
-			}
-		}
-	}
+        for (itrFactory = m_JxjFactorys.begin(); itrFactory != m_JxjFactorys.end(); itrFactory++)
+        {
+            if ((*itrFactory) == pFactory->name())
+            {
+                bCheckBroadcast = TRUE;
+                checkDeviceByBroadcast(JXJ_SDK);
+                break;
+            }
+        }
+    }
 	
 
 	if (!bCheckBroadcast)
@@ -363,10 +368,10 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 	CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在初始化..."), [=]()
 	{
 		//<<<<<<<<<<<<<<<<<<add intelligent search device   by zhangyaofa 2016/5/17 
-		if (ui->checkBoxSearchIp->isChecked())
+		if (!bCheckBroadcast)
 		{
 			autoCheckDeviceByBroadcast(bLock, pFactory, port, user, password, mtLoginResult);
-		}		
+		}
 		//>>>>>>>>>>>>>>>>>>add end
 
 		for (int i = 0; i < mvcIps.size() && (!*bpCancel); i++)
@@ -382,7 +387,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 				*bLock = false;
 				if (!pServer)
 				{
-					qDebug() << "nullptr == pServer";
+					qDebug() << "nullptr == pServer" << sIP;
 					return;
 				}
 
@@ -699,23 +704,22 @@ void LogindDeviceDialog::initNetCombobox(){
 void LogindDeviceDialog::checkDeviceByBroadcast(int nFactoryType)
 {
 
-	qDebug() << "check device by broadcast start";
+	qDebug() << "check device by broadcast start" << QString(nFactoryType);
 	mvcIps.clear();
 
 	SearchDeviceInterface *pSearch = CreateSearchObj();
 
 	//set DLL path
-	pSearch->SetDllPath("factorys\\");
+	pSearch->SetDllPath("factorys\\");	
 
 	int nDeviceLen = sizeof(NET_DEVICE_INFO);
 	char *pDevice = new char[nDeviceLen * 512];
 	int nRet = 0;
-	memset(pDevice, 0, nDeviceLen * 512);
+	memset(pDevice, 0, nDeviceLen * 512);	
 	std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
 	CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在搜索设备，请稍等..."), [=, this]()
 	{
-		bool bRet = pSearch->GetDevice(pDevice, nDeviceLen * 512, (int *)&nRet);
-
+	bool bRet = pSearch->GetDevice(pDevice, nDeviceLen * 512, (int *)&nRet);
 		if (bRet)
 		{
 			int i;
