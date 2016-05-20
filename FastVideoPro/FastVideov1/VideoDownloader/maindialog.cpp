@@ -19,6 +19,9 @@
 #include "Verify.h"
 #include "TaskLogRecordDialog.h"
 
+
+#pragma comment(lib, "SearchDevices.lib")
+
 #define REFRESH_SECONDS   10
 MainDialog::MainDialog(QWidget *parent) :
 MyBaseDialog(parent),
@@ -94,6 +97,10 @@ mStop(false)
     // ScreenAdaption::instance().init(this->geometry().width(), this->geometry().height());
     //  ScreenAdaption::instance().adpte(this);
 
+	//<<<<<<<<<<<<<add by zhangyaofa
+	m_pSearch = CreateSearchObj();
+	//>>>>>>>>>>>>>add end
+
     CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("正在加载数据中..."), [=]()
     {
         videoserverFactory::getFactorys();
@@ -136,8 +143,14 @@ mStop(false)
 MainDialog::~MainDialog()
 {
     this->saveForExit();
+
+	//<<<<<<<<<<<<<<add by zhangyaofa
+	DestroySearchObj(m_pSearch);
+	//>>>>>>>>>>>>>>>add end
+
     exit(1);
     mStop = true;
+	
     CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("正在退出中..."), [this]()
     {
         if (mDownloadTimerThread)
@@ -159,6 +172,9 @@ MainDialog::~MainDialog()
 //    delete m_backBtn2;
 //    m_closeBtn2->deleteLater();
     delete ui;
+
+
+
     Verify::uninit();
     CWaitDlg::setMainDlg(this->parentWidget());
     // exit(1);
@@ -555,6 +571,7 @@ void MainDialog::saveForExit(){
 
  //   ui->listWidgetDevices->setAllTaskCancel();
  //   ui->listWidgetDevices->setQuiting();
+	
     CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("正在保存数据中..."), [=]()
     {
         int time = 0;

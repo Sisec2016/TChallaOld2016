@@ -202,13 +202,14 @@ void SvrFactory::videoFileExterns(std::vector<std::string>& externs)
 }
 
 IVideoServer* SvrFactory::create(){
-    VF_BEGIN()
+	VF_BEGIN()		
         int port = spService->create(mFactory);
+	
         if (port != PORT_NONE)
         {
             return new SvrVideoserver(port, mFactory);
         }
-    VF_END()
+    VF_END()  
     return nullptr;
 }
 

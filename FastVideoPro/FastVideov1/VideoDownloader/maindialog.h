@@ -10,6 +10,8 @@
 //#include "noflamedlg.h"
 #include "../mybasedialog.h"
 
+#include "SearchDevicesImpl.h"
+
 namespace Ui {
 class MainDialog;
 }
@@ -47,6 +49,9 @@ public:
     void onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pFileAllRows);
     void onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask);
 
+	//<<<<<<<<<<<<add by zhangyaofa 2016/5/20	
+	SearchDeviceInterface *m_pSearch;
+	//>>>>>>>>>>>>>>>>add end
 public:
     QString getSaveDatasDir();
 private slots:

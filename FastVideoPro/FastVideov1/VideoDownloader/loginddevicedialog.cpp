@@ -19,9 +19,10 @@
 #include "netdlg.h"
 #include "IPConfigSucessDialog.h"
 
-#include "SearchDevicesImpl.h"
+#include "maindialog.h"
 
-#pragma comment(lib, "SearchDevices.lib")
+
+
 
 
 
@@ -56,11 +57,17 @@ mCurrentPage(1)
 
 	ui->pushButtonDirect->hide();
 	ipConfigGuide();
+
+	//<<<<<<<<<<<<<<add by zhangyaofa 
+	MainDialog *pMainDlg = (MainDialog *)parent;
+	m_pSearch = pMainDlg->m_pSearch;
+	//>>>>>>>>>>>>>add end
 }
 
 LogindDeviceDialog::~LogindDeviceDialog()
 {
 	delete ui;
+	
 }
 
 void LogindDeviceDialog::ipConfigGuide(){
@@ -707,10 +714,10 @@ void LogindDeviceDialog::checkDeviceByBroadcast(int nFactoryType)
 	qDebug() << "check device by broadcast start" << QString(nFactoryType);
 	mvcIps.clear();
 
-	SearchDeviceInterface *pSearch = CreateSearchObj();
+	
 
 	//set DLL path
-	pSearch->SetDllPath("factorys\\");	
+	//m_pSearch->SetDllPath("factorys\\");	
 
 	int nDeviceLen = sizeof(NET_DEVICE_INFO);
 	char *pDevice = new char[nDeviceLen * 512];
@@ -719,7 +726,7 @@ void LogindDeviceDialog::checkDeviceByBroadcast(int nFactoryType)
 	std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
 	CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在搜索设备，请稍等..."), [=, this]()
 	{
-	bool bRet = pSearch->GetDevice(pDevice, nDeviceLen * 512, (int *)&nRet);
+	bool bRet = m_pSearch->GetDevice(pDevice, nDeviceLen * 512, (int *)&nRet);
 		if (bRet)
 		{
 			int i;
@@ -759,7 +766,7 @@ void LogindDeviceDialog::checkDeviceByBroadcast(int nFactoryType)
 			}
 		}
 
-		DestroySearchObj(pSearch);
+		
 		delete pDevice;
 
 	}, [=, this](bool bCancel){

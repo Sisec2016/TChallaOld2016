@@ -439,13 +439,13 @@ videoserverFactory::~videoserverFactory()
 std::shared_ptr<videoserver> videoserverFactory::create(bool nullSver)
 {
     if (!mInit)
-    {
+    {        
         mInit = sheInit();
         mInit = true;
     }
     std::shared_ptr<videoserver> p;
     if (mInit)
-    {
+    {        
         std::lock_guard<std::recursive_mutex> lock(m_mutexService);
         for (auto it =  m_vcServices.begin(); it != m_vcServices.end(); it++)
         {
@@ -454,7 +454,7 @@ std::shared_ptr<videoserver> videoserverFactory::create(bool nullSver)
                 if ((*it)->isNull())
                 {
                     if (nullSver || nullptr == mpFactory)
-                    {
+                    {                       
                         p = *it;
                         break;
                     }
@@ -462,7 +462,7 @@ std::shared_ptr<videoserver> videoserverFactory::create(bool nullSver)
                 else
                 {
                     if (!nullSver && nullptr != mpFactory)
-                    {
+                    {                       
                         p = *it;
                         break;
                     }
@@ -474,13 +474,14 @@ std::shared_ptr<videoserver> videoserverFactory::create(bool nullSver)
         {
             std::vector< std::shared_ptr<videoserver> > s_vcServices;
             if (nullptr == mpFactory || nullSver)
-            {
+            {                
                 p = std::shared_ptr<videoserver>(new videoserver(nullptr, this));
             }
             else{
-                IVideoServer* pvr = mpFactory->create();
+                IVideoServer* pvr = mpFactory->create();               
                 if (pvr != nullptr)
                 {
+                   
                     p = std::shared_ptr<videoserver>(new videoserver(pvr, this));
                 }
             }
@@ -488,7 +489,7 @@ std::shared_ptr<videoserver> videoserverFactory::create(bool nullSver)
     }
 
     if (p)
-    {
+    {       
         p->setRelease(false);
     }
 
