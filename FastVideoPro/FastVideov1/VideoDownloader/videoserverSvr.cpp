@@ -241,10 +241,27 @@ bool SvrVideoserver::init_service(){
         }
         
         try{
-             mpService = std::make_shared< RcfClient<VideoserverSvr> >(RCF::TcpEndpoint("127.0.0.1", mPort));
-             mpService->getClientStub().setConnectTimeoutMs(5 * 1000);
-             mpService->getClientStub().setRemoteCallTimeoutMs(120 * 1000);
-             mpService->getClientStub().setMaxBatchMessageLength(100000000);
+             mpService = std::make_shared< RcfClient<VideoserverSvr> >(RCF::TcpEndpoint("127.0.0.1", mPort));	
+			 ///<<<<<<<<<<<<<<<<<modify by zhangyaofa 2016/5/24
+			 switch (mFactory)
+			 {
+			 case SISC_IPC_HANGJINGKEJI:
+				 mpService->getClientStub().setConnectTimeoutMs(3 * 1000);
+				 mpService->getClientStub().setRemoteCallTimeoutMs(120 * 3 * 1000);
+				 mpService->getClientStub().setMaxBatchMessageLength(100000000);
+				 break;
+			 default:
+				 mpService->getClientStub().setConnectTimeoutMs(5 * 1000);
+				 mpService->getClientStub().setRemoteCallTimeoutMs(120 * 1000);
+				 mpService->getClientStub().setMaxBatchMessageLength(100000000);
+				 break;
+			 }            
+			 /////////////////////////////////////////
+			 /*mpService->getClientStub().setConnectTimeoutMs(5 * 1000);
+			 mpService->getClientStub().setRemoteCallTimeoutMs(120 * 1000);
+			 mpService->getClientStub().setMaxBatchMessageLength(100000000);*/
+			 ///>>>>>>>>>>>>>>>>modify end
+
         }
         catch (const RCF::Exception & e)
         {
