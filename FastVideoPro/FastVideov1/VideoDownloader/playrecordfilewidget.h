@@ -6,12 +6,21 @@
 #include <thread>
 #include <mutex>
 #include <QTimer>
-#include "noflamedlg.h"
+////<<<<<<<<modify window drag by zhangyaofa 2016/5/25
+#include "playflamedlg.h"
+/////////////////////////////////////////////////
+//#include "noflamedlg.h"
+////>>>>>>>>>modify end
+
 namespace Ui {
 class PlayRecordFilewidget;
 }
 
-class PlayRecordFilewidget : public NoFlameDlg
+////<<<<<<<<<modify window drag by zhangyaofa 2016/5/25
+class PlayRecordFilewidget : public PlayFlameDlg
+////////////////////////////////////////////////////
+//class PlayRecordFilewidget : public NoFlameDlg
+////>>>>>>>>>modify end
 {
     Q_OBJECT
 
