@@ -5,7 +5,11 @@
 #include "screenadaption.h"
 
 PlayRecordFilewidget::PlayRecordFilewidget(RecordFile &f, std::shared_ptr<videoserver> pServer, QWidget *parent) :
-    NoFlameDlg(parent),
+////<<<<<<<<<<<modify window drag by zhangyaofa 2016/5/25
+    PlayFlameDlg(parent),
+/////////////////////////////////////////////////////
+//  NoFlameDlg(parent),
+////>>>>>>>>>>>modify end
     mpService(pServer),
     mFile(f),
     ui(new Ui::PlayRecordFilewidget)
