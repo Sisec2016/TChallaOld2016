@@ -1017,7 +1017,11 @@ bool videoserver::GetRecordFileList(std::vector<RecordFile>& files, /*int nChann
             bool r = mpServer->GetRecordFileList(daysFiles, channelVec, QDateTime(start, tmS).toTime_t(), QDateTime(dtE, tmE).toTime_t());
             if (!r)
             {
-                return false;
+				///////////<<<<<<<<<<<<<<<<<<modify DALI search fail by zhangyaofa 2016/5/25
+				continue;
+				///////////////////////////////////////////////
+                //return false;
+				///////////>>>>>>>>>>>>>>>>>>modify end
             }
 
             for (int i = 0; i < daysFiles.size(); i++)
@@ -1307,10 +1311,16 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
 
     if (!r)
     {
+		//addLog(IP.c_str(), __LINE__);	
+		char log[1024] = { 0 };
+		sprintf(log, "Ip: %s videoserver::sheLogin failed", IP.c_str());
         this->mLastError = pServer->getLastError();
-        addLog("videoserver::sheLogin failed", __LINE__);
+        addLog(log, __LINE__);
     }
     else{
+		//addLog(IP.c_str(), __LINE__);		
+		char log[1024] = { 0 };
+		sprintf(log, "Ip: %s videoserver::sheLogin true", IP.c_str());
         addLog("videoserver::sheLogin true", __LINE__);
     }
     return r;
