@@ -127,7 +127,7 @@ void videoserverFactory::initOEMFacList()
 		m_OEMXMFacMap["施耐安"] = SISC_IPC_SNA;
 		m_OEMXMFacMap["雄迈"] = SISC_IPC_XM;
 		m_OEMXMFacMap["海视泰"] = SISC_IPC_HAISHITAI;
-		m_OEMXMFacMap["新达共创"] = SISC_IPC_XINDAGONGCHUANG;
+		m_OEMXMFacMap["新大共创"] = SISC_IPC_XINDAGONGCHUANG;
 		m_OEMXMFacMap["天视达"] = SISC_IPC_TIANSHIDA;
 		m_OEMXMFacMap["守卫者"] = SISC_IPC_SHOUWEIZHE;
 		m_OEMXMFacMap["深圳思浪"] = SISC_IPC_SILANG;
@@ -1017,7 +1017,11 @@ bool videoserver::GetRecordFileList(std::vector<RecordFile>& files, /*int nChann
             bool r = mpServer->GetRecordFileList(daysFiles, channelVec, QDateTime(start, tmS).toTime_t(), QDateTime(dtE, tmE).toTime_t());
             if (!r)
             {
-                return false;
+				///////////<<<<<<<<<<<<<<<<<<modify DALI search fail by zhangyaofa 2016/5/25
+				continue;
+				///////////////////////////////////////////////
+                //return false;
+				///////////>>>>>>>>>>>>>>>>>>modify end
             }
 
             for (int i = 0; i < daysFiles.size(); i++)
@@ -1307,10 +1311,11 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
 
     if (!r)
     {
+		//addLog(IP.c_str(), __LINE__);	
         this->mLastError = pServer->getLastError();
         addLog("videoserver::sheLogin failed", __LINE__);
     }
-    else{
+    else{		
         addLog("videoserver::sheLogin true", __LINE__);
     }
     return r;
