@@ -127,7 +127,7 @@ void videoserverFactory::initOEMFacList()
 		m_OEMXMFacMap["施耐安"] = SISC_IPC_SNA;
 		m_OEMXMFacMap["雄迈"] = SISC_IPC_XM;
 		m_OEMXMFacMap["海视泰"] = SISC_IPC_HAISHITAI;
-		m_OEMXMFacMap["新达共创"] = SISC_IPC_XINDAGONGCHUANG;
+		m_OEMXMFacMap["新大共创"] = SISC_IPC_XINDAGONGCHUANG;
 		m_OEMXMFacMap["天视达"] = SISC_IPC_TIANSHIDA;
 		m_OEMXMFacMap["守卫者"] = SISC_IPC_SHOUWEIZHE;
 		m_OEMXMFacMap["深圳思浪"] = SISC_IPC_SILANG;
