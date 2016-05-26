@@ -118,6 +118,8 @@ public:
     virtual bool StopPlayBack(__int64 playbackHandle, __int32 mPause);
     bool getPlayBackPos(__int64 playbackHandle, __int32* pos);
     bool getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed);
+	void InitRF(__int32 channel, HISI_DVR_FIND_DATA& findInfo, RecordFile& rf);
+	void InitTime(HISI_DVR_TIME& struStartTime, HISI_DVR_TIME& struStopTime, __time64_t timeStart, __time64_t timeEnd);
 private:
     const RecordFile* m_playFile;
     __time64_t mStartPlayTime;
