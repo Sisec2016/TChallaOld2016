@@ -364,10 +364,10 @@ static void CALLBACK PosCallBack(LLONG lPlayHandle, DWORD dwTotalSize, DWORD dwD
 
 IVideoServer* dh_videoserver::clone()
 {
-//     dh_videoserver *svr = new dh_videoserver();
+ dh_videoserver *svr = new dh_videoserver();
 // 	memcpy(svr, this, sizeof(dh_videoserver));
 //     return svr;
-	return NULL;
+ return svr;
 }
 
 bool dh_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
