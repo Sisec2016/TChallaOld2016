@@ -496,40 +496,59 @@ bool JiuAn_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const 
 	if (timeStart >= timeEnd) return false;
 
     files.clear();
-	HISI_DVR_TIME struStartTime, struStopTime, struEveryDayTime;
-	InitTime(struStartTime, struStopTime, timeStart, timeEnd);
+	HISI_DVR_TIME struStartTime, struStopTime;
+	HISI_DVR_TIME struStartTimeTemp, struEveryDayTime;
+	InitTime(struStartTime, struStopTime, timeStart, timeEnd);	
+	
+	struStartTimeTemp = struStartTime;
 	struEveryDayTime = struStopTime;
-	struEveryDayTime.dwDay = struStartTime.dwDay;
-//	DWORD m_days = struStopTime.dwDay - struStartTime.dwDay;
+
+	if (struStopTime.dwDay > struStartTime.dwDay)
+	{
+		struEveryDayTime.dwDay = struStartTime.dwDay;
+		struEveryDayTime.dwHour = 23;
+		struEveryDayTime.dwMinute = 59;
+		struEveryDayTime.dwSecond = 59;
+	}
 
     __int32 nChannelId = 0;
 	for (; struStartTime.dwDay <= struStopTime.dwDay; struStartTime.dwDay += 1, struEveryDayTime.dwDay += 1){
+		if (struEveryDayTime.dwDay == struStopTime.dwDay)
+		{
+			struEveryDayTime = struStopTime;
+		}
+		if (struStartTimeTemp.dwDay != struStartTime.dwDay)
+		{
+			struStartTime.dwHour = 0;
+			struStartTime.dwMinute = 0;
+			struStartTime.dwSecond = 0;
+		}
 		for (int ch = 0; ch < channelVec.size(); ch++)
 		{
 			nChannelId = channelVec[ch];
-			char szTime[512];
-			ZeroMemory(szTime, 512);
 
 			LONG lfind = DVR_FindFile(m_lLoginHandle, nChannelId, rt_all, &struStartTime, &struEveryDayTime);			
-
 			if (lfind == -1) continue;
 		
 			HISI_DVR_FIND_DATA findInfo;
 			ZeroMemory(&findInfo, sizeof(findInfo));
-
+			findInfo.struStartTime = struStartTime;
+			findInfo.struStopTime = struEveryDayTime;
 			LONG re = DVR_FindNextFile(lfind, &findInfo);
-
+			
 			while (true)
 			{
 				if (re != HISI_DVR_ISFINDING && re != HISI_DVR_FILE_SUCCESS)
 					break;
-				if (re != HISI_DVR_FILE_SUCCESS) ::Sleep(20);
+				if (re != HISI_DVR_FILE_SUCCESS) ::Sleep(20); 
 
 				RecordFile rf;
 				InitRF(nChannelId, findInfo, rf);
 				if (findInfo.dwFileSize == 0)
 				{
+					
 					LONG hdl = DVR_GetFileByTime(m_lLoginHandle, rf.channel, &findInfo.struStartTime, &findInfo.struStopTime, (char*)"C:/test.h263");
+
 					hdl < 0 ? rf.size = 0 : rf.size = (rf.endTime - rf.beginTime) * 18083;
 					pJiuAn_DVR_StopGetFile(hdl);
 				}
@@ -543,12 +562,18 @@ bool JiuAn_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const 
 					files.push_back(rf);
 				}
 
+				char erree[200] = { 0 };
+				sprintf_s(erree, "sawwwwwwwwwwwww s_time:%d-%02d-%02d %02d:%02d:%02d e_time:%d-%02d-%02d %02d:%02d:%02d", findInfo.struStartTime, findInfo.struStopTime);
+				Log::instance().AddLog(string(erree));
+
 				ZeroMemory(&findInfo, sizeof(findInfo));
 				re = DVR_FindNextFile(lfind, &findInfo);
 			}
+			
 		}
 	}
 	
+
     Log::instance().AddLog(string("GetRecordFileList done"));
     return true;
 }
