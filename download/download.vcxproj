@@ -140,10 +140,6 @@
     <ClCompile Include="downloadcontrol.cpp" />
     <ClCompile Include="downloadmanager.cpp" />
     <ClCompile Include="downloadthread.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_downloadcontrol.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_downloadmanager.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_downloadthread.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_singleapllication.cpp" />
     <ClCompile Include="GeneratedFiles\Release\moc_downloadcontrol.cpp" />
     <ClCompile Include="GeneratedFiles\Release\moc_downloadmanager.cpp" />
     <ClCompile Include="GeneratedFiles\Release\moc_downloadthread.cpp" />
@@ -211,7 +207,7 @@ endlocal
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="msvc2013" />
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="QTDIR" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
