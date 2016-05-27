@@ -11,29 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{BD694506-BCBB-4B6B-8B52-97DC874406C8}</ProjectGuid>
-    <RootNamespace>DHVideoServer</RootNamespace>
+    <ProjectGuid>{02086719-A686-4AB9-B2CE-5E19F843217B}</ProjectGuid>
+    <RootNamespace>HAIKVideoServer</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <PlatformToolSet>v120</PlatformToolSet>
-    <OutputDirectory>..\bin\factorys\DH\</OutputDirectory>
+    <OutputDirectory>..\bin\factorys\haikang\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <IntermediateDirectory>release\</IntermediateDirectory>
-    <PrimaryOutput>DHVideoServer</PrimaryOutput>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PrimaryOutput>HAIKVideoServer</PrimaryOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <PlatformToolSet>v120</PlatformToolSet>
-    <OutputDirectory>..\bin\factorys\DH\</OutputDirectory>
+    <OutputDirectory>..\bin\factorys\haikang\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <IntermediateDirectory>debug\</IntermediateDirectory>
-    <PrimaryOutput>DHVideoServer</PrimaryOutput>
+    <PrimaryOutput>HAIKVideoServer</PrimaryOutput>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -45,14 +44,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\work\downloadVideo\bin\factorys\DH\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\work\downloadVideo\bin\factorys\BaoXinSheng\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">DHVideoServer</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BaoXinShengVideoServer</TargetName>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</IgnoreImportLibrary>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\Debug\factorys\DH\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\Debug\factorys\haikang\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">DHVideoServer</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAIKVideoServer</TargetName>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -60,7 +59,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;sdk;..\boostinclude;..\VideoDownloader;debug;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtWidgets;..\..\VideoServer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;sdk;..\boostinclude;..\VideoDownloader;debug;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -Zc:strictStrings -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -78,14 +77,14 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_log_setup-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_log-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_system-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_date_time-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_chrono-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_filesystem-vc120-mt-1_57.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zlnetsdk.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_log_setup-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_log-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_system-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_date_time-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_chrono-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_filesystem-vc120-mt-1_57.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>sdk;$(QTDIR)\lib;../boostlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <LinkDLL>true</LinkDLL>
       <LinkIncremental>false</LinkIncremental>
-      <OutputFile>$(OutDir)\DHVideoServer.dll</OutputFile>
+      <OutputFile>$(OutDir)\BaoXinShengVideoServer.dll</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -101,7 +100,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;sdk;..\boostinclude;..\VideoDownloader;debug;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtWidgets;..\..\VideoServer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;sdk;..\boostinclude;..\VideoDownloader;debug;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -119,13 +118,13 @@
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>../boostlib/libboost_log_setup-vc120-mt-gd-1_57.lib;../boostlib/libboost_log-vc120-mt-gd-1_57.lib;../boostlib/libboost_system-vc120-mt-gd-1_57.lib;../boostlib/libboost_date_time-vc120-mt-gd-1_57.lib;../boostlib/libboost_chrono-vc120-mt-gd-1_57.lib;../boostlib/libboost_filesystem-vc120-mt-gd-1_57.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sdk\\HCNetSDK.lib;../boostlib/libboost_log_setup-vc120-mt-gd-1_57.lib;../boostlib/libboost_log-vc120-mt-gd-1_57.lib;../boostlib/libboost_system-vc120-mt-gd-1_57.lib;../boostlib/libboost_date_time-vc120-mt-gd-1_57.lib;../boostlib/libboost_chrono-vc120-mt-gd-1_57.lib;../boostlib/libboost_filesystem-vc120-mt-gd-1_57.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>sdk;$(QTDIR)\lib;../boostlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <LinkDLL>true</LinkDLL>
-      <OutputFile>$(OutDir)\DHVideoServer.dll</OutputFile>
+      <OutputFile>$(OutDir)\HAIKVideoServer.dll</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -141,14 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\VideoServer\log.cpp" />
-    <ClCompile Include="Api_DH.cpp" />
-    <ClCompile Include="DH_videoserver.cpp" />
+    <ClCompile Include="BaoXinShengVideoServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\VideoServer\IVideoServer.h" />
     <ClInclude Include="..\..\VideoServer\log.h" />
-    <ClInclude Include="Api_DH.h" />
-    <ClInclude Include="DH_videoserver.h" />
+    <ClInclude Include="BaoXinShengVideoServer.h" />
+    <ClInclude Include="sdk\assistant.h" />
+    <ClInclude Include="sdk\zlnetsdk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
