@@ -492,111 +492,150 @@ LONG DVR_GetFileByTime(LONG lUserID, int channel, PHISI_DVR_TIME lpStartTime, PH
 bool JiuAn_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
     __time64_t timeEnd)
 {
-	if (m_lLoginHandle <= 0) return false;
-	if (timeStart >= timeEnd) return false;
+    if (m_lLoginHandle <= 0)
+    {
+        m_sLastError = "请先登录!";
+        Log::instance().AddLog(string("GetRecordFileList 请先登录"));
+        return false;
+    }
+
+    if (timeStart >= timeEnd)
+    {
+        m_sLastError = "时间范围不对!";
+        Log::instance().AddLog(string("GetRecordFileList 时间范围不对"));
+        return false;
+    }
 
     files.clear();
-	HISI_DVR_TIME struStartTime, struStopTime, struEveryDayTime;
-	InitTime(struStartTime, struStopTime, timeStart, timeEnd);
-	struEveryDayTime = struStopTime;
-	struEveryDayTime.dwDay = struStartTime.dwDay;
-//	DWORD m_days = struStopTime.dwDay - struStartTime.dwDay;
+    struct tm Tm;
 
+    HISI_DVR_TIME struStartTime;
+    _localtime64_s(&Tm, (const time_t*)&timeStart);
+    struStartTime.dwYear = Tm.tm_year + 1900;
+    struStartTime.dwMonth = Tm.tm_mon + 1;
+    struStartTime.dwDay = Tm.tm_mday;
+    struStartTime.dwHour = Tm.tm_hour;
+    struStartTime.dwMinute = Tm.tm_min;
+    struStartTime.dwSecond = Tm.tm_sec;
+
+    HISI_DVR_TIME struStopTime;
+    _localtime64_s(&Tm, (const time_t*)&timeEnd);
+    struStopTime.dwYear = Tm.tm_year + 1900;
+    struStopTime.dwMonth = Tm.tm_mon + 1;
+    struStopTime.dwDay = Tm.tm_mday;
+    struStopTime.dwHour = Tm.tm_hour;
+    struStopTime.dwMinute = Tm.tm_min;
+    struStopTime.dwSecond = Tm.tm_sec;
     __int32 nChannelId = 0;
-	for (; struStartTime.dwDay <= struStopTime.dwDay; struStartTime.dwDay += 1, struEveryDayTime.dwDay += 1){
-		for (int ch = 0; ch < channelVec.size(); ch++)
-		{
-			nChannelId = channelVec[ch];
-			char szTime[512];
-			ZeroMemory(szTime, 512);
+    for (int ch = 0; ch < channelVec.size(); ch++)
+    {
+        nChannelId = channelVec[ch];
+        char szTime[512];
+        ZeroMemory(szTime, 512);
+        sprintf(szTime, " s_time:%d-%02d-%02d %02d:%02d:%02d e_time:%d-%02d-%02d %02d:%02d:%02d channel:%d linkID:%d",
+            struStartTime.dwYear, struStartTime.dwMonth, struStartTime.dwDay,
+            struStartTime.dwHour, struStartTime.dwMinute, struStartTime.dwSecond,
+            struStopTime.dwYear, struStopTime.dwMonth, struStopTime.dwDay,
+            struStopTime.dwHour, struStopTime.dwMinute, struStopTime.dwSecond, nChannelId, m_lLoginHandle);
+        Log::instance().AddLog(string("GetRecordFileList ") + string(szTime));
 
-			LONG lfind = DVR_FindFile(m_lLoginHandle, nChannelId, rt_all, &struStartTime, &struEveryDayTime);			
+        LONG lfind = DVR_FindFile(m_lLoginHandle, nChannelId, rt_all, &struStartTime, &struStopTime);
 
-			if (lfind == -1) continue;
-		
-			HISI_DVR_FIND_DATA findInfo;
-			ZeroMemory(&findInfo, sizeof(findInfo));
+        if (lfind == 0)
+        {
+            m_sLastError = GetLastErrorString();
+            Log::instance().AddLog(string("GetRecordFileList 查询录像失败，错误原因：") + m_sLastError);
+            continue;
+        }
+        HISI_DVR_FIND_DATA findInfo;
+        ZeroMemory(&findInfo, sizeof(findInfo));
+        int iFinds = 0;
 
-			LONG re = DVR_FindNextFile(lfind, &findInfo);
+        LONG re = DVR_FindNextFile(lfind, &findInfo);
+        RecordFile rf;
+        
+        while (re == HISI_DVR_ISFINDING || re == HISI_DVR_FILE_SUCCESS)
+        {
+            if (re == HISI_DVR_FILE_SUCCESS /*&& findInfo.dwFileSize > 0*/)//获得视频文件必须大于0(测试中有发现文件大小为0情况,所以必须过滤掉改部分)
+            {
+                struct tm Tm;
+                Tm.tm_year = findInfo.struStartTime.dwYear - 1900;
+                Tm.tm_mon = findInfo.struStartTime.dwMonth - 1;
+                Tm.tm_mday = findInfo.struStartTime.dwDay;
+                Tm.tm_hour = findInfo.struStartTime.dwHour;
+                Tm.tm_min = findInfo.struStartTime.dwMinute;
+                Tm.tm_sec = findInfo.struStartTime.dwSecond;
+                rf.beginTime = _mktime64(&Tm);
 
-			while (true)
-			{
-				if (re != HISI_DVR_ISFINDING && re != HISI_DVR_FILE_SUCCESS)
-					break;
-				if (re != HISI_DVR_FILE_SUCCESS) ::Sleep(20);
+                Tm.tm_year = findInfo.struStopTime.dwYear - 1900;
+                Tm.tm_mon = findInfo.struStopTime.dwMonth - 1;
+                Tm.tm_mday = findInfo.struStopTime.dwDay;
+                Tm.tm_hour = findInfo.struStopTime.dwHour;
+                Tm.tm_min = findInfo.struStopTime.dwMinute;
+                Tm.tm_sec = findInfo.struStopTime.dwSecond;
+                rf.endTime = _mktime64(&Tm);
 
-				RecordFile rf;
-				InitRF(nChannelId, findInfo, rf);
-				if (findInfo.dwFileSize == 0)
-				{
-					LONG hdl = DVR_GetFileByTime(m_lLoginHandle, rf.channel, &findInfo.struStartTime, &findInfo.struStopTime, (char*)"C:/test.h263");
-					hdl < 0 ? rf.size = 0 : rf.size = (rf.endTime - rf.beginTime) * 18083;
-					pJiuAn_DVR_StopGetFile(hdl);
-				}
-				else{
-					rf.size = findInfo.dwFileSize;
-				}
+                rf.channel = nChannelId;
+                rf.name = findInfo.sFileName;
+                if (findInfo.dwFileSize != 0)
+                {
+                    rf.size = findInfo.dwFileSize;
+                }
+                else
+                {
+                    LONG hdl = DVR_GetFileByTime(m_lLoginHandle, rf.channel, &findInfo.struStartTime, &findInfo.struStopTime, (char*)"C:/test.h263");
 
-				if (rf.size > 0)
-				{
-					rf.setPrivateData(&findInfo, sizeof(HISI_DVR_FIND_DATA));
-					files.push_back(rf);
-				}
+                    if (hdl < 0)
+                    {
+                        rf.size = 0;
+                    }
+                    else{
+                        pJiuAn_DVR_StopGetFile(hdl);
+                        rf.size = (rf.endTime - rf.beginTime) * 18083;
+                    }
+                    
+                }
+                if (rf.size > 0)
+                {
+                    rf.setPrivateData(&findInfo, sizeof(HISI_DVR_FIND_DATA));
+                    files.push_back(rf);
+                    iFinds++;
+                }
+                else{
+                    ::Sleep(20);
+                }
 
-				ZeroMemory(&findInfo, sizeof(findInfo));
-				re = DVR_FindNextFile(lfind, &findInfo);
-			}
-		}
-	}
-	
+            }
+            else
+            {
+                ::Sleep(20);
+            }
+
+            ZeroMemory(&findInfo, sizeof(findInfo));
+            re = DVR_FindNextFile(lfind, &findInfo);
+        }
+
+        Log::instance().AddLog(string("GetRecordFileList 003"));
+
+        if (HISI_DVR_FILE_EXCEPTION == re || -1 == re)
+        {
+            m_sLastError = GetLastErrorString();
+            Log::instance().AddLog(string("GetRecordFileList 查询录像失败 01，错误原因：") + m_sLastError);
+            continue;
+        }
+        Log::instance().AddLog(string("GetRecordFileList 004"));
+        if (FALSE == DVR_FindClose(lfind))
+        {
+            m_sLastError = GetLastErrorString();
+            Log::instance().AddLog(string("GetRecordFileList 关闭查询录像失败，错误原因：") + m_sLastError);
+            continue;
+        }
+    }
+
     Log::instance().AddLog(string("GetRecordFileList done"));
     return true;
 }
 
-
-void JiuAn_videoserver::InitRF(__int32 channel, HISI_DVR_FIND_DATA& findInfo, RecordFile& rf)
-{
-	struct tm Tm;
-	Tm.tm_year = findInfo.struStartTime.dwYear - 1900;
-	Tm.tm_mon = findInfo.struStartTime.dwMonth - 1;
-	Tm.tm_mday = findInfo.struStartTime.dwDay;
-	Tm.tm_hour = findInfo.struStartTime.dwHour;
-	Tm.tm_min = findInfo.struStartTime.dwMinute;
-	Tm.tm_sec = findInfo.struStartTime.dwSecond;
-	rf.beginTime = _mktime64(&Tm);
-
-	Tm.tm_year = findInfo.struStopTime.dwYear - 1900;
-	Tm.tm_mon = findInfo.struStopTime.dwMonth - 1;
-	Tm.tm_mday = findInfo.struStopTime.dwDay;
-	Tm.tm_hour = findInfo.struStopTime.dwHour;
-	Tm.tm_min = findInfo.struStopTime.dwMinute;
-	Tm.tm_sec = findInfo.struStopTime.dwSecond;
-	rf.endTime = _mktime64(&Tm);
-
-	rf.channel = channel;
-	rf.name = findInfo.sFileName;
-}
-
-void JiuAn_videoserver::InitTime(HISI_DVR_TIME& struStartTime, HISI_DVR_TIME& struStopTime, __time64_t timeStart, __time64_t timeEnd)
-{
-	struct tm Tm;
-
-	_localtime64_s(&Tm, (const time_t*)&timeStart);
-	struStartTime.dwYear = Tm.tm_year + 1900;
-	struStartTime.dwMonth = Tm.tm_mon + 1;
-	struStartTime.dwDay = Tm.tm_mday;
-	struStartTime.dwHour = Tm.tm_hour;
-	struStartTime.dwMinute = Tm.tm_min;
-	struStartTime.dwSecond = Tm.tm_sec;
-
-	_localtime64_s(&Tm, (const time_t*)&timeEnd);
-	struStopTime.dwYear = Tm.tm_year + 1900;
-	struStopTime.dwMonth = Tm.tm_mon + 1;
-	struStopTime.dwDay = Tm.tm_mday;
-	struStopTime.dwHour = Tm.tm_hour;
-	struStopTime.dwMinute = Tm.tm_min;
-	struStopTime.dwSecond = Tm.tm_sec;
-}
 
 bool JiuAn_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
