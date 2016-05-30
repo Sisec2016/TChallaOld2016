@@ -6,6 +6,8 @@
 //#include "log.h"
 //Log g_log("dizhipu_videoserver");
 
+
+
 IVideoServerFactory* VideoServerFactory()
 {
     return new CFactoryDiZhiPu();
@@ -190,6 +192,8 @@ bool GetDevConfigTry(long lhandle, char* channelName, DWORD *dwRetLen, int nWait
 
 bool dizhipu_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
+//	g_log.AddLog(string("asdasd"));
+
     memset(&m_deviceInfo, 0, sizeof(m_deviceInfo));
 
 	int iError = 0;
@@ -315,120 +319,111 @@ bool getFileTry(long lhandle, H264_DVR_FINDINFO *findInfo, H264_DVR_FILE_DATA *s
 bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std::vector<int>& channelVec, __time64_t timeStart,
                                                        __time64_t timeEnd)
 {
+	if (m_lLoginHandle <= 0) return false;
 
-    if (m_lLoginHandle <= 0)
-    {
-		m_sLastError = "请先登录!";
-		//g_log.AddLog(string("GetRecordFileList 请先登录"));
-        return false;
-    }
-
-    if (timeStart >= timeEnd)
-    {
-		m_sLastError = "时间范围不对!";
-		//g_log.AddLog(string("GetRecordFileList 时间范围不对"));
-        return false;
-    }
+	if (timeStart >= timeEnd) return false;
 
 	files.clear();
 
-	std::vector<int>::iterator itr = channelVec.begin();
-	for (; itr != channelVec.end(); itr++)
+	H264_DVR_TIME stime, etime;
+	H264_DVR_TIME stimeTmp, everydayTime;
+
+	tm STime;
+	tm ETime;
+	_localtime64_s(&STime, (const time_t*)&timeStart);
+	_localtime64_s(&ETime, (const time_t*)&timeEnd);
+
+	timeStdToDiZhiPu2(&STime, &stime);
+	timeStdToDiZhiPu2(&ETime, &etime);
+	
+	stimeTmp = stime;
+	everydayTime = etime;
+	if (etime.dwDay > stime.dwDay)
 	{
-		int nChannelId = *itr;
-
-		H264_DVR_TIME stime;
-		H264_DVR_TIME etime;
-		tm STime;
-		tm ETime;
-		_localtime64_s(&STime, (const time_t*)&timeStart);
-		_localtime64_s(&ETime, (const time_t*)&timeEnd);
-
-		timeStdToDiZhiPu2(&STime, &stime);
-		timeStdToDiZhiPu2(&ETime, &etime);
-		char szTime[512];
-		ZeroMemory(szTime, 512);
-		sprintf(szTime, " s_time:%d-%02d-%02d %02d:%02d:%02d e_time:%d-%02d-%02d %02d:%02d:%02d channel:%d linkID:%d", stime.dwYear, stime.dwMonth, stime.dwDay,
-			stime.dwHour, stime.dwMinute, stime.dwSecond,
-			etime.dwYear, etime.dwMonth, etime.dwDay, etime.dwHour, etime.dwMinute, etime.dwSecond, nChannelId, m_lLoginHandle);
-		//g_log.AddLog(string("GetRecordFileList ") + string(szTime));
-
-		char szTime64_s[64];
-		ZeroMemory(szTime64_s, 64);
-		char szTime64_e[64];
-		ZeroMemory(szTime64_e, 64);
-		_i64toa(timeStart, szTime64_s, 10);
-		_i64toa(timeEnd, szTime64_e, 10);
-		//g_log.AddLog(string("time64 s_time:") + string(szTime64_s) + string(" e_time:") + string(szTime64_e));
-
-		H264_DVR_FINDINFO findInfo;
-		ZeroMemory(&findInfo, sizeof(findInfo));
-		findInfo.nChannelN0 = nChannelId - 1;
-		findInfo.nFileType = 0;
-		findInfo.startTime = stime;
-		findInfo.endTime = etime;
-
-		H264_DVR_FILE_DATA *szSend = new H264_DVR_FILE_DATA[MAX_SEARCH_COUNT];
-		ZeroMemory(szSend, sizeof(H264_DVR_FILE_DATA)*MAX_SEARCH_COUNT);
-
-		int iMaxNum = 0;
-		bool bRet = false;
-		bRet = getFileTry(m_lLoginHandle, &findInfo, szSend, MAX_SEARCH_COUNT, &iMaxNum);
-		if (bRet == false)
+		everydayTime.dwDay = stime.dwDay;
+		everydayTime.dwHour = 23;
+		everydayTime.dwMinute = 59;
+		everydayTime.dwSecond = 59;
+	}
+	for (; stime.dwDay <= etime.dwDay; stime.dwDay += 1, everydayTime.dwDay += 1)
+	{
+		if (everydayTime.dwDay == etime.dwDay)
 		{
-			continue;
+			everydayTime = etime;
 		}
-
-		if (!bRet)
+		if (stimeTmp.dwDay != stime.dwDay)
 		{
-			m_sLastError = GetLastErrorString();
-			continue;
+			stime.dwHour = 0;
+			stime.dwMinute = 0;
+			stime.dwSecond = 0;
 		}
-		if (iMaxNum == 0)
+		std::vector<int>::iterator itr = channelVec.begin();
+		for (; itr != channelVec.end(); itr++)
 		{
-			continue;;
-		}
+			int nChannelId = *itr;
 
-		{
-			Mutex::ScopedLock lock(m_mtx);
-			H264_DVR_FILE_DATA item;
-			RecordFile info;
-			tm sTm;
-			tm eTm;
-			char szFileName[MAX_PATH];
-			for (int i = 0; i < iMaxNum; i++)
+			H264_DVR_FINDINFO findInfo;
+			ZeroMemory(&findInfo, sizeof(findInfo));
+			findInfo.nChannelN0 = nChannelId - 1;
+			findInfo.nFileType = 0;
+			findInfo.startTime = stime;
+			findInfo.endTime = everydayTime;
+
+			H264_DVR_FILE_DATA *szSend = new H264_DVR_FILE_DATA[MAX_SEARCH_COUNT];
+			ZeroMemory(szSend, sizeof(H264_DVR_FILE_DATA)*MAX_SEARCH_COUNT);
+
+			int iMaxNum = 0;
+			bool bRet = false;
+			bRet = getFileTry(m_lLoginHandle, &findInfo, szSend, MAX_SEARCH_COUNT, &iMaxNum);
+			if (bRet == false || iMaxNum == 0)
 			{
-				item = szSend[i];
-				ZeroMemory(szFileName, sizeof(szFileName));
-				sprintf(szFileName, "channel%d %04d-%02d-%02d %02d-%02d-%02d -- %04d-%02d-%02d %02d-%02d-%02d",
-					nChannelId,
-					item.stBeginTime.year,
-					item.stBeginTime.month,
-					item.stBeginTime.day,
-					item.stBeginTime.hour,
-					item.stBeginTime.minute,
-					item.stBeginTime.second,
-					item.stEndTime.year,
-					item.stEndTime.month,
-					item.stEndTime.day,
-					item.stEndTime.hour,
-					item.stEndTime.minute,
-					item.stEndTime.second);
-				m_mapArcItem.insert(make_pair(string(szFileName), item));
-
-				timeDiZhiPuToStd(&item.stBeginTime, &sTm);
-				timeDiZhiPuToStd(&item.stEndTime, &eTm);
-
-				info.channel = nChannelId/*item.ch*/;
-				info.size = item.size * 1024;
-				info.name = szFileName;
-				info.beginTime = mktime(&sTm);
-				info.endTime = mktime(&eTm);
-				files.push_back(info);
-			}
+				m_sLastError = GetLastErrorString();
+				continue;
+			}	
+			SaveToFiles(files, szSend, iMaxNum, nChannelId);
 		}
 	}
 	return true;
+}
+
+void dizhipu_videoserver::SaveToFiles(std::vector<RecordFile>& files, H264_DVR_FILE_DATA* szSend, int iMaxNum, int nChannelId)
+{
+	Mutex::ScopedLock lock(m_mtx);
+	H264_DVR_FILE_DATA item;
+	RecordFile info;
+	tm sTm;
+	tm eTm;
+	char szFileName[MAX_PATH];
+	for (int i = 0; i < iMaxNum; i++)
+	{
+		item = szSend[i];
+		ZeroMemory(szFileName, sizeof(szFileName));
+		sprintf(szFileName, "channel%d %04d-%02d-%02d %02d-%02d-%02d -- %04d-%02d-%02d %02d-%02d-%02d",
+			nChannelId,
+			item.stBeginTime.year,
+			item.stBeginTime.month,
+			item.stBeginTime.day,
+			item.stBeginTime.hour,
+			item.stBeginTime.minute,
+			item.stBeginTime.second,
+			item.stEndTime.year,
+			item.stEndTime.month,
+			item.stEndTime.day,
+			item.stEndTime.hour,
+			item.stEndTime.minute,
+			item.stEndTime.second);
+		m_mapArcItem.insert(make_pair(string(szFileName), item));
+
+		timeDiZhiPuToStd(&item.stBeginTime, &sTm);
+		timeDiZhiPuToStd(&item.stEndTime, &eTm);
+
+		info.channel = nChannelId/*item.ch*/;
+		info.size = item.size * 1024;
+		info.name = szFileName;
+		info.beginTime = mktime(&sTm);
+		info.endTime = mktime(&eTm);
+		files.push_back(info);
+	}
 }
 
 bool downloadTry(long lhandle, H264_DVR_FILE_DATA *info, const char* saveFileName, long ptr, download_handle_t& hdl)

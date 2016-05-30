@@ -76,6 +76,10 @@ public:
 	virtual bool GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
                                                  __time64_t timeEnd);
 
+	void InitTime(DONGYANG::TimeInfo& staTime, DONGYANG::TimeInfo& stopTime, __time64_t timeStart, __time64_t timeEnd);
+	void SaveToFiles(DONGYANG::RecFileQueryResult* cFileResult, DWORD dwFileCnt, __int32 nChannelId,
+		std::vector<RecordFile>& files);
+
 	virtual bool downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl);
     virtual bool stopDownload(download_handle_t h);
     virtual bool  PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle);

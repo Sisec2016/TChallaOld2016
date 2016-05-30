@@ -72,7 +72,7 @@ public:
     virtual bool logout();
 	virtual bool GetRecordFileList(std::vector<RecordFile>& files, std::vector<int>& channelVec, __time64_t timeStart,
                                                  __time64_t timeEnd);
-
+	void SaveToFiles(std::vector<RecordFile>& files, H264_DVR_FILE_DATA* szSend, int iMaxNum, int nChannelId);
     virtual bool downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl);
     virtual bool stopDownload(download_handle_t h);
     virtual bool  PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle);
