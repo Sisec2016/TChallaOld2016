@@ -25,24 +25,24 @@ protected:
 private:
     Ui::MainWindow *ui;
     //去掉标题栏，能拖动窗口移动
-	
+
 protected:
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-	void showEvent(QShowEvent* event);
+    void showEvent(QShowEvent* event);
 private slots:
     void onMinClicked();
-	void onCloseClicked();
-	void onAboutClicked();
+    void onCloseClicked();
+    void onAboutClicked();
     void onHelpClicked();
     void onUpdateClicked();
     void onDiskBtnclicked();
     void onShareBtnclicked();
     void onFTPBtnclicked();
-	void onToolBtnclicked();
+    void onToolBtnclicked();
     void onVideoBtnclicked();
-	void onScreenBtnclicked();
+    void onScreenBtnclicked();
     void onFileBtnclicked();
     void onNetBtnclicked();
     void onLogBtnclicked();
@@ -54,7 +54,7 @@ private:
     QPoint mLastMousePosition;
     bool mMoving;
     MainDialog* mpVideoDownloadDlg;
-//
+    //
 };
 
 #endif // MAINWINDOW_H

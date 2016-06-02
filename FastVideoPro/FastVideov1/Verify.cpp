@@ -14,6 +14,7 @@ const char* Verify::version()
     return "2.0.3";
 #else
     return "1.3.5.1.2";
+
 #endif
 }
 

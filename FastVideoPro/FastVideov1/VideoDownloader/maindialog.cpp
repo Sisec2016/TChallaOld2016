@@ -23,8 +23,8 @@
 MainDialog::MainDialog(QWidget *parent) :
 MyBaseDialog(parent),
 ui(new Ui::MainDialog),
-mStop(false)
-
+mStop(false),
+mLoaded(false)
 {
 
     ui->setupUi(this);
@@ -98,7 +98,7 @@ mStop(false)
     {
         videoserverFactory::getFactorys();
 
-    }, [this](bool bCancel){load(); });
+    }, [this](bool bCancel){load(); mLoaded = true; });
 
 
     mDownloadTimerThread = std::shared_ptr<std::thread>(new std::thread([&]()
@@ -129,6 +129,11 @@ mStop(false)
 
     CWaitDlg::setMainDlg(this);
     // ScreenAdaption::instance().showInCenter(this);
+    if (!WindowUtils::isOnLine())
+    {
+        UIUtils::showTip(*this,
+            QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
+    }
 }
 
 
@@ -433,7 +438,13 @@ void MainDialog::on_downloadButton_clicked()
 
 void MainDialog::on_closeButton_clicked()
 {
-    this->reject();
+    if (mLoaded)
+    {
+        this->reject();
+    }
+    else{
+        UIUtils::showTip(*this, QString::fromLocal8Bit("正在加载中，请稍候再退出"));
+    }
 }
 
 void MainDialog::on_zonedownloadBtn_clicked()

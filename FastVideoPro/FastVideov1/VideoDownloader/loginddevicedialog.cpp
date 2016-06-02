@@ -1,8 +1,9 @@
-ï»¿#include "PING.h"
+#include "PING.h"
 #include "loginddevicedialog.h"
 #include "ui_loginddevicedialog.h"
 #include "videoserver.h"
 #include <QCollator>
+#include <QNetworkConfigurationManager>
 
 #include "utils.h"
 #include "uiutils.h"
@@ -18,9 +19,12 @@
 #include "utils.h"
 #include "netdlg.h"
 #include "IPConfigSucessDialog.h"
+#include "Iphlpapi.h"
 
-#define     NET_IP_DEAFAULT     QStringLiteral("é»˜è®¤")
-#define     IP_CONFIG_GUIDE_TITLE  QStringLiteral("IPè‡ªåŠ¨åŒ¹é…å‘å¯¼")
+#pragma comment(lib,"Iphlpapi")
+
+#define     NET_IP_DEAFAULT     QStringLiteral("Ä¬ÈÏ")
+#define     IP_CONFIG_GUIDE_TITLE  QStringLiteral("IP×Ô¶¯Æ¥ÅäÏòµ¼")
 LogindDeviceDialog::LogindDeviceDialog(QWidget *parent) :
     NoFlameDlg(parent),
     ui(new Ui::LogindDeviceDialog),
@@ -42,7 +46,7 @@ LogindDeviceDialog::LogindDeviceDialog(QWidget *parent) :
     connect(ui->lineEditFactory, SIGNAL(textChanged(const QString &)), this, SLOT(on_txtSearchFactory_textChanged(const QString &)));
     connect(ui->listViewServers, SIGNAL(onSelected(ListViewItem*)), this, SLOT(on_factory_Selected(ListViewItem*)));
     ui->listViewServers->init(ui->widgetHeader);
-    this->setPage(1);
+
     ui->checkBoxDefaultPort->setChecked(true);
     ui->checkBoxSearchIp->setChecked(true);
     initNetCombobox();
@@ -50,6 +54,7 @@ LogindDeviceDialog::LogindDeviceDialog(QWidget *parent) :
 
     ui->pushButtonDirect->hide();
     ipConfigGuide();
+    this->setPage(1);
 }
 
 LogindDeviceDialog::~LogindDeviceDialog()
@@ -58,8 +63,15 @@ LogindDeviceDialog::~LogindDeviceDialog()
 }
 
 void LogindDeviceDialog::ipConfigGuide(){
+    QNetworkConfigurationManager mgr;
+    if (!WindowUtils::isOnLine())
+    {
+        UIUtils::showTip(*this,
+            QString::fromLocal8Bit("±¾µØÁ¬½Ó¶Ï¿ª£¬Çë²åºÃÍøÏß»ò¿ªÆô±¾µØÁ¬½Ó£¡"));
+        return;
+    }
     this->hide();
-    if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("æ˜¯å¦è¿›è¡Œä¸‹è½½å™¨IPæ™ºèƒ½åŒ¹é…ï¼Ÿ")))
+    if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("ÊÇ·ñ½øĞĞÏÂÔØÆ÷IPÖÇÄÜÆ¥Åä£¿")))
     {   
 
         std::shared_ptr<QString> pIP = std::make_shared<QString>();
@@ -67,28 +79,25 @@ void LogindDeviceDialog::ipConfigGuide(){
         std::shared_ptr<QString> pMask = std::make_shared<QString>("255.255.255.0");
         std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½åŒ¹é…ï¼Œè¯·ç¨ç­‰...."), [=, this]()
+        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÆ¥Åä£¬ÇëÉÔµÈ...."), [=, this]()
         {
 
             *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate);
-			qDebug() << QString("kevin : setIPByDHCP : bResult %1").arg(*bResult);
             if (*bpCancel)
             {
                 return;
             }
             if (!*bResult)
             {
-                *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate, msetIps);
-				qDebug() << QString("kevin : getDirectDevice : bResult %1").arg(*bResult);
+                *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
                 if (*bpCancel)
                 {
                     return;
                 }
                 if (*bResult)
                 {
-                    if (!WindowUtils::setNetConfig(QStringLiteral("æœ¬åœ°è¿æ¥"), *pIP, "255.255.255.0", *pNetGate, true))
+                    if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
                     {
-						qDebug() << QString("kevin : setNetConfig : failed").arg(*bResult);
                         *bResult = false;
                     }
                 }
@@ -106,7 +115,7 @@ void LogindDeviceDialog::ipConfigGuide(){
                 this->show();
             }
             else{
-                if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("æ™ºèƒ½è¯†åˆ«ç½‘æ®µå¤±è´¥ï¼æ˜¯å¦è¿›è¡Œæ·±åº¦åŒ¹é…ï¼Ÿ")))
+                if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("ÖÇÄÜÊ¶±ğÍø¶ÎÊ§°Ü£¡ÊÇ·ñ½øĞĞÉî¶ÈÆ¥Åä£¿")))
                 {
                     deepConfig();
                 }
@@ -117,7 +126,7 @@ void LogindDeviceDialog::ipConfigGuide(){
     }
     else{
         netDlg netDlg_(nullptr);
-        netDlg_.setTitleName(QStringLiteral("ç½‘ç»œé…ç½®"));
+        netDlg_.setTitleName(QStringLiteral("ÍøÂçÅäÖÃ"));
         netDlg_.exec();
         this->show();
     }
@@ -128,7 +137,7 @@ void LogindDeviceDialog::deepConfig(){
     std::shared_ptr<QString> pIP = std::make_shared<QString>();
     std::shared_ptr<QString> pNetGate = std::make_shared<QString>();
     std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æ·±åº¦åŒ¹é…ï¼Œè¯·ç¨ç­‰..."), [=, this](){
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚÉî¶ÈÆ¥Åä£¬ÇëÉÔµÈ..."), [=, this](){
         for (int i = 0; i < 255; i++)
         {
             *pNetGate = QString("192.168.%1.1").arg(i);
@@ -137,7 +146,7 @@ void LogindDeviceDialog::deepConfig(){
             {
                 return;
             }
-            if (!WindowUtils::setNetConfig(QString::fromLocal8Bit("æœ¬åœ°è¿æ¥"), *pIP, "255.255.255.0", *pNetGate, true))
+            if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
             {
                 continue;
             }
@@ -162,9 +171,9 @@ void LogindDeviceDialog::deepConfig(){
         }
         else{
             UIUtils::showTip(*this,
-                QString::fromLocal8Bit("æ™ºèƒ½è¯†åˆ«ç½‘æ®µå¤±è´¥ï¼è¯·æ‰‹åŠ¨è®¾ç½®ï¼"));
+                QString::fromLocal8Bit("ÖÇÄÜÊ¶±ğÍø¶ÎÊ§°Ü£¡ÇëÊÖ¶¯ÉèÖÃ£¡"));
             netDlg netDlg_(nullptr);
-            netDlg_.setTitleName(QStringLiteral("ç½‘ç»œé…ç½®"));
+            netDlg_.setTitleName(QStringLiteral("ÍøÂçÅäÖÃ"));
             netDlg_.exec();
             this->show();
         }
@@ -175,6 +184,8 @@ void LogindDeviceDialog::deepConfig(){
 
 void LogindDeviceDialog::initFactory()
 {
+    
+    std::lock_guard<std::recursive_mutex> lock(mmtPages);
     ui->listViewServers->removeAllItems();
     const std::deque<videoserverFactory *>& Factorys = videoserverFactory::getFactorys();
     std::deque<videoserverFactory *> fs;
@@ -183,27 +194,35 @@ void LogindDeviceDialog::initFactory()
     {
         if (sFilter.isEmpty() || Utils::getChineseSpell(Factorys[i]->name()).toLower().startsWith(sFilter))
         {
-            fs.push_back(Factorys[i]);
+            if (nullptr != Factorys[i])
+            {
+                fs.push_back(Factorys[i]);
+            }
+            
         }
     }
     
     FormFactoryItem* pFirstItem = NULL;
-	for (int i = (mCurrentPage - 1) * NUM_OF_ONEPAGE; i < fs.size() && i < NUM_OF_ONEPAGE + (mCurrentPage - 1) * NUM_OF_ONEPAGE; ++i)
+	for (int i = (mCurrentPage - 1) * NUM_OF_ONEPAGE; i < fs.size() && i < mCurrentPage * NUM_OF_ONEPAGE; ++i)
     {
         FormFactoryItem* pItem = new FormFactoryItem(ui->listViewServers);
         pItem->setFactory(fs[i]);
         ui->listViewServers->addWidgetItem(pItem);
+        
+        mmpPort[pItem] = fs[i]->port();
         if (NULL == pFirstItem)
         {
             pFirstItem = pItem;
+            this->on_factory_Selected(pFirstItem);
         }
     }
 
-    this->on_factory_Selected(pFirstItem);
+
 }
 
 void LogindDeviceDialog::on_btnCloseX_clicked()
 {
+
     emit onClose();
 }
 
@@ -225,17 +244,23 @@ void LogindDeviceDialog::on_lineEditPort_textChanged(const QString &arg1)
 
 void LogindDeviceDialog::on_pushButtonConnect_clicked()
 {
+    if (!WindowUtils::isOnLine())
+    {
+        UIUtils::showTip(*ui->listViewServers,
+            QString::fromLocal8Bit("±¾µØÁ¬½Ó¶Ï¿ª£¬Çë²åºÃÍøÏß»ò¿ªÆô±¾µØÁ¬½Ó£¡"));
+        return;
+    }
 
     FormFactoryItem* pItem = (FormFactoryItem*)ui->listViewServers->getSelectedItem();
     if (nullptr == pItem)
     {
-        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªå‚å•†ï¼"));
+        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸ö³§ÉÌ£¡"));
         return;
     }
     videoserverFactory* pFactory = pItem->getFactory();
     if (pFactory == NULL)
     {
-        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªå‚å•†ï¼"));
+        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸ö³§ÉÌ£¡"));
         return;
     }
 
@@ -250,7 +275,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
     qDebug()<<port<<" toUInt():"<<port.toUInt();
     if (port.toStdString().find_first_not_of("1234567890") != std::string::npos || port.isEmpty())
     {
-        UIUtils::showTip(*ui->lineEditPort, QString::fromLocal8Bit("è¯·è¾“å…¥æ­£ç¡®çš„ç«¯å£å·ï¼"));
+        UIUtils::showTip(*ui->lineEditPort, QString::fromLocal8Bit("ÇëÊäÈëÕıÈ·µÄ¶Ë¿ÚºÅ£¡"));
         return;
     }
 
@@ -261,11 +286,11 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 	password = password.trimmed();
 	if (user.isEmpty() && (!(password.isEmpty())))
 	{
-		UIUtils::showTip(*ui->lineEditAccount, QString::fromLocal8Bit("è¯·è¾“å…¥ç”¨æˆ·åï¼"));
+		UIUtils::showTip(*ui->lineEditAccount, QString::fromLocal8Bit("ÇëÊäÈëÓÃ»§Ãû£¡"));
 		return;
 	}
 
-	//å¦‚æœç”¨æˆ·åä¸ºç©ºï¼Œåˆ™ç”¨æˆ·åä¸å¯†ç éƒ½å–å‚å•†é»˜è®¤
+	//Èç¹ûÓÃ»§ÃûÎª¿Õ£¬ÔòÓÃ»§ÃûÓëÃÜÂë¶¼È¡³§ÉÌÄ¬ÈÏ
     if (user.isEmpty())
     {
 		user = UNDEFIN_DEVICE_DEFAULT_USER;
@@ -285,13 +310,13 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 
 	connectThreads.clear();
 	m_bStop = false;
-    qDebug()<<"æ­£åœ¨ç™»é™†ä¸­...";
+    qDebug()<<"ÕıÔÚµÇÂ½ÖĞ...";
     std::shared_ptr<bool> bLock = std::shared_ptr<bool>(new bool(false));
     mResults.clear();
 	ui->pushButtonConnect->setEnabled(false);
 	ui->closeButton->setEnabled(false);
     std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨åˆå§‹åŒ–..."), [=]()
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚ³õÊ¼»¯..."), [=]()
     {
         for (int i = 0; i < mvcIps.size() && (!*bpCancel); i++)
 		{
@@ -313,7 +338,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 std::shared_ptr<LoginServerInfo> pInfo = std::shared_ptr<LoginServerInfo>(new LoginServerInfo());
                 pInfo->factory = pServer->factory()->factory();
                 //pInfo->id = QString::number(QDateTime::currentDateTime().toTime_t());
-				//ç”¨æ—¶é—´åšidåœ¨çº¿ç¨‹å¹¶å‘æ—¶å–å€¼ä¸€æ ·,é€ æˆä¸‹è½½å¼‚å¸¸
+				//ÓÃÊ±¼ä×öidÔÚÏß³Ì²¢·¢Ê±È¡ÖµÒ»Ñù,Ôì³ÉÏÂÔØÒì³£
                 pInfo->id = sIP + QString::number(QDateTime::currentDateTime().toTime_t());
                 pInfo->ip = sIP;
                 pInfo->name = ui->lineEditDeviceName->text();
@@ -331,7 +356,10 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 }
                 pInfo->password = password;
                 pInfo->user = user;
-                if (pServer->login(pInfo, &m_bStop))
+
+                
+
+                if (pServer->login(pInfo, bpCancel.get()))
                 {
                     qDebug()<<"login succeed!";
                     std::lock_guard<std::recursive_mutex>  lockLoginResult(*mtLoginResult);
@@ -358,12 +386,12 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
         }
         if (!*bpCancel)
         {
-            CWaitDlg::setShowMsg(QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½ç™»å½•ä¸­..."));
+            CWaitDlg::setShowMsg(QString::fromLocal8Bit("ÕıÔÚÖÇÄÜµÇÂ¼ÖĞ..."));
         }
        
 // 		char threadsize[16] = {0};
 // 		sprintf_s(threadsize, "connectThreads.size():%d", connectThreads.size());
-// 		Log::instance().AddLog(QString("æ­£åœ¨æ™ºèƒ½ç™»å½•ä¸­...") );
+// 		Log::instance().AddLog(QString("ÕıÔÚÖÇÄÜµÇÂ¼ÖĞ...") );
         for (int i = 0; i < connectThreads.size(); i++)
         {
             connectThreads[i]->join();
@@ -382,7 +410,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 		{
 			if (mResults.size() == 0)
 			{
-				MessageBoxDlg msgDlg(QString::fromLocal8Bit("ç™»é™†å¤±è´¥ï¼"));
+				MessageBoxDlg msgDlg(QString::fromLocal8Bit("µÇÂ½Ê§°Ü£¡"));
 				msgDlg.exec();
 				qDebug() << "pServer->getLastError() end";
 			}
@@ -401,7 +429,6 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 }
 			}
 
-
 		}
         ui->pushButtonConnect->setEnabled(true);
         ui->closeButton->setEnabled(true);
@@ -417,13 +444,13 @@ void LogindDeviceDialog::on_pushButtonDirect_clicked(){
     ui->pushButtonDirect->setEnabled(false);
     std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
 
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½è¯†åˆ«ï¼Œè¯·ç¨ç­‰..."), [=, this]()
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÊ¶±ğ£¬ÇëÉÔµÈ..."), [=, this]()
     {
         QString strIP;
         QString strGate;
         if (*bResult = WindowUtils::getDirectDevice(strIP, strGate))
         {
-            QString sName = QString::fromLocal8Bit("æœ¬åœ°è¿æ¥");
+            QString sName = WindowUtils::getLoacalNetName();
             WindowUtils::setNetConfig(sName, strIP, "255.255.255.0", strGate, true);
             ui->lineEditIP->setText(strGate);
             ui->checkBoxSearchIp->setChecked(false);
@@ -432,11 +459,11 @@ void LogindDeviceDialog::on_pushButtonDirect_clicked(){
         if (*bResult)
         {
             UIUtils::showTip(*ui->pushButtonDirect,
-                QString::fromLocal8Bit("ç›´è¿è®¾ç½®æˆåŠŸï¼"));
+                QString::fromLocal8Bit("Ö±Á¬ÉèÖÃ³É¹¦£¡"));
         }
         else{
             UIUtils::showTip(*ui->pushButtonDirect,
-                QString::fromLocal8Bit("ç›´è¿è®¾ç½®å¤±è´¥ï¼è¯·æ£€æŸ¥ç½‘ç»œå†é‡è¯•ï¼Œæˆ–è€…æ‰‹å·¥è¿›è¡Œé…ç½®ã€‚"));
+                QString::fromLocal8Bit("Ö±Á¬ÉèÖÃÊ§°Ü£¡Çë¼ì²éÍøÂçÔÙÖØÊÔ£¬»òÕßÊÖ¹¤½øĞĞÅäÖÃ¡£"));
         }
         ui->pushButtonDirect->setEnabled(true);
     });
@@ -463,11 +490,11 @@ void LogindDeviceDialog::getIps()
         if (netip.isEmpty() || (netip != NET_IP_DEAFAULT && !Utils::isIpV4(netip)))
         {
             UIUtils::showTip(*ui->comboBoxNet,
-                QString::fromLocal8Bit("è¯·è¾“å…¥æˆ–é€‰æ‹©æœ‰æ•ˆIPç½‘æ®µï¼"));
+                QString::fromLocal8Bit("ÇëÊäÈë»òÑ¡ÔñÓĞĞ§IPÍø¶Î£¡"));
             return;
         }
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-        CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æœç´¢è®¾å¤‡ï¼Œè¯·ç¨ç­‰..."), [=, this]()
+        CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚËÑË÷Éè±¸£¬ÇëÉÔµÈ..."), [=, this]()
 		{
             if (netip != NET_IP_DEAFAULT)
             {
@@ -486,7 +513,7 @@ void LogindDeviceDialog::getIps()
             if (mvcIps.size() == 0)
             {
                 UIUtils::showTip(*ui->checkBoxSearchIp,
-                                 QString::fromLocal8Bit("æœªæ‰¾åˆ°è®¾å¤‡ï¼"));
+                                 QString::fromLocal8Bit("Î´ÕÒµ½Éè±¸£¡"));
             }
         }, bpCancel);
     }
@@ -500,7 +527,7 @@ void LogindDeviceDialog::getIps()
         else
         {
             UIUtils::showTip(*ui->lineEditIP,
-                             QString::fromLocal8Bit("è¯·è¾“å…¥æœ‰æ•ˆIPï¼"));
+                             QString::fromLocal8Bit("ÇëÊäÈëÓĞĞ§IP£¡"));
         }
     }
 }
@@ -512,6 +539,7 @@ void LogindDeviceDialog::on_closeButton_clicked()
 
 void LogindDeviceDialog::setPage(int num)
 {
+    std::lock_guard<std::recursive_mutex> lock(mmtPages);
     const std::deque<videoserverFactory *>& Factorys = videoserverFactory::getFactorys();
     std::deque<videoserverFactory *> fs;
     QString sFilter = ui->lineEditFactory->text().toLower();
@@ -523,7 +551,11 @@ void LogindDeviceDialog::setPage(int num)
         }
     }
 
-    int maxPage = fs.size() / NUM_OF_ONEPAGE + 1;
+    int maxPage = fs.size() / NUM_OF_ONEPAGE;
+    if (fs.size() % NUM_OF_ONEPAGE)
+    {
+        maxPage++;
+    }
     if (num < 1)
     {
         num = 1;
@@ -549,12 +581,26 @@ void LogindDeviceDialog::on_lineEditIP_textChanged(const QString &arg1)
 
 void LogindDeviceDialog::on_pushButtonNext_clicked()
 {
-	setPage(++mCurrentPage);
+    __try{
+
+        setPage(++mCurrentPage);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        mCurrentPage--;
+        
+    }
+	
 }
 
 void LogindDeviceDialog::on_pushButtonPre_clicked()
 {
-	setPage(--mCurrentPage);
+    __try{
+        setPage(--mCurrentPage);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
 }
 
 void LogindDeviceDialog::on_checkBoxSearchIp_stateChanged(int state)
@@ -587,20 +633,23 @@ void LogindDeviceDialog::on_checkBoxDefaultPort_stateChanged(int state)
 }
 
 void LogindDeviceDialog::on_factory_Selected(ListViewItem* item){
-    if (ui->checkBoxDefaultPort->isChecked())
+    std::lock_guard<std::recursive_mutex> lock(mmtPages);
+    if (ui->checkBoxDefaultPort->isChecked() && mmpPort.find(item) != mmpPort.end())
     {
-        FormFactoryItem* pItem = (FormFactoryItem*)(item);
-        if (pItem != NULL)
-        {
-            ui->lineEditPort->setText(QString::number(pItem->getFactory()->port()));
-        }
+        ui->lineEditPort->setText(QString::number(mmpPort[item]));
     }
-
+    
 }
 
 void LogindDeviceDialog::on_txtSearchFactory_textChanged(const QString &arg1)
 {
-    setPage(1);
+    __try{
+        setPage(1);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+
+    }
 }
 
 void LogindDeviceDialog::initNetCombobox(){

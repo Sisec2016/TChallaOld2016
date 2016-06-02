@@ -36,28 +36,28 @@ QT_END_NAMESPACE
 
 
 MainWindow::MainWindow(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::MainWindow)
+QDialog(parent),
+ui(new Ui::MainWindow)
 {
     qDebug() << __FUNCTION__ << __LINE__;
     ui->setupUi(this);
 
 
-   // createAllDialog();
+    // createAllDialog();
 
-   setWindowFlags(Qt::FramelessWindowHint|Qt::WindowSystemMenuHint| Qt::WindowMinimizeButtonHint);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
 
-   ui->closeBtn->setStyleSheet(transparentBtn_StyleSheet);
-   ui->minBtn->setStyleSheet(transparentBtn_StyleSheet);
-   ui->moreBtn->setStyleSheet(transparentBtn_StyleSheet);
+    ui->closeBtn->setStyleSheet(transparentBtn_StyleSheet);
+    ui->minBtn->setStyleSheet(transparentBtn_StyleSheet);
+    ui->moreBtn->setStyleSheet(transparentBtn_StyleSheet);
 
-   this->setWindowIcon(QIcon(":/images/logoIcon.png"));
+    this->setWindowIcon(QIcon(":/images/logoIcon.png"));
 
-   QMenu *pMenu = new QMenu(QStringLiteral("menu"), ui->moreBtn);
+    QMenu *pMenu = new QMenu(QStringLiteral("menu"), ui->moreBtn);
 
-   QAction *updateAct = new QAction(QIcon(":/images/Update.png"), QStringLiteral("软件更新"), this);
-	QAction *helpAct = new QAction(QIcon(":/images/Help.png"), QStringLiteral("帮助"), this);
-	QAction *aboutAct = new QAction(QIcon(":/images/About.png"), QStringLiteral("关于"), this);
+    QAction *updateAct = new QAction(QIcon(":/images/Update.png"), QStringLiteral("软件更新"), this);
+    QAction *helpAct = new QAction(QIcon(":/images/Help.png"), QStringLiteral("帮助"), this);
+    QAction *aboutAct = new QAction(QIcon(":/images/About.png"), QStringLiteral("关于"), this);
 
     setProductUi();
 
@@ -66,39 +66,39 @@ MainWindow::MainWindow(QWidget *parent) :
     pMenu->addAction(helpAct);
     pMenu->addAction(aboutAct);
 
-   //ui->moreBtn->setPopupMode(QToolButton::InstantPopup);
+    //ui->moreBtn->setPopupMode(QToolButton::InstantPopup);
     ui->moreBtn->setMenu(pMenu);
-  //  pMenu->setStyleSheet(Menu_StyleSheet);
+    //  pMenu->setStyleSheet(Menu_StyleSheet);
 
-    connect(ui->closeBtn,SIGNAL(clicked()),this,SLOT(onCloseClicked()));
-    connect(ui->minBtn,SIGNAL(clicked()),this,SLOT(onMinClicked()));
+    connect(ui->closeBtn, SIGNAL(clicked()), this, SLOT(onCloseClicked()));
+    connect(ui->minBtn, SIGNAL(clicked()), this, SLOT(onMinClicked()));
 
-	connect(aboutAct, SIGNAL(triggered()), this, SLOT(onAboutClicked()));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(onAboutClicked()));
     connect(helpAct, SIGNAL(triggered()), this, SLOT(onHelpClicked()));
     connect(updateAct, SIGNAL(triggered()), this, SLOT(onUpdateClicked()));
-    connect(ui->videoDownloadBtn,SIGNAL(clicked()),this,SLOT(onVideoBtnclicked()));
-    connect(ui->diskBtn,SIGNAL(clicked()),this,SLOT(onDiskBtnclicked()));
-    connect(ui->shareBtn,SIGNAL(clicked()),this,SLOT(onShareBtnclicked()));
-  //  connect(ui->ftpBtn,SIGNAL(clicked()),this,SLOT(onFTPBtnclicked()));
-	connect(ui->toolBtn, SIGNAL(clicked()), this, SLOT(onToolBtnclicked()));
-	connect(ui->screenBtn, SIGNAL(clicked()), this, SLOT(onScreenBtnclicked()));
-    connect(ui->fileBtn,SIGNAL(clicked()),this,SLOT(onFileBtnclicked()));
-    connect(ui->netBtn,SIGNAL(clicked()),this,SLOT(onNetBtnclicked()));
-    connect(ui->logBtn,SIGNAL(clicked()),this,SLOT(onLogBtnclicked()));
+    connect(ui->videoDownloadBtn, SIGNAL(clicked()), this, SLOT(onVideoBtnclicked()));
+    connect(ui->diskBtn, SIGNAL(clicked()), this, SLOT(onDiskBtnclicked()));
+    connect(ui->shareBtn, SIGNAL(clicked()), this, SLOT(onShareBtnclicked()));
+    //  connect(ui->ftpBtn,SIGNAL(clicked()),this,SLOT(onFTPBtnclicked()));
+    connect(ui->toolBtn, SIGNAL(clicked()), this, SLOT(onToolBtnclicked()));
+    connect(ui->screenBtn, SIGNAL(clicked()), this, SLOT(onScreenBtnclicked()));
+    connect(ui->fileBtn, SIGNAL(clicked()), this, SLOT(onFileBtnclicked()));
+    connect(ui->netBtn, SIGNAL(clicked()), this, SLOT(onNetBtnclicked()));
+    connect(ui->logBtn, SIGNAL(clicked()), this, SLOT(onLogBtnclicked()));
     mpVideoDownloadDlg = nullptr;
-    qDebug()<<__FUNCTION__<<__LINE__;
+    qDebug() << __FUNCTION__ << __LINE__;
     CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在加载数据中..."), [=]()
     {
         videoserverFactory::getFactorys();
 
-    }, [this](bool bCancel){ });
+    }, [this](bool bCancel){});
 }
 
 MainWindow::~MainWindow()
 {
     qDebug() << "~uninit()";
     Verify::uninit();
-	qDebug() << "~MainWindow()";
+    qDebug() << "~MainWindow()";
     if (nullptr != mpVideoDownloadDlg){
         delete mpVideoDownloadDlg;
     }
@@ -120,8 +120,8 @@ void MainWindow::setProductUi(){
             const QWidget* pParent = ui->logo->parentWidget();
             ui->logo->move((pParent->width() - ui->logo->width()) / 2 + pParent->x(), ui->logo->y());
         }
-        
-       // ui->logo->setPicture(*p);
+
+        // ui->logo->setPicture(*p);
     }
     else{
         ui->logo->setStyleSheet("border-image: url(:/images/logo.png)");
@@ -154,20 +154,20 @@ bool MySystemShutDown()
 {
     HANDLE hToken;
     TOKEN_PRIVILEGES tkp;
-    
+
     //获取进程标志
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
         return false;
-    
+
     //获取关机特权的LUID
     LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid);
     tkp.PrivilegeCount = 1;
     tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-    
+
     //获取这个进程的关机特权
     AdjustTokenPrivileges(hToken, false, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
     if (GetLastError() != ERROR_SUCCESS) return false;
-    
+
     // 强制关闭计算机
     if (!ExitWindowsEx(EWX_SHUTDOWN | EWX_FORCE, 0))
         return false;
@@ -190,9 +190,9 @@ void MainWindow::onCloseClicked()
 
 void MainWindow::onAboutClicked()
 {
-	AboutDialog aboutDlg(this);
-	//aboutDlg.setTitleName(QStringLiteral("关于"));
-	aboutDlg.exec();
+    AboutDialog aboutDlg(this);
+    //aboutDlg.setTitleName(QStringLiteral("关于"));
+    aboutDlg.exec();
 }
 void MainWindow::onHelpClicked()
 {
@@ -207,8 +207,8 @@ void MainWindow::onUpdateClicked()
 
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
-	QDialog::mousePressEvent(event);
-    if(event->button() == Qt::LeftButton)
+    QDialog::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton)
     {
         mMoving = true;
         mLastMousePosition = event->globalPos();
@@ -217,29 +217,29 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
-	QDialog::mouseMoveEvent(event);
-    if( event->buttons().testFlag(Qt::LeftButton) && mMoving)
+    QDialog::mouseMoveEvent(event);
+    if (event->buttons().testFlag(Qt::LeftButton) && mMoving)
     {
-       // this->move(this->pos() + (event->globalPos() - mLastMousePosition));
-       // mLastMousePosition = event->globalPos();
+        // this->move(this->pos() + (event->globalPos() - mLastMousePosition));
+        // mLastMousePosition = event->globalPos();
     }
 }
 
 void MainWindow::showEvent(QShowEvent* event)
 {
-	QWidget* pParent = this->parentWidget();
-	if (pParent == NULL)
-	{
-		pParent = (QWidget*)QApplication::desktop();
-	}
-	this->move((pParent->width() - this->width()) / 2, (pParent->height() - this->height()) / 2);
-	QDialog::showEvent(event);
+    QWidget* pParent = this->parentWidget();
+    if (pParent == NULL)
+    {
+        pParent = (QWidget*)QApplication::desktop();
+    }
+    this->move((pParent->width() - this->width()) / 2, (pParent->height() - this->height()) / 2);
+    QDialog::showEvent(event);
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent* event)
 {
-	QDialog::mouseReleaseEvent(event);
-    if(event->button() == Qt::LeftButton)
+    QDialog::mouseReleaseEvent(event);
+    if (event->button() == Qt::LeftButton)
     {
         mMoving = false;
     }
@@ -253,7 +253,7 @@ void execDlg(MainDialog& dlg)
     {
         std::cout << "execDlg unkonw error!" << std::endl;
         //Log::add("execDlg unkonw error!", fatal);
-       // exit(-1);
+        // exit(-1);
     }
 }
 void MainWindow::onVideoBtnclicked()
@@ -267,57 +267,57 @@ void MainWindow::onVideoBtnclicked()
 
 void MainWindow::onDiskBtnclicked()
 {
-	DiskDlg diskDlg(this);
+    DiskDlg diskDlg(this);
     diskDlg.setTitleName(QStringLiteral("磁盘导出"));
     diskDlg.exec();
 }
 
 void MainWindow::onShareBtnclicked()
 {
-	ShareDlg shareDlg(this);
+    ShareDlg shareDlg(this);
     shareDlg.setTitleName(QStringLiteral("共享导出"));
     shareDlg.exec();
 }
 
 void MainWindow::onFTPBtnclicked()
 {
-	FTPDlg ftpDlg(this);
-   ftpDlg.setTitleName(QStringLiteral("FTP导出"));
-   ftpDlg.exec();
+    FTPDlg ftpDlg(this);
+    ftpDlg.setTitleName(QStringLiteral("FTP导出"));
+    ftpDlg.exec();
 }
 
 void MainWindow::onToolBtnclicked()
 {
-	tooldlg toolDlg1(this);
-	toolDlg1.setTitleName(QStringLiteral("其它工具"));
-	toolDlg1.exec();
+    tooldlg toolDlg1(this);
+    toolDlg1.setTitleName(QStringLiteral("其它工具"));
+    toolDlg1.exec();
     setProductUi();
 }
 
 void MainWindow::onScreenBtnclicked()
 {
-	ShellExecuteA(GetDesktopWindow(), "open", "screenRecord\\ScreenCap.exe",NULL, NULL, SW_SHOWNORMAL);
+    ShellExecuteA(GetDesktopWindow(), "open", "screenRecord\\ScreenCap.exe", NULL, NULL, SW_SHOWNORMAL);
 
 }
 
 
 void MainWindow::onFileBtnclicked()
 {
-	FileManagerDlg fileDlg(this);
-	fileDlg.setTitleName(QStringLiteral("文件管理"));
+    FileManagerDlg fileDlg(this);
+    fileDlg.setTitleName(QStringLiteral("文件管理"));
     fileDlg.exec();
 }
 
 void MainWindow::onNetBtnclicked()
 {
-	netDlg netDlg_(this);
-	 netDlg_.setTitleName(QStringLiteral("网络配置"));
-     netDlg_.exec();
+    netDlg netDlg_(this);
+    netDlg_.setTitleName(QStringLiteral("网络配置"));
+    netDlg_.exec();
 }
 
 void MainWindow::onLogBtnclicked()
 {
-     logManagerDlg logDlg(this);
-	 logDlg.setTitleName(QStringLiteral("日志管理"));//QLatin1String 会显示乱码
-     logDlg.exec();
+    logManagerDlg logDlg(this);
+    logDlg.setTitleName(QStringLiteral("日志管理"));//QLatin1String 会显示乱码
+    logDlg.exec();
 }
