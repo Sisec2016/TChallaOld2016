@@ -21,7 +21,7 @@ typedef BOOL(WINAPI *PJiuAn_DVR_GetDVRConfig) (LONG lUserID, DWORD dwCommand, LO
 typedef LONG(WINAPI *PJiuAn_DVR_FindFile) (LONG lUserID, LONG lChannel, DWORD dwFileType, PHISI_DVR_TIME lpStartTime, PHISI_DVR_TIME lpStopTime);
 typedef LONG(WINAPI *PJiuAn_DVR_FindNextFile)(LONG lFindHandle, PHISI_DVR_FIND_DATA lpFindData);
 typedef BOOL(WINAPI *PJiuAn_DVR_FindClose)(LONG lFindHandle);
-typedef LONG(WINAPI *PJiuAn_DVR_PlayBackByTime) (LONG lUserID, LONG lChannel, PHISI_DVR_TIME lpStartTime, PHISI_DVR_TIME lpStopTime, HWND hWnd);
+typedef LONG(WINAPI *PHISI_DVR_PlayBackByTime) (LONG lUserID, LONG lChannel, PHISI_DVR_TIME lpStartTime, PHISI_DVR_TIME lpStopTime, HWND hWnd);
 typedef BOOL(WINAPI *PJiuAn_DVR_PlayBackControl) (LONG lPlayHandle, DWORD dwControlCode, DWORD dwInValue, DWORD *LPOutValue);
 typedef BOOL(WINAPI *PJiuAn_DVR_StopPlayBack) (LONG lPlayHandle);
 typedef LONG(WINAPI *PJiuAn_DVR_PlayBackByName)(LONG lUserID, char *sPlayBackFileName, HWND hWnd);
@@ -42,6 +42,7 @@ extern PJiuAn_DVR_GetFileByTime pJiuAn_DVR_GetFileByTime;
 extern PJiuAn_DVR_GetFileByName pJiuAn_DVR_GetFileByName;
 extern PJiuAn_DVR_StopGetFile pJiuAn_DVR_StopGetFile;
 extern PJiuAn_DVR_PlayBackByName pJiuAn_DVR_PlayBackByName;
+extern PHISI_DVR_PlayBackByTime pJiuAn_DVR_PlayBackByTime;
 extern PJiuAn_DVR_StopPlayBack pJiuAn_DVR_StopPlayBack;
 extern PJiuAn_DVR_PlayBackControl pJiuAn_DVR_PlayBackControl;
 extern PJiuAn_DVR_GetLastError pJiuAn_DVR_GetLastError;
@@ -80,8 +81,9 @@ public:
 
     virtual void videoFileExterns(std::vector<std::string >& externs)
     {
-        externs.push_back("h264");
-        //externs.push_back("dav");
+      // externs.push_back("h264");
+		externs.push_back("mp4");
+     //   externs.push_back("dav");
     }
 
     virtual IVideoServer* create();
@@ -123,11 +125,10 @@ public:
 private:
     const RecordFile* m_playFile;
     __time64_t mStartPlayTime;
-
 protected:
 
     HISI_DEVCEINFO m_deviceInfo;
-
+	
     std::recursive_mutex m_mtxPos;
     std::map<long long, INT64> m_mapDownloadTotalSize;
     std::map<long long, INT64> m_mapDownloadPos;
