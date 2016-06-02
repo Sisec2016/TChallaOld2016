@@ -6,7 +6,7 @@
 //#include "log.h"
 //Log g_log("dizhipu_videoserver");
 
-
+#define ONEDAY	24 * 60 * 60
 
 IVideoServerFactory* VideoServerFactory()
 {
@@ -326,37 +326,56 @@ bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std:
 	files.clear();
 
 	H264_DVR_TIME stime, etime;
-	H264_DVR_TIME stimeTmp, everydayTime;
+//	H264_DVR_TIME stimeTmp, everydayTime;
 
 	tm STime;
 	tm ETime;
 	_localtime64_s(&STime, (const time_t*)&timeStart);
 	_localtime64_s(&ETime, (const time_t*)&timeEnd);
-
 	timeStdToDiZhiPu2(&STime, &stime);
 	timeStdToDiZhiPu2(&ETime, &etime);
-	
-	stimeTmp = stime;
-	everydayTime = etime;
-	if (etime.dwDay > stime.dwDay)
+
+	__time64_t everytime, begintime, endtime;
+	begintime = timeStart;
+
+	struct tm Tm = { 0, 0, 0, stime.dwDay, stime.dwMonth - 1, stime.dwYear - 1900 };
+	everytime = mktime(&Tm);
+	if (stime.dwDay == etime.dwDay && stime.dwMonth == etime.dwMonth && stime.dwYear == etime.dwYear)
 	{
-		everydayTime.dwDay = stime.dwDay;
-		everydayTime.dwHour = 23;
-		everydayTime.dwMinute = 59;
-		everydayTime.dwSecond = 59;
+		begintime = timeStart;
+		endtime = timeEnd;
 	}
-	for (; stime.dwDay <= etime.dwDay; stime.dwDay += 1, everydayTime.dwDay += 1)
+
+	for (; everytime < timeEnd; everytime += ONEDAY)
 	{
-		if (everydayTime.dwDay == etime.dwDay)
+		if (stime.dwDay != etime.dwDay || stime.dwMonth != etime.dwMonth || stime.dwYear != etime.dwYear)
 		{
-			everydayTime = etime;
+			if (begintime == timeStart)
+			{
+				timeStart += 1;
+				endtime = everytime + ONEDAY - 1;
+			}
+			else
+			{
+				begintime = everytime;
+				if ((everytime + ONEDAY) > timeEnd)
+				{
+					endtime = timeEnd;
+				}
+				else{
+					endtime = everytime + ONEDAY - 1;
+				}
+			}
 		}
-		if (stimeTmp.dwDay != stime.dwDay)
-		{
-			stime.dwHour = 0;
-			stime.dwMinute = 0;
-			stime.dwSecond = 0;
-		}
+		H264_DVR_TIME Begin_Time, End_Time;
+
+		tm STime;
+		tm ETime;
+		_localtime64_s(&STime, (const time_t*)&begintime);
+		_localtime64_s(&ETime, (const time_t*)&endtime);
+		timeStdToDiZhiPu2(&STime, &Begin_Time);
+		timeStdToDiZhiPu2(&ETime, &End_Time);
+
 		std::vector<int>::iterator itr = channelVec.begin();
 		for (; itr != channelVec.end(); itr++)
 		{
@@ -366,8 +385,8 @@ bool dizhipu_videoserver::GetRecordFileList(std::vector<RecordFile>& files, std:
 			ZeroMemory(&findInfo, sizeof(findInfo));
 			findInfo.nChannelN0 = nChannelId - 1;
 			findInfo.nFileType = 0;
-			findInfo.startTime = stime;
-			findInfo.endTime = everydayTime;
+			findInfo.startTime = Begin_Time;
+			findInfo.endTime = End_Time;
 
 			H264_DVR_FILE_DATA *szSend = new H264_DVR_FILE_DATA[MAX_SEARCH_COUNT];
 			ZeroMemory(szSend, sizeof(H264_DVR_FILE_DATA)*MAX_SEARCH_COUNT);
