@@ -8,6 +8,8 @@
 
 Log g_log("DongYang_videoserver");
 
+#define ONEDAY			24 * 60 * 60
+
 IVideoServerFactory* VideoServerFactory()
 {
 	return new CDongYangFactory();
@@ -228,39 +230,53 @@ bool DongYang_videoserver::GetRecordFileList(std::vector<RecordFile>& files, con
 
 	DONGYANG::TimeInfo staTime = { 0 };
 	DONGYANG::TimeInfo stopTime = { 0 };
-	DONGYANG::TimeInfo staTimeTmp = { 0 };
-	DONGYANG::TimeInfo everyDayTime = { 0 };
+	
 	InitTime(staTime, stopTime, timeStart, timeEnd);
-	staTimeTmp = staTime;
-	everyDayTime = stopTime;
-	if (stopTime.wDay > staTime.wDay)
+
+	__time64_t everydaytime, begintime, endtime;
+	begintime = timeStart;
+
+	struct tm Tm = { 0, 0, 0, staTime.wDay, staTime.wMonth - 1, staTime.wYear - 1900 };
+	everydaytime = mktime(&Tm);
+
+	if (staTime.wDay == stopTime.wDay && staTime.wMonth == stopTime.wMonth && staTime.wYear == stopTime.wYear)
 	{
-		everyDayTime.wDay = staTime.wDay;
-		everyDayTime.wHour = 23;
-		everyDayTime.wMinute = 59;
-		everyDayTime.wSecond = 59;
+		begintime = timeStart;
+		endtime = timeEnd;
 	}
 
 	__int32 nChannelId = 0;
-	for (; staTime.wDay <= stopTime.wDay; staTime.wDay += 1, everyDayTime.wDay += 1)
-	{
-		if (everyDayTime.wDay == stopTime.wDay)
+	for (; everydaytime < timeEnd; everydaytime += ONEDAY)
+	{		
+		if (staTime.wDay != stopTime.wDay || staTime.wMonth != stopTime.wMonth || staTime.wYear != stopTime.wYear)
 		{
-			everyDayTime = stopTime;
+			if (begintime == timeStart)	{
+				timeStart += 1;
+				endtime = everydaytime + ONEDAY - 1;
+			}
+			else
+			{
+				begintime = everydaytime;
+				if ((everydaytime + ONEDAY) > timeEnd)
+				{
+					endtime = timeEnd;
+				}
+				else{
+					endtime = everydaytime + ONEDAY - 1;
+				}
+
+			}
+
 		}
-		if (staTimeTmp.wDay != staTime.wDay)
-		{
-			staTime.wHour = 0;
-			staTime.wMinute = 0;
-			staTime.wSecond = 0;
-		}
+		DONGYANG::TimeInfo Begin_Time = { 0 };
+		DONGYANG::TimeInfo End_Time = { 0 };
+		InitTime(Begin_Time, End_Time, begintime, endtime);
 		for (int ch = 0; ch < channelVec.size(); ch++)
 		{		
 			nChannelId = channelVec[ch];
-			g_log.AddLog(string("[2]GetRecordFileList run here"));
 
 			HANDLE hQuery = INVALID_HANDLE_VALUE;
-			int nRet = Api_DY::Api().m_pDyNetwork_ClientStartFileQuery(&hQuery, m_hDevice, nChannelId, DONGYANG::RECORD_TYPE_ALL, &staTime, &everyDayTime);
+			int nRet = Api_DY::Api().m_pDyNetwork_ClientStartFileQuery(&hQuery, m_hDevice, nChannelId, DONGYANG::RECORD_TYPE_ALL, &Begin_Time, &End_Time);
 			g_log.AddLog(string("[3]GetRecordFileList run here"));
 			if (DONGYANG::eRetSuccess != nRet || INVALID_HANDLE_VALUE == hQuery)
 			{
@@ -357,7 +373,6 @@ void DongYang_videoserver::InitTime(DONGYANG::TimeInfo& staTime, DONGYANG::TimeI
 	stopTime.wMinute = Tm.tm_min;
 	stopTime.wSecond = Tm.tm_sec;
 }
-
 
 bool DongYang_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
