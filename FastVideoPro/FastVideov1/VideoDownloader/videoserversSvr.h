@@ -63,7 +63,7 @@ public:
 	virtual bool logout();
 	virtual bool GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
 		__time64_t timeEnd);
-	//æ¸…é™¤å·²æŸ¥è¯¢åˆ°å¾—è§†é¢‘æ–‡ä»¶æ¸…å•
+	//Çå³ıÒÑ²éÑ¯µ½µÃÊÓÆµÎÄ¼şÇåµ¥
 	virtual void ClearRecordFileList();
 
 	virtual bool downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl);

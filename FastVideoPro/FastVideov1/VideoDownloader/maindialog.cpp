@@ -94,7 +94,7 @@ mLoaded(false)
     // ScreenAdaption::instance().init(this->geometry().width(), this->geometry().height());
     //  ScreenAdaption::instance().adpte(this);
 
-    CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("æ­£åœ¨åŠ è½½æ•°æ®ä¸­..."), [=]()
+    CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("ÕıÔÚ¼ÓÔØÊı¾İÖĞ..."), [=]()
     {
         videoserverFactory::getFactorys();
 
@@ -132,7 +132,7 @@ mLoaded(false)
     if (!WindowUtils::isOnLine())
     {
         UIUtils::showTip(*this,
-            QString::fromLocal8Bit("æœ¬åœ°è¿æ¥æ–­å¼€ï¼Œè¯·æ’å¥½ç½‘çº¿æˆ–å¼€å¯æœ¬åœ°è¿æ¥ï¼"));
+            QString::fromLocal8Bit("±¾µØÁ¬½Ó¶Ï¿ª£¬Çë²åºÃÍøÏß»ò¿ªÆô±¾µØÁ¬½Ó£¡"));
     }
 }
 
@@ -143,7 +143,7 @@ MainDialog::~MainDialog()
     this->saveForExit();
     exit(1);
     mStop = true;
-    CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("æ­£åœ¨é€€å‡ºä¸­..."), [this]()
+    CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("ÕıÔÚÍË³öÖĞ..."), [this]()
     {
         if (mDownloadTimerThread)
         {
@@ -172,7 +172,7 @@ MainDialog::~MainDialog()
 DeviceWidget* MainDialog::createDeviceWidget(std::shared_ptr<videoserver> pServer)
 {
     DeviceWidget* p = new DeviceWidget(pServer, *ui->taskTreeWidget);
-    //p->login();//æ­¤å¤„ç™»å½•å¤šä½™,æœ¬å‡½æ•°æ˜¯DeviceListWidgetç±»å›è°ƒåˆ›å»ºDeviceWidgetå¯¹è±¡ä½¿ç”¨çš„,åœ¨DeviceListWidgetç±»ä¸­å·²æœ‰è°ƒç”¨
+    //p->login();//´Ë´¦µÇÂ¼¶àÓà,±¾º¯ÊıÊÇDeviceListWidgetÀà»Øµ÷´´½¨DeviceWidget¶ÔÏóÊ¹ÓÃµÄ,ÔÚDeviceListWidgetÀàÖĞÒÑÓĞµ÷ÓÃ
     return p;
 }
 
@@ -286,7 +286,7 @@ void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
         return;
     }
     pDevice->initTaskWidget(pDownloadTask);
-    CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("æ­£åœ¨åŠ è½½ä¸‹è½½é€šé“ä¸­..."), [=]()
+    CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("ÕıÔÚ¼ÓÔØÏÂÔØÍ¨µÀÖĞ..."), [=]()
     {
         qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
         pDownloadTask->save();
@@ -304,7 +304,7 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pF
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     if (pFileAllRows.get() == nullptr || pFileAllRows->size() > MAX_FILES_NUM)
     {
-        UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("å•æ¬¡æœç´¢çš„æ–‡ä»¶è¿‡å¤šï¼Œè¯·ç¼©çŸ­ä¸‹è½½æ—¶æ®µæˆ–è€…å‡å°‘ä¸‹è½½é€šé“ã€‚"));
+        UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("µ¥´ÎËÑË÷µÄÎÄ¼ş¹ı¶à£¬ÇëËõ¶ÌÏÂÔØÊ±¶Î»òÕß¼õÉÙÏÂÔØÍ¨µÀ¡£"));
         ui->widgetDisable->lower();
         return;
     }
@@ -344,7 +344,7 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pF
         pDownloadTask->setFilePath(pDevice->getSaveDirName() + "/" + timeString);
         pDownloadTask->setName(QString("%1(%2)").arg(pDevice->getLoginInfo()->name).arg(timeString));
 
-        CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("æ­£åœ¨åŠ è½½ä¸‹è½½é€šé“ä¸­..."), [=]()
+        CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("ÕıÔÚ¼ÓÔØÏÂÔØÍ¨µÀÖĞ..."), [=]()
         {
             qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
             for (int i = 0; i < pFiles->size(); i++)
@@ -361,7 +361,7 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pF
     }
     else
     {
-        MessageBoxDlg msgDlg(QString::fromLocal8Bit("è§†é¢‘æ–‡ä»¶æœªæ‰¾åˆ°ï¼"));
+        MessageBoxDlg msgDlg(QString::fromLocal8Bit("ÊÓÆµÎÄ¼şÎ´ÕÒµ½£¡"));
         msgDlg.exec();
         ui->widgetDisable->lower();
     }
@@ -380,7 +380,7 @@ void MainDialog::on_downloadButton_clicked()
     if (pDevice == nullptr)
     {
         UIUtils::showTip(*ui->downloadButton,
-            QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªè®¾å¤‡ï¼"));
+            QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸öÉè±¸£¡"));
         return;
     }
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
@@ -388,15 +388,15 @@ void MainDialog::on_downloadButton_clicked()
     ui->listWidgetChannels->getSelectedChannels(channels);
     if (channels.size() == 0)
     {
-        UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªé€šé“ï¼"));
+        UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸öÍ¨µÀ£¡"));
         return;
     }
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     ui->widgetDisable->raise();
     std::shared_ptr< std::vector<RecordFile> > pFileAllRows = std::make_shared< std::vector<RecordFile> >();
-    CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("æ­£åœ¨æœç´¢é€šé“æ–‡ä»¶ä¸­..."), [channels, pFileAllRows, this, pDevice]()
+    CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("ÕıÔÚËÑË÷Í¨µÀÎÄ¼şÖĞ..."), [channels, pFileAllRows, this, pDevice]()
     {
-        qDebug() << "æ­£åœ¨æœç´¢é€šé“æ–‡ä»¶ä¸­";
+        qDebug() << "ÕıÔÚËÑË÷Í¨µÀÎÄ¼şÖĞ";
         std::vector<RecordFile> fileRows;
         pDevice->getService()->ClearRecordFileList();
 
@@ -443,7 +443,7 @@ void MainDialog::on_closeButton_clicked()
         this->reject();
     }
     else{
-        UIUtils::showTip(*this, QString::fromLocal8Bit("æ­£åœ¨åŠ è½½ä¸­ï¼Œè¯·ç¨å€™å†é€€å‡º"));
+        UIUtils::showTip(*this, QString::fromLocal8Bit("ÕıÔÚ¼ÓÔØÖĞ£¬ÇëÉÔºòÔÙÍË³ö"));
     }
 }
 
@@ -453,7 +453,7 @@ void MainDialog::on_zonedownloadBtn_clicked()
     if (pDevice == nullptr)
     {
         UIUtils::showTip(*ui->downloadButton,
-            QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªè®¾å¤‡ï¼"));
+            QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸öÉè±¸£¡"));
         return;
     }
 
@@ -461,13 +461,13 @@ void MainDialog::on_zonedownloadBtn_clicked()
     ui->listWidgetChannels->getSelectedChannels(channels);
     if (channels.size() == 0)
     {
-        UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªé€šé“ï¼"));
+        UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸öÍ¨µÀ£¡"));
         return;
     }
     std::shared_ptr< std::vector<RecordFile> > pFileAllRows = std::make_shared< std::vector<RecordFile> >();
-    CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("æ­£åœ¨æœç´¢é€šé“æ–‡ä»¶ä¸­..."), [channels, pFileAllRows, this, pDevice]()
+    CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("ÕıÔÚËÑË÷Í¨µÀÎÄ¼şÖĞ..."), [channels, pFileAllRows, this, pDevice]()
     {
-        qDebug() << "æ­£åœ¨æœç´¢é€šé“æ–‡ä»¶ä¸­";
+        qDebug() << "ÕıÔÚËÑË÷Í¨µÀÎÄ¼şÖĞ";
         std::vector<RecordFile> fileRows;
         pDevice->getService()->ClearRecordFileList();
 
@@ -566,7 +566,7 @@ void MainDialog::saveForExit(){
 
  //   ui->listWidgetDevices->setAllTaskCancel();
  //   ui->listWidgetDevices->setQuiting();
-    CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("æ­£åœ¨ä¿å­˜æ•°æ®ä¸­..."), [=]()
+    CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("ÕıÔÚ±£´æÊı¾İÖĞ..."), [=]()
     {
         int time = 0;
 
@@ -599,7 +599,7 @@ void MainDialog::saveForExit(){
         }
         else
         {
-            //UIUtils::showTip(*this, QString::fromLocal8Bit("ä¿å­˜ä¸‹è½½æ•°æ®å¤±è´¥ï¼è¯·ç¨å€™å†è¯•..."));
+            //UIUtils::showTip(*this, QString::fromLocal8Bit("±£´æÏÂÔØÊı¾İÊ§°Ü£¡ÇëÉÔºòÔÙÊÔ..."));
         }
 }
 void MainDialog::on_leftBtn_clicked()

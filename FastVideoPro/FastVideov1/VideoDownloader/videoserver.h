@@ -25,7 +25,7 @@
 #include "SqlTableMembers.h"
 using namespace std;
 
-#define UNDEFIN_DEVICE_STR "鏅鸿兘璇嗗埆"
+#define UNDEFIN_DEVICE_STR "智能识别"
 #define UNDEFIN_DEVICE_DEFAULT_USER "UNDEFIN_DEVICE_DEFAULT_USER"
 #define UNDEFIN_DEVICE_DEFAULT_PASSWORD "UNDEFIN_DEVICE_DEFAULT_PASSWORD"
 
@@ -399,14 +399,14 @@ protected:
     }
 
 public:
-	static OEMFacMap m_OEMXMFacMap;   //闆勮繄OEM绯诲垪
-	static OEMFacMap m_OEMHIKFacMap;  //娴峰悍OEM绯诲垪
-	static OEMFacMap m_OEMDHFacMap;   //澶у崕OEM绯诲垪
-    static OEMFacMap m_OEMBXSFacMap;  //瀹濇鐩汷EM绯诲垪
-	static OEMFacMap m_OEMJiuAnFacMap;  //涔濆畨OEM绯诲垪
-	static OEMFacMap m_OEMDongYangFacMap; //涓滈槼OEM绯荤粺
-	static OEMFacMap m_OEMZhongWeiFacMap; //涓淮OEM绯诲垪
-    static OEMFacMap m_OEMJXJMap; //浣充俊鎹稯EM绯诲垪
+	static OEMFacMap m_OEMXMFacMap;   //雄迈OEM系列
+	static OEMFacMap m_OEMHIKFacMap;  //海康OEM系列
+	static OEMFacMap m_OEMDHFacMap;   //大华OEM系列
+    static OEMFacMap m_OEMBXSFacMap;  //宝欣盛OEM系列
+	static OEMFacMap m_OEMJiuAnFacMap;  //九安OEM系列
+	static OEMFacMap m_OEMDongYangFacMap; //东阳OEM系统
+	static OEMFacMap m_OEMZhongWeiFacMap; //中维OEM系列
+    static OEMFacMap m_OEMJXJMap; //佳信捷OEM系列
 };
 
 #define TIME_FORMAT "yyyy-MM-dd hh:mm:ss"
@@ -448,7 +448,7 @@ class videoserver
 {
     virtual videoserver* cloneDerect(); 
 
-	void remove();//鐢ㄤ簬鍒犻櫎鍘傚晢鏃剁櫥褰曞拰鏋愭瀯
+	void remove();//用于删除厂商时登录和析构
     
 public:
     static videoserver* getServerByPort(int port);

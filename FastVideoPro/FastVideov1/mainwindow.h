@@ -24,7 +24,7 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    //å»æ‰æ ‡é¢˜æ ï¼Œèƒ½æ‹–åŠ¨çª—å£ç§»åŠ¨
+    //È¥µô±êÌâÀ¸£¬ÄÜÍÏ¶¯´°¿ÚÒÆ¶¯
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);
