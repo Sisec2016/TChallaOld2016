@@ -115,7 +115,7 @@ void WindowUtils::getLocalIPs(const QString& sHostName, std::vector<QString> &IP
 
 BOOL FindProcessByName(const char* szFileName, PROCESSENTRY32& pe)
 {
-    // ²ÉÓÃ½ø³Ì¿ìÕÕÃ¶¾Ù½ø³ÌµÄ·½·¨²éÕÒÖ¸¶¨Ãû³Æ½ø³Ì
+    // é‡‡ç”¨è¿›ç¨‹å¿«ç…§æšä¸¾è¿›ç¨‹çš„æ–¹æ³•æŸ¥æ‰¾æŒ‡å®šåç§°è¿›ç¨‹
     HANDLE hProcesses;
     PROCESSENTRY32 lpe =
     {
@@ -124,11 +124,11 @@ BOOL FindProcessByName(const char* szFileName, PROCESSENTRY32& pe)
 
     QString sFileName(QString::fromLocal8Bit(szFileName).toLower());
 
-    // ´´½¨½ø³Ì¿ìÕÕ
+    // åˆ›å»ºè¿›ç¨‹å¿«ç…§
     hProcesses = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hProcesses == INVALID_HANDLE_VALUE)
         return FALSE;
-    // »ñÈ¡µÚÒ»¸ö½ø³ÌÊµÀı
+    // è·å–ç¬¬ä¸€ä¸ªè¿›ç¨‹å®ä¾‹
     BOOL isExist = ::Process32First(hProcesses, &lpe);
     BOOL isRunning = FALSE;
     QString strName;
@@ -140,7 +140,7 @@ BOOL FindProcessByName(const char* szFileName, PROCESSENTRY32& pe)
             isRunning = TRUE;
             break;
         }
-        // ±éÀúÏÂÒ»¸ö½ø³ÌÊµÀı
+        // éå†ä¸‹ä¸€ä¸ªè¿›ç¨‹å®ä¾‹
         isExist = ::Process32Next(hProcesses, &lpe);
     }
 
@@ -168,7 +168,7 @@ void WindowUtils::terminateProcess(const char* szFileName){
 
     QString sFileName(QString::fromLocal8Bit(szFileName).toLower());
 
-    // ´´½¨½ø³Ì¿ìÕÕ
+    // åˆ›å»ºè¿›ç¨‹å¿«ç…§
     hProcesses = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hProcesses == INVALID_HANDLE_VALUE)
     {
@@ -176,7 +176,7 @@ void WindowUtils::terminateProcess(const char* szFileName){
         return;
     }
        
-    // »ñÈ¡µÚÒ»¸ö½ø³ÌÊµÀı
+    // è·å–ç¬¬ä¸€ä¸ªè¿›ç¨‹å®ä¾‹
     BOOL isExist = ::Process32First(hProcesses, &lpe);
     BOOL isRunning = FALSE;
     QString strName;
@@ -185,10 +185,10 @@ void WindowUtils::terminateProcess(const char* szFileName){
         strName = QString::fromWCharArray(lpe.szExeFile).toLower();
         if (strName.indexOf(sFileName) >= 0)
         {
-            HANDLE h = OpenProcess(1, TRUE, lpe.th32ProcessID);   //È¡½ø³ÌÊµÀı PROCESS_TERMINATE
+            HANDLE h = OpenProcess(1, TRUE, lpe.th32ProcessID);   //å–è¿›ç¨‹å®ä¾‹ PROCESS_TERMINATE
             TerminateProcess(h, 0);
         }
-        // ±éÀúÏÂÒ»¸ö½ø³ÌÊµÀı
+        // éå†ä¸‹ä¸€ä¸ªè¿›ç¨‹å®ä¾‹
         isExist = ::Process32Next(hProcesses, &lpe);
     }
 
@@ -275,15 +275,15 @@ bool WindowUtils::isConnecteTo(const QString& IP, int millSeconds){
 
 typedef struct arppkt
 {
-    unsigned short hdtyp;//Ó²¼şÀàĞÍ
-    unsigned short protyp;//Ğ­ÒéÀàĞÍ
-    unsigned char hdsize;//Ó²¼şµØÖ·³¤¶È
-    unsigned char prosize;//Ğ­ÒéµØÖ·³¤¶È
-    unsigned short op;//£¨²Ù×÷ÀàĞÍ£©²Ù×÷Öµ:ARP/RARP
-    u_char smac[6];//Ô´MACµØÖ·
-    u_char sip[4];//Ô´IPµØÖ·
-    u_char dmac[6];//Ä¿µÄMACµØÖ·
-    u_char dip[4];//Ä¿µÄIPµØÖ·
+    unsigned short hdtyp;//ç¡¬ä»¶ç±»å‹
+    unsigned short protyp;//åè®®ç±»å‹
+    unsigned char hdsize;//ç¡¬ä»¶åœ°å€é•¿åº¦
+    unsigned char prosize;//åè®®åœ°å€é•¿åº¦
+    unsigned short op;//ï¼ˆæ“ä½œç±»å‹ï¼‰æ“ä½œå€¼:ARP/RARP
+    u_char smac[6];//æºMACåœ°å€
+    u_char sip[4];//æºIPåœ°å€
+    u_char dmac[6];//ç›®çš„MACåœ°å€
+    u_char dip[4];//ç›®çš„IPåœ°å€
 }arpp;
 
 
@@ -297,17 +297,17 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
 
     int result;
     int i = 0, inum;
-    pcap_if_t * alldevs;//Ö¸Ïòpcap_if_t½á¹¹ÁĞ±íÖ¸Õë
-    pcap_t * adhandle;//¶¨Òå°ü²¶×½¾ä±ú
-    char errbuf[PCAP_ERRBUF_SIZE];//´íÎó»º³å×îĞ¡Îª256
-    u_int netmask; //¶¨Òå×ÓÍøÑÚÂë
+    pcap_if_t * alldevs;//æŒ‡å‘pcap_if_tç»“æ„åˆ—è¡¨æŒ‡é’ˆ
+    pcap_t * adhandle;//å®šä¹‰åŒ…æ•æ‰å¥æŸ„
+    char errbuf[PCAP_ERRBUF_SIZE];//é”™è¯¯ç¼“å†²æœ€å°ä¸º256
+    u_int netmask; //å®šä¹‰å­ç½‘æ©ç 
     char packet_filter[] = "ether proto \\arp";
     struct bpf_program fcode;
     struct pcap_pkthdr * header;
     const u_char * pkt_data;
-    //´ò¿ªÈÕÖ¾ÎÄ¼ş
+    //æ‰“å¼€æ—¥å¿—æ–‡ä»¶
 
-    //µ±Ç°ËùÓĞ¿ÉÓÃµÄÍøÂçÉè±¸
+    //å½“å‰æ‰€æœ‰å¯ç”¨çš„ç½‘ç»œè®¾å¤‡
     if (pcap_findalldevs(&alldevs, errbuf) == -1)
     {
         qDebug() << "Error in pcap_findalldevs:" << errbuf;
@@ -339,14 +339,14 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
     pcap_freealldevs(alldevs);
     
 
-    //±àÒë¹ıÂËÆ÷£¬Ö»²¶»ñARP°ü
+    //ç¼–è¯‘è¿‡æ»¤å™¨ï¼Œåªæ•è·ARPåŒ…
     if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0)
     {
         qDebug() << "unable to compile the packet filter.Check the syntax.";
         return false;
     }
 
-    //ÉèÖÃ¹ıÂËÆ÷
+    //è®¾ç½®è¿‡æ»¤å™¨
     if (pcap_setfilter(adhandle, &fcode) < 0)
     {
         qDebug() << "Error setting the filter.";
@@ -364,7 +364,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
             qDebug() << "arp time out";
             break;
         }
-        //Ñ­»·½âÎöARPÊı¾İ°ü
+        //å¾ªç¯è§£æARPæ•°æ®åŒ…
         if (pcap_next_ex(adhandle, &header, &pkt_data) == 0){
             continue;
         }
@@ -455,16 +455,16 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
 
     int result;
     int i = 0, inum;
-    pcap_if_t * alldevs;//Ö¸Ïòpcap_if_t½á¹¹ÁĞ±íÖ¸Õë
-    pcap_t * adhandle;//¶¨Òå°ü²¶×½¾ä±ú
-    char errbuf[PCAP_ERRBUF_SIZE];//´íÎó»º³å×îĞ¡Îª256
-    u_int netmask; //¶¨Òå×ÓÍøÑÚÂë
+    pcap_if_t * alldevs;//æŒ‡å‘pcap_if_tç»“æ„åˆ—è¡¨æŒ‡é’ˆ
+    pcap_t * adhandle;//å®šä¹‰åŒ…æ•æ‰å¥æŸ„
+    char errbuf[PCAP_ERRBUF_SIZE];//é”™è¯¯ç¼“å†²æœ€å°ä¸º256
+    u_int netmask; //å®šä¹‰å­ç½‘æ©ç 
     char packet_filter[] = "ether proto \\arp";
     struct bpf_program fcode;
     struct pcap_pkthdr * header;
     const u_char * pkt_data;
 
-    //µ±Ç°ËùÓĞ¿ÉÓÃµÄÍøÂçÉè±¸
+    //å½“å‰æ‰€æœ‰å¯ç”¨çš„ç½‘ç»œè®¾å¤‡
     if (pcap_findalldevs(&alldevs, errbuf) == -1)
     {
         qDebug() << "Error in pcap_findalldevs:" << errbuf;
@@ -498,14 +498,14 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     pcap_freealldevs(alldevs);
     std::map<QString, std::set<QString>> mpDestSource;
 
-    //±àÒë¹ıÂËÆ÷£¬Ö»²¶»ñARP°ü
+    //ç¼–è¯‘è¿‡æ»¤å™¨ï¼Œåªæ•è·ARPåŒ…
     if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0)
     {
         qDebug() << "unable to compile the packet filter.Check the syntax.";
         return false;
     }
 
-    //ÉèÖÃ¹ıÂËÆ÷
+    //è®¾ç½®è¿‡æ»¤å™¨
     if (pcap_setfilter(adhandle, &fcode) < 0)
     {
         qDebug() << "Error setting the filter.";
@@ -523,7 +523,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
             qDebug() << "arp time out";
             break;
         }
-        //Ñ­»·½âÎöARPÊı¾İ°ü
+        //å¾ªç¯è§£æARPæ•°æ®åŒ…
         if (pcap_next_ex(adhandle, &header, &pkt_data) == 0){
             continue;
         }
@@ -682,14 +682,14 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
     if (ips.size() > 0)
     {
         _IP_ADAPTER_INFO* pIpAdapterInfo = (PIP_ADAPTER_INFO)malloc(sizeof(PIP_ADAPTER_INFO));
-        ULONG uOutBufLen = sizeof(PIP_ADAPTER_INFO);//´æ·ÅÍø¿¨ĞÅÏ¢µÄ»º³åÇø´óĞ¡
-        //µÚÒ»´Îµ÷ÓÃGetAdapterInfo»ñÈ¡ulOutBufLen´óĞ¡
+        ULONG uOutBufLen = sizeof(PIP_ADAPTER_INFO);//å­˜æ”¾ç½‘å¡ä¿¡æ¯çš„ç¼“å†²åŒºå¤§å°
+        //ç¬¬ä¸€æ¬¡è°ƒç”¨GetAdapterInfoè·å–ulOutBufLenå¤§å°
         int errorNo = GetAdaptersInfo(pIpAdapterInfo, &uOutBufLen);
         if (errorNo == ERROR_BUFFER_OVERFLOW)
         {
-            //»ñÈ¡ĞèÒªµÄ»º³åÇø´óĞ¡
+            //è·å–éœ€è¦çš„ç¼“å†²åŒºå¤§å°
             free(pIpAdapterInfo);
-            pIpAdapterInfo = (PIP_ADAPTER_INFO)malloc(uOutBufLen);//·ÖÅäËùĞèÒªµÄÄÚ´æ
+            pIpAdapterInfo = (PIP_ADAPTER_INFO)malloc(uOutBufLen);//åˆ†é…æ‰€éœ€è¦çš„å†…å­˜
             errorNo = (GetAdaptersInfo(pIpAdapterInfo, &uOutBufLen));
         }
 
@@ -730,7 +730,7 @@ const QString& WindowUtils::getLoacalNetName(){
             if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()))
             {
                 qDebug() << i.name() << i.humanReadableName();
-                if (i.humanReadableName().contains(QString::fromLocal8Bit("±¾µØÁ¬½Ó")))
+                if (i.humanReadableName().contains(QString::fromLocal8Bit("æœ¬åœ°è¿æ¥")))
                 {
                     localNetName = i.humanReadableName();
                     break;

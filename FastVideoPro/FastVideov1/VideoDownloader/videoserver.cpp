@@ -80,14 +80,14 @@ std::deque<videoserverFactory *> videoserverFactory::s_Factorys;
 std::recursive_mutex videoserverFactory::s_mutexFactorys;
 std::vector<std::string> videoserverFactory::s_vcExternFunStrings;
 
-OEMFacMap videoserverFactory::m_OEMXMFacMap;   //ÐÛÂõOEMÏµÁÐ
-OEMFacMap videoserverFactory::m_OEMHIKFacMap;  //º£¿µOEMÏµÁÐ
-OEMFacMap videoserverFactory::m_OEMDHFacMap;   //´ó»ªOEMÏµÁÐ
-OEMFacMap videoserverFactory::m_OEMBXSFacMap;  //±¦ÐÀÊ¢OEMÏµÁÐ
-OEMFacMap videoserverFactory::m_OEMJiuAnFacMap;  //¾Å°²OEMÏµÁÐ
-OEMFacMap videoserverFactory::m_OEMDongYangFacMap; //¶«ÑôOEMÏµÍ³
-OEMFacMap videoserverFactory::m_OEMZhongWeiFacMap; //ÖÐÎ¬OEMÏµÁÐ
-OEMFacMap videoserverFactory::m_OEMJXJMap; //¼ÑÐÅ½ÝOEMÏµÁÐ
+OEMFacMap videoserverFactory::m_OEMXMFacMap;   //é›„è¿ˆOEMç³»åˆ—
+OEMFacMap videoserverFactory::m_OEMHIKFacMap;  //æµ·åº·OEMç³»åˆ—
+OEMFacMap videoserverFactory::m_OEMDHFacMap;   //å¤§åŽOEMç³»åˆ—
+OEMFacMap videoserverFactory::m_OEMBXSFacMap;  //å®æ¬£ç››OEMç³»åˆ—
+OEMFacMap videoserverFactory::m_OEMJiuAnFacMap;  //ä¹å®‰OEMç³»åˆ—
+OEMFacMap videoserverFactory::m_OEMDongYangFacMap; //ä¸œé˜³OEMç³»ç»Ÿ
+OEMFacMap videoserverFactory::m_OEMZhongWeiFacMap; //ä¸­ç»´OEMç³»åˆ—
+OEMFacMap videoserverFactory::m_OEMJXJMap; //ä½³ä¿¡æ·OEMç³»åˆ—
 
 downloadEvent::downloadEvent(videoserver* pSvr, qint64 totalSize, qint64 size, bool failed) :
    QEvent(SERVICE_CALLBACK_EVENT), m_pSvr(pSvr), m_totalSize(totalSize), m_size(size), m_failed(failed)
@@ -121,167 +121,167 @@ const std::deque<videoserverFactory*>& videoserverFactory::getFactorys()
 
 void videoserverFactory::initOEMFacList()
 {
-	// µÏÖÇÆÖOEM
+	// è¿ªæ™ºæµ¦OEM
 	{
-		m_OEMXMFacMap["¾Þ·å¿Æ¼¼"] = SISC_IPC_JF;
-		m_OEMXMFacMap["Ê©ÄÍ°²"] = SISC_IPC_SNA;
-		m_OEMXMFacMap["ÐÛÂõ"] = SISC_IPC_XM;
-		m_OEMXMFacMap["º£ÊÓÌ©"] = SISC_IPC_HAISHITAI;
-		m_OEMXMFacMap["ÐÂ´ó¹²´´"] = SISC_IPC_XINDAGONGCHUANG;
-		m_OEMXMFacMap["ÌìÊÓ´ï"] = SISC_IPC_TIANSHIDA;
-		m_OEMXMFacMap["ÊØÎÀÕß"] = SISC_IPC_SHOUWEIZHE;
-		m_OEMXMFacMap["ÉîÛÚË¼ÀË"] = SISC_IPC_SILANG;
-		m_OEMXMFacMap["»ôÄáÎ¤¶û"] = SISC_IPC_HUONIWEIER;
-		m_OEMXMFacMap["ÔÆµäÊÓ"] = SISC_IPC_YUNDIANSHI;
-		m_OEMXMFacMap["ÊÀÐÇ°²·À"] = SISC_IPC_SHIXINGANFANG;
-		m_OEMXMFacMap["Á¢°²´ï"] = SISC_IPC_LIANDA;
-		m_OEMXMFacMap["ÄÏÄþ¹ÚÌ©"] = SISC_IPC_NANNINGGUANGTAI;
-		m_OEMXMFacMap["ÔÆµäÊÓ"] = SISC_IPC_YUNDIANSHI;
-		m_OEMXMFacMap["µÂ¼ÓÀ­"] = SISC_IPC_DEJIALA;
+		m_OEMXMFacMap["å·¨å³°ç§‘æŠ€"] = SISC_IPC_JF;
+		m_OEMXMFacMap["æ–½è€å®‰"] = SISC_IPC_SNA;
+		m_OEMXMFacMap["é›„è¿ˆ"] = SISC_IPC_XM;
+		m_OEMXMFacMap["æµ·è§†æ³°"] = SISC_IPC_HAISHITAI;
+		m_OEMXMFacMap["æ–°å¤§å…±åˆ›"] = SISC_IPC_XINDAGONGCHUANG;
+		m_OEMXMFacMap["å¤©è§†è¾¾"] = SISC_IPC_TIANSHIDA;
+		m_OEMXMFacMap["å®ˆå«è€…"] = SISC_IPC_SHOUWEIZHE;
+		m_OEMXMFacMap["æ·±åœ³æ€æµª"] = SISC_IPC_SILANG;
+		m_OEMXMFacMap["éœå°¼éŸ¦å°”"] = SISC_IPC_HUONIWEIER;
+		m_OEMXMFacMap["äº‘å…¸è§†"] = SISC_IPC_YUNDIANSHI;
+		m_OEMXMFacMap["ä¸–æ˜Ÿå®‰é˜²"] = SISC_IPC_SHIXINGANFANG;
+		m_OEMXMFacMap["ç«‹å®‰è¾¾"] = SISC_IPC_LIANDA;
+		m_OEMXMFacMap["å—å®å† æ³°"] = SISC_IPC_NANNINGGUANGTAI;
+		m_OEMXMFacMap["äº‘å…¸è§†"] = SISC_IPC_YUNDIANSHI;
+		m_OEMXMFacMap["å¾·åŠ æ‹‰"] = SISC_IPC_DEJIALA;
 
 
- 		m_OEMXMFacMap["ÃÀ·ÀÎ°Òµ"] = SISC_IPC_MEIFANGWEIYE;
- 		m_OEMXMFacMap["°îÊÀµç×Ó"] = SISC_IPC_GUANGZHOUBANGSHI;
- 		m_OEMXMFacMap["ÊÓ°²°²·À"] = SISC_IPC_GUANGZHOUSHIAN;
- 		m_OEMXMFacMap["ÇÇ°²¿Æ¼¼"] = SISC_IPC_QIAOAN;
-        m_OEMXMFacMap["ÀÊÊÓÐË"] = SISC_IPC_LANGSHIXIN;
-        m_OEMXMFacMap["ÑÇ°²"] = SISC_IPC_YAAN;
- 		m_OEMXMFacMap["Ì©Íþ¸ß¿Æ"] = SISC_IPC_TAIWEIGAOKE;
-        m_OEMXMFacMap["¹ãÖÝÒÚÊÓ"] = SISC_IPC_GUANGZHOUYISHI;
-        m_OEMXMFacMap["ÉîÛÚºê¿µÍþÊÓOEMÐÛÂõ"] = SISC_IPC_HONGKANGWEISHIOEMXM;
+ 		m_OEMXMFacMap["ç¾Žé˜²ä¼Ÿä¸š"] = SISC_IPC_MEIFANGWEIYE;
+ 		m_OEMXMFacMap["é‚¦ä¸–ç”µå­"] = SISC_IPC_GUANGZHOUBANGSHI;
+ 		m_OEMXMFacMap["è§†å®‰å®‰é˜²"] = SISC_IPC_GUANGZHOUSHIAN;
+ 		m_OEMXMFacMap["ä¹”å®‰ç§‘æŠ€"] = SISC_IPC_QIAOAN;
+        m_OEMXMFacMap["æœ—è§†å…´"] = SISC_IPC_LANGSHIXIN;
+        m_OEMXMFacMap["äºšå®‰"] = SISC_IPC_YAAN;
+ 		m_OEMXMFacMap["æ³°å¨é«˜ç§‘"] = SISC_IPC_TAIWEIGAOKE;
+        m_OEMXMFacMap["å¹¿å·žäº¿è§†"] = SISC_IPC_GUANGZHOUYISHI;
+        m_OEMXMFacMap["æ·±åœ³å®åº·å¨è§†OEMé›„è¿ˆ"] = SISC_IPC_HONGKANGWEISHIOEMXM;
 
-        m_OEMXMFacMap["ÕéÊÓË³"] = SISC_IPC_ZHENSHISHUN;                      // ÕéÊÓË³
-        m_OEMXMFacMap["½ðÉ½Æ·¿Æ"] = SISC_IPC_JINSHANPINKE;                            // ½ðÉ½Æ·¿Æ
-        m_OEMXMFacMap["Ðñ·åÍþÊÓ"] = SISC_IPC_XUFENGWS;                                // Ðñ·åÍþÊÓ
-        m_OEMXMFacMap["ÐÀÊÓ±¦"] = SISC_IPC_XINGSHIBAO;                              // ÐÀÊÓ±¦
+        m_OEMXMFacMap["è‡»è§†é¡º"] = SISC_IPC_ZHENSHISHUN;                      // è‡»è§†é¡º
+        m_OEMXMFacMap["é‡‘å±±å“ç§‘"] = SISC_IPC_JINSHANPINKE;                            // é‡‘å±±å“ç§‘
+        m_OEMXMFacMap["æ—­å³°å¨è§†"] = SISC_IPC_XUFENGWS;                                // æ—­å³°å¨è§†
+        m_OEMXMFacMap["æ¬£è§†å®"] = SISC_IPC_XINGSHIBAO;                              // æ¬£è§†å®
 
-        m_OEMXMFacMap["¼ÑÊÓ°²"] = SISC_IPC_ZSB;                      // ¼ÑÊÓ°²
-        m_OEMXMFacMap["¿ª¶ûÈð"] = SISC_IPC_KER;                            // ¿ª¶ûÈð
-        m_OEMXMFacMap["°²Äá"] = SISC_IPC_AN;                                // °²Äá
-        m_OEMXMFacMap["°ÂÍþÍØ"] = SISC_IPC_AWT;                              // °ÂÍþÍØ
+        m_OEMXMFacMap["ä½³è§†å®‰"] = SISC_IPC_ZSB;                      // ä½³è§†å®‰
+        m_OEMXMFacMap["å¼€å°”ç‘ž"] = SISC_IPC_KER;                            // å¼€å°”ç‘ž
+        m_OEMXMFacMap["å®‰å°¼"] = SISC_IPC_AN;                                // å®‰å°¼
+        m_OEMXMFacMap["å¥¥å¨æ‹“"] = SISC_IPC_AWT;                              // å¥¥å¨æ‹“
 
-        m_OEMXMFacMap["¾ý°²°²"] = SISC_IPC_JAA;                      // ¾ý°²°²
-        m_OEMXMFacMap["öÎ½ÝÑ¶"] = SISC_IPC_XJX;                            // öÎ½ÝÑ¶
-        m_OEMXMFacMap["»ªÑó"] = SISC_IPC_HY;                                // »ªÑó
-        m_OEMXMFacMap["ÇÉÐ¾"] = SISC_IPC_QX;                              // ÇÉÐ¾
+        m_OEMXMFacMap["å›å®‰å®‰"] = SISC_IPC_JAA;                      // å›å®‰å®‰
+        m_OEMXMFacMap["é‘«æ·è®¯"] = SISC_IPC_XJX;                            // é‘«æ·è®¯
+        m_OEMXMFacMap["åŽæ´‹"] = SISC_IPC_HY;                                // åŽæ´‹
+        m_OEMXMFacMap["å·§èŠ¯"] = SISC_IPC_QX;                              // å·§èŠ¯
 
-        m_OEMXMFacMap["ÓÊ¿Æ"] = SISC_IPC_YK;                      // ÓÊ¿Æ
-        m_OEMXMFacMap["¾Ó°²±¦"] = SISC_IPC_JAB;                            // ¾Ó°²±¦
-        m_OEMXMFacMap["ÄÏÖÐ"] = SISC_IPC_NZ;                                // ÄÏÖÐ
-        m_OEMXMFacMap["ÁúÖ®¾»"] = SISC_IPC_LZJ;                              // ÁúÖ®¾»
+        m_OEMXMFacMap["é‚®ç§‘"] = SISC_IPC_YK;                      // é‚®ç§‘
+        m_OEMXMFacMap["å±…å®‰å®"] = SISC_IPC_JAB;                            // å±…å®‰å®
+        m_OEMXMFacMap["å—ä¸­"] = SISC_IPC_NZ;                                // å—ä¸­
+        m_OEMXMFacMap["é¾™ä¹‹å‡€"] = SISC_IPC_LZJ;                              // é¾™ä¹‹å‡€
 
-        m_OEMXMFacMap["ÊÀÐÇ"] = SISC_IPC_SX;                      // ÊÀÐÇ
-        m_OEMXMFacMap["çâÌØÊÓ"] = SISC_IPC_WTS;                            // çâÌØÊÓ
-        m_OEMXMFacMap["°²Ö®Ñ¶"] = SISC_IPC_AZX;                                // °²Ö®Ñ¶
-        m_OEMXMFacMap["°Ù¿Æ²©"] = SISC_IPC_BKB;                              // °Ù¿Æ²©
+        m_OEMXMFacMap["ä¸–æ˜Ÿ"] = SISC_IPC_SX;                      // ä¸–æ˜Ÿ
+        m_OEMXMFacMap["çŽ®ç‰¹è§†"] = SISC_IPC_WTS;                            // çŽ®ç‰¹è§†
+        m_OEMXMFacMap["å®‰ä¹‹è®¯"] = SISC_IPC_AZX;                                // å®‰ä¹‹è®¯
+        m_OEMXMFacMap["ç™¾ç§‘åš"] = SISC_IPC_BKB;                              // ç™¾ç§‘åš
 
-        m_OEMXMFacMap["´óÌÆ»ªÇ¿"] = SISC_IPC_DTHQ;                      // ´óÌÆ»ªÇ¿
-        m_OEMXMFacMap["º£ÒÁ"] = SISC_IPC_HAIY;                            // º£ÒÁ
-        m_OEMXMFacMap["°²ÁªÈñÊÓ"] = SISC_IPC_ALKJ;                                // °²ÁªÈñÊÓ
-        m_OEMXMFacMap["Ðñöª¿Æ¼¼"] = SISC_IPC_XTKJ;                              // Ðñöª¿Æ¼¼
+        m_OEMXMFacMap["å¤§å”åŽå¼º"] = SISC_IPC_DTHQ;                      // å¤§å”åŽå¼º
+        m_OEMXMFacMap["æµ·ä¼Š"] = SISC_IPC_HAIY;                            // æµ·ä¼Š
+        m_OEMXMFacMap["å®‰è”é”è§†"] = SISC_IPC_ALKJ;                                // å®‰è”é”è§†
+        m_OEMXMFacMap["æ—­éœ†ç§‘æŠ€"] = SISC_IPC_XTKJ;                              // æ—­éœ†ç§‘æŠ€
 
-        m_OEMXMFacMap["»ªÏè¹ú¼Ê"] = SISC_IPC_HXGJ;                      // »ªÏè¹ú¼Ê
-        m_OEMXMFacMap["¶û¼Ñ"] = SISC_IPC_ERJIA;                            // ¶û¼Ñ
-        m_OEMXMFacMap["ºêÎªÊÓÑ¶"] = SISC_IPC_HWSX;                                // ºêÎªÊÓÑ¶
-        m_OEMXMFacMap["ÐÀÈÙÈª"] = SISC_IPC_XINGRQ;                              // ÐÀÈÙÈª
+        m_OEMXMFacMap["åŽç¿”å›½é™…"] = SISC_IPC_HXGJ;                      // åŽç¿”å›½é™…
+        m_OEMXMFacMap["å°”ä½³"] = SISC_IPC_ERJIA;                            // å°”ä½³
+        m_OEMXMFacMap["å®ä¸ºè§†è®¯"] = SISC_IPC_HWSX;                                // å®ä¸ºè§†è®¯
+        m_OEMXMFacMap["æ¬£è£æ³‰"] = SISC_IPC_XINGRQ;                              // æ¬£è£æ³‰
 
-        m_OEMXMFacMap["Ð³ÃÀµç×Ó"] = SISC_IPC_XMDZ;                      // Ð³ÃÀµç×Ó
-        m_OEMXMFacMap["ºãÈóî£ÊÓ"] = SISC_IPC_AOKS;                            // °Ä¿ÆÉ­
-        m_OEMXMFacMap["ºãÈóî£ÊÓ"] = SISC_IPC_HRRS;                                // ºãÈóî£ÊÓ
-        m_OEMXMFacMap["°²¼Î¿Æ¼¼"] = SISC_IPC_AJKJ;                              // °²¼Î¿Æ¼¼
+        m_OEMXMFacMap["è°ç¾Žç”µå­"] = SISC_IPC_XMDZ;                      // è°ç¾Žç”µå­
+        m_OEMXMFacMap["æ’æ¶¦ç¿è§†"] = SISC_IPC_AOKS;                            // æ¾³ç§‘æ£®
+        m_OEMXMFacMap["æ’æ¶¦ç¿è§†"] = SISC_IPC_HRRS;                                // æ’æ¶¦ç¿è§†
+        m_OEMXMFacMap["å®‰å˜‰ç§‘æŠ€"] = SISC_IPC_AJKJ;                              // å®‰å˜‰ç§‘æŠ€
 
-        m_OEMXMFacMap["Äá°²¿Æ¼¼"] = SISC_IPC_NAKJ;                      // Äá°²¿Æ¼¼
-        m_OEMXMFacMap["À¶Í¼ÊÓÑ¶"] = SISC_IPC_LTSX;                            // À¶Í¼ÊÓÑ¶
-        m_OEMXMFacMap["ÍþµÏË¹"] = SISC_IPC_WEIDS;                                // ÍþµÏË¹
-        m_OEMXMFacMap["ÉîÛÚÊÐ±¾µÂ"] = SISC_IPC_SZSBD;                              // ÉîÛÚÊÐ±¾µÂ
+        m_OEMXMFacMap["å°¼å®‰ç§‘æŠ€"] = SISC_IPC_NAKJ;                      // å°¼å®‰ç§‘æŠ€
+        m_OEMXMFacMap["è“å›¾è§†è®¯"] = SISC_IPC_LTSX;                            // è“å›¾è§†è®¯
+        m_OEMXMFacMap["å¨è¿ªæ–¯"] = SISC_IPC_WEIDS;                                // å¨è¿ªæ–¯
+        m_OEMXMFacMap["æ·±åœ³å¸‚æœ¬å¾·"] = SISC_IPC_SZSBD;                              // æ·±åœ³å¸‚æœ¬å¾·
 
-        m_OEMXMFacMap["Ó¡ÃÎ¿Æ¼¼"] = SISC_IPC_YMKJ;                      // Ó¡ÃÎ¿Æ¼¼
-        m_OEMXMFacMap["ÈñÀÉÌØ"] = SISC_IPC_RUILT;                            // ÈñÀÉÌØ
-        m_OEMXMFacMap["Ó¢·ÉÍØ"] = SISC_IPC_YINGFT;                                // Ó¢·ÉÍØ
-        m_OEMXMFacMap["Áú°²ÌìÏÂ"] = SISC_IPC_LATX;                              // Áú°²ÌìÏÂ
+        m_OEMXMFacMap["å°æ¢¦ç§‘æŠ€"] = SISC_IPC_YMKJ;                      // å°æ¢¦ç§‘æŠ€
+        m_OEMXMFacMap["é”éƒŽç‰¹"] = SISC_IPC_RUILT;                            // é”éƒŽç‰¹
+        m_OEMXMFacMap["è‹±é£žæ‹“"] = SISC_IPC_YINGFT;                                // è‹±é£žæ‹“
+        m_OEMXMFacMap["é¾™å®‰å¤©ä¸‹"] = SISC_IPC_LATX;                              // é¾™å®‰å¤©ä¸‹
 
-        m_OEMXMFacMap["Î¬°îµç×Ó"] = SISC_IPC_WBDZ;                      // Î¬°îµç×Ó
-        m_OEMXMFacMap["ÐÂÈñ»ª¿Æ"] = SISC_IPC_XRHK;                            // ÐÂÈñ»ª¿Æ
-        m_OEMXMFacMap["µã²©µç×Ó"] = SISC_IPC_DBDZ;                                // µã²©µç×Ó
-        m_OEMXMFacMap["·ÉºèÐÅ"] = SISC_IPC_FEIHX;                              // ·ÉºèÐÅ
+        m_OEMXMFacMap["ç»´é‚¦ç”µå­"] = SISC_IPC_WBDZ;                      // ç»´é‚¦ç”µå­
+        m_OEMXMFacMap["æ–°é”åŽç§‘"] = SISC_IPC_XRHK;                            // æ–°é”åŽç§‘
+        m_OEMXMFacMap["ç‚¹åšç”µå­"] = SISC_IPC_DBDZ;                                // ç‚¹åšç”µå­
+        m_OEMXMFacMap["é£žé¸¿ä¿¡"] = SISC_IPC_FEIHX;                              // é£žé¸¿ä¿¡
 
-        m_OEMXMFacMap["³¬±¾ÀÖ"] = SISC_IPC_CHAOBL;                      // ³¬±¾ÀÖ
-        m_OEMXMFacMap["ÓîË¸ÉÌÃ³"] = SISC_IPC_YSSM;                            // ÓîË¸ÉÌÃ³
-        m_OEMXMFacMap["ÅÁÄá¿Â"] = SISC_IPC_PANK;                                // ÅÁÄá¿Â
-        m_OEMXMFacMap["±¦ÊÓ¼Ñ"] = SISC_IPC_BAOJS;                              // ±¦ÊÓ¼Ñ
+        m_OEMXMFacMap["è¶…æœ¬ä¹"] = SISC_IPC_CHAOBL;                      // è¶…æœ¬ä¹
+        m_OEMXMFacMap["å®‡çƒå•†è´¸"] = SISC_IPC_YSSM;                            // å®‡çƒå•†è´¸
+        m_OEMXMFacMap["å¸•å°¼æŸ¯"] = SISC_IPC_PANK;                                // å¸•å°¼æŸ¯
+        m_OEMXMFacMap["å®è§†ä½³"] = SISC_IPC_BAOJS;                              // å®è§†ä½³
 
-        m_OEMXMFacMap["¿ÆÀ¼"] = SISC_IPC_KELAN;                      // ¿ÆÀ¼
-        m_OEMXMFacMap["±±ÊÓÍ¨"] = SISC_IPC_BEIST;                            // ±±ÊÓÍ¨
-        m_OEMXMFacMap["¿Æ´ï¿Æ¼¼"] = SISC_IPC_KDKJ;                                // ¿Æ´ï¿Æ¼¼
-        m_OEMXMFacMap["É½±¾ÖÇÄÜ"] = SISC_IPC_SBZN;                              // É½±¾ÖÇÄÜ
+        m_OEMXMFacMap["ç§‘å…°"] = SISC_IPC_KELAN;                      // ç§‘å…°
+        m_OEMXMFacMap["åŒ—è§†é€š"] = SISC_IPC_BEIST;                            // åŒ—è§†é€š
+        m_OEMXMFacMap["ç§‘è¾¾ç§‘æŠ€"] = SISC_IPC_KDKJ;                                // ç§‘è¾¾ç§‘æŠ€
+        m_OEMXMFacMap["å±±æœ¬æ™ºèƒ½"] = SISC_IPC_SBZN;                              // å±±æœ¬æ™ºèƒ½
 
-        m_OEMXMFacMap["¾«´ïÈñ"] = SISC_IPC_JINGDR;                      // ¾«´ïÈñ
-        m_OEMXMFacMap["º¼ÖÝÊ¥ÉÐ"] = SISC_IPC_HZSS;                            // º¼ÖÝÊ¥ÉÐ
-        m_OEMXMFacMap["ºººÍ¶«·½"] = SISC_IPC_HTDF;                                // ºººÍ¶«·½
-        m_OEMXMFacMap["ÐÇ±¦ÍþÊÓ"] = SISC_IPC_XBWS;                              // ÐÇ±¦ÍþÊÓ
+        m_OEMXMFacMap["ç²¾è¾¾é”"] = SISC_IPC_JINGDR;                      // ç²¾è¾¾é”
+        m_OEMXMFacMap["æ­å·žåœ£å°š"] = SISC_IPC_HZSS;                            // æ­å·žåœ£å°š
+        m_OEMXMFacMap["æ±‰å’Œä¸œæ–¹"] = SISC_IPC_HTDF;                                // æ±‰å’Œä¸œæ–¹
+        m_OEMXMFacMap["æ˜Ÿå®å¨è§†"] = SISC_IPC_XBWS;                              // æ˜Ÿå®å¨è§†
 
-        m_OEMXMFacMap["±±¾©Ó¢¿µ¼ÎÒµ"] = SISC_IPC_BJYKJY;                      // ±±¾©Ó¢¿µ¼ÎÒµ
-        m_OEMXMFacMap["¹ãÖÝÊÐÌ©ºÀ"] = SISC_IPC_GZSTH;                            // ¹ãÖÝÊÐÌ©ºÀ
-        m_OEMXMFacMap["ÉîÛÚÊÐ°²Ô£"] = SISC_IPC_SZSAY;                                // ÉîÛÚÊÐ°²Ô£
-        m_OEMXMFacMap["¹ãÖÝ×óÌï"] = SISC_IPC_GZZT;                              // ¹ãÖÝ×óÌï
+        m_OEMXMFacMap["åŒ—äº¬è‹±åº·å˜‰ä¸š"] = SISC_IPC_BJYKJY;                      // åŒ—äº¬è‹±åº·å˜‰ä¸š
+        m_OEMXMFacMap["å¹¿å·žå¸‚æ³°è±ª"] = SISC_IPC_GZSTH;                            // å¹¿å·žå¸‚æ³°è±ª
+        m_OEMXMFacMap["æ·±åœ³å¸‚å®‰è£•"] = SISC_IPC_SZSAY;                                // æ·±åœ³å¸‚å®‰è£•
+        m_OEMXMFacMap["å¹¿å·žå·¦ç”°"] = SISC_IPC_GZZT;                              // å¹¿å·žå·¦ç”°
 	}
 	
-	// º£¿µOEM
+	// æµ·åº·OEM
 	{
-		m_OEMHIKFacMap["¹ã¶«ÁìÓò"] = SISC_IPC_GUANGDONGLINYU;
+		m_OEMHIKFacMap["å¹¿ä¸œé¢†åŸŸ"] = SISC_IPC_GUANGDONGLINYU;
 
-        m_OEMHIKFacMap["¿õÊÓ°²"] = SISC_IPC_KUANGSHIAN;
-		m_OEMHIKFacMap["¹ãÖÝºêÏè"] = SISC_IPC_GZHX;
+        m_OEMHIKFacMap["æ—·è§†å®‰"] = SISC_IPC_KUANGSHIAN;
+		m_OEMHIKFacMap["å¹¿å·žå®ç¿”"] = SISC_IPC_GZHX;
 
-		m_OEMHIKFacMap["Á¢°²´ïOEM"] = SISC_IPC_LANDAOEMHK;
-		m_OEMHIKFacMap["Î÷°²º£·½"] = SISC_IPC_XIANHAIFANG;
-		m_OEMHIKFacMap["±±¾©Õý·½Ê±´ú"] = SISC_IPC_BEIJINGZHENGFANG;
-		m_OEMHIKFacMap["Ì©¿µÎ°ÒµOEMº£¿µ"] = SISC_IPC_TAIKANGWEIYEOEMHK;
-		m_OEMHIKFacMap["ÌìÃô"] = SISC_IPC_TIANMIN;
-		m_OEMHIKFacMap["¿Æ¶÷"] = SISC_IPC_KEEN;
-		m_OEMHIKFacMap["°²¾ÓÄñ"] = SISC_IPC_ANJULIAO;
-		m_OEMHIKFacMap["±±¾©ÒæÈÚ¹ÚÊÀ"] = SISC_IPC_YIRONGGUANSHI;
-		m_OEMHIKFacMap["¶«´ó½ðÖÇÆ½Ì¨"] = SISC_IPC_DONGDAJIZHI;
-		m_OEMHIKFacMap["GEÓ²ÅÌÂ¼Ïñ»ú"] = SISC_IPC_GERECORDER;
-		m_OEMHIKFacMap["¹ãÖÝÃ×¿¨61ÏµÁÐ"] = SISC_IPC_MIKA61;
-		m_OEMHIKFacMap["¹ãÖÝÃ×¿¨8081ÏµÁÐNVR"] = SISC_IPC_MIKA8081;
-		m_OEMHIKFacMap["ºãÒä"] = SISC_IPC_HENGYI;
-		m_OEMHIKFacMap["ÉîÛÚ°Ë°²"] = SISC_IPC_BAAN;
-		m_OEMHIKFacMap["ÉîÛÚ°Ù»ã"] = SISC_IPC_BAIHUI;
-		m_OEMHIKFacMap["ÉîÛÚº£ÊÓ°²"] = SISC_IPC_HAISHIAN;
-		m_OEMHIKFacMap["ÉîÛÚ¾ÞÁJ"] = SISC_IPC_JUFU;
-		m_OEMHIKFacMap["ÉîÛÚÈüÇå"] = SISC_IPC_SAIQING;
-		m_OEMHIKFacMap["ÉîÛÚÐË¿Æ°²"] = SISC_IPC_XINGKEAN;
-		m_OEMHIKFacMap["ÌìÌìÓÓ"] = SISC_IPC_TIANTIANYOU;
+		m_OEMHIKFacMap["ç«‹å®‰è¾¾OEM"] = SISC_IPC_LANDAOEMHK;
+		m_OEMHIKFacMap["è¥¿å®‰æµ·æ–¹"] = SISC_IPC_XIANHAIFANG;
+		m_OEMHIKFacMap["åŒ—äº¬æ­£æ–¹æ—¶ä»£"] = SISC_IPC_BEIJINGZHENGFANG;
+		m_OEMHIKFacMap["æ³°åº·ä¼Ÿä¸šOEMæµ·åº·"] = SISC_IPC_TAIKANGWEIYEOEMHK;
+		m_OEMHIKFacMap["å¤©æ•"] = SISC_IPC_TIANMIN;
+		m_OEMHIKFacMap["ç§‘æ©"] = SISC_IPC_KEEN;
+		m_OEMHIKFacMap["å®‰å±…é¸Ÿ"] = SISC_IPC_ANJULIAO;
+		m_OEMHIKFacMap["åŒ—äº¬ç›Šèžå† ä¸–"] = SISC_IPC_YIRONGGUANSHI;
+		m_OEMHIKFacMap["ä¸œå¤§é‡‘æ™ºå¹³å°"] = SISC_IPC_DONGDAJIZHI;
+		m_OEMHIKFacMap["GEç¡¬ç›˜å½•åƒæœº"] = SISC_IPC_GERECORDER;
+		m_OEMHIKFacMap["å¹¿å·žç±³å¡61ç³»åˆ—"] = SISC_IPC_MIKA61;
+		m_OEMHIKFacMap["å¹¿å·žç±³å¡8081ç³»åˆ—NVR"] = SISC_IPC_MIKA8081;
+		m_OEMHIKFacMap["æ’å¿†"] = SISC_IPC_HENGYI;
+		m_OEMHIKFacMap["æ·±åœ³å…«å®‰"] = SISC_IPC_BAAN;
+		m_OEMHIKFacMap["æ·±åœ³ç™¾æ±‡"] = SISC_IPC_BAIHUI;
+		m_OEMHIKFacMap["æ·±åœ³æµ·è§†å®‰"] = SISC_IPC_HAISHIAN;
+		m_OEMHIKFacMap["æ·±åœ³å·¨ç½¦"] = SISC_IPC_JUFU;
+		m_OEMHIKFacMap["æ·±åœ³èµ›æ¸…"] = SISC_IPC_SAIQING;
+		m_OEMHIKFacMap["æ·±åœ³å…´ç§‘å®‰"] = SISC_IPC_XINGKEAN;
+		m_OEMHIKFacMap["å¤©å¤©ä½‘"] = SISC_IPC_TIANTIANYOU;
 	}
 	
-	// ±¦ÐÀÊ¢OEM
+	// å®æ¬£ç››OEM
 	{
-        m_OEMBXSFacMap["öÎÅô°²·À"] = SISC_IPC_XP;
-        m_OEMBXSFacMap["ÎÖÊË´ï"] = SISC_IPC_WSD;
+        m_OEMBXSFacMap["é‘«é¹å®‰é˜²"] = SISC_IPC_XP;
+        m_OEMBXSFacMap["æ²ƒä»•è¾¾"] = SISC_IPC_WSD;
 	}
 	
-	// ¾Å°²¹âµçOEM
+	// ä¹å®‰å…‰ç”µOEM
 	{
-		m_OEMJiuAnFacMap["Ì©¿µÎ°Òµ"] = SISC_IPC_TAIKANGWEIYE;
+		m_OEMJiuAnFacMap["æ³°åº·ä¼Ÿä¸š"] = SISC_IPC_TAIKANGWEIYE;
 	}
 	
-	// ¶«Ñô¹ú¼ÊOEM
+	// ä¸œé˜³å›½é™…OEM
 	{
-		m_OEMDongYangFacMap["ºê¿µÍþÊÓ"] = SISC_IPC_HONGKANGWEISHI;
+		m_OEMDongYangFacMap["å®åº·å¨è§†"] = SISC_IPC_HONGKANGWEISHI;
 	}
 	
-	// ÖÐÎ¬OEM
+	// ä¸­ç»´OEM
 	{
-		m_OEMZhongWeiFacMap["Ê¨°²ÁªÑ¶"] = SISC_IPC_SALX;
-		m_OEMZhongWeiFacMap["¹ãÖÝÀûÁè"] = SISC_IPC_GZLL;
-		m_OEMZhongWeiFacMap["ÖÐÌï°²±£"] = SISC_IPC_ZHONGTIANANBAO;
-		m_OEMZhongWeiFacMap["¼ªÈñ"] = SISC_IPC_JIRUI;
-		m_OEMZhongWeiFacMap["»ª°îº£ÊÓ"] = SISC_IPC_HUABANGHAISHI;
+		m_OEMZhongWeiFacMap["ç‹®å®‰è”è®¯"] = SISC_IPC_SALX;
+		m_OEMZhongWeiFacMap["å¹¿å·žåˆ©å‡Œ"] = SISC_IPC_GZLL;
+		m_OEMZhongWeiFacMap["ä¸­ç”°å®‰ä¿"] = SISC_IPC_ZHONGTIANANBAO;
+		m_OEMZhongWeiFacMap["å‰é”"] = SISC_IPC_JIRUI;
+		m_OEMZhongWeiFacMap["åŽé‚¦æµ·è§†"] = SISC_IPC_HUABANGHAISHI;
 	}
 
-    //¼ÑÐÅ½Ý
-    m_OEMJXJMap["¼ªÌï"] = SISC_IPC_JITIAN;
+    //ä½³ä¿¡æ·
+    m_OEMJXJMap["å‰ç”°"] = SISC_IPC_JITIAN;
 }
 
 void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
@@ -619,7 +619,7 @@ videoserver::~videoserver()
 
 }
 
-//ÓÃÓÚÉ¾³ý³§ÉÌÊ±µÇÂ¼ºÍÎö¹¹
+//ç”¨äºŽåˆ é™¤åŽ‚å•†æ—¶ç™»å½•å’Œæžæž„
 void videoserver::remove()
 {
 	delete this;
@@ -891,7 +891,7 @@ bool videoserver::login(std::shared_ptr<LoginServerInfo> p, bool *pbStop)
             }
         }
 
-        mLastError = "ÎÞ·¨Ê¶±ðµÄÉè±¸!";
+        mLastError = "æ— æ³•è¯†åˆ«çš„è®¾å¤‡!";
         return false;
     }
 
@@ -1248,7 +1248,7 @@ QString videoserver::getChannelName(int channel)
          QString s = QString::fromLocal8Bit(m_channels.at(channel).c_str());
          if (s.isEmpty())
          {
-             s = QString::fromLocal8Bit("Í¨µÀ%1").arg(channel);
+             s = QString::fromLocal8Bit("é€šé“%1").arg(channel);
          }
          s.replace(" ", "");
          return s;

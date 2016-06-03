@@ -32,7 +32,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
 	backBtn->hide();
 
 	//QSettings *configIniRead = new QSettings("setting.ini", QSettings::IniFormat);
-	//将读取到的ini文件保存在QString中，先取值，然后通过toString()函数转换成QString类型  
+	//灏嗚鍙栧埌鐨刬ni鏂囦欢淇濆瓨鍦≦String涓紝鍏堝彇鍊硷紝鐒跺悗閫氳繃toString()鍑芥暟杞崲鎴怮String绫诲瀷  
 	//QString ipResult = configIniRead->value("/AppInfo/AppVersion").toString();
 	
 

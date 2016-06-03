@@ -23,8 +23,8 @@
 
 #pragma comment(lib,"Iphlpapi")
 
-#define     NET_IP_DEAFAULT     QStringLiteral("Ä¬ÈÏ")
-#define     IP_CONFIG_GUIDE_TITLE  QStringLiteral("IP×Ô¶¯Æ¥ÅäÏòµ¼")
+#define     NET_IP_DEAFAULT     QStringLiteral("é»˜è®¤")
+#define     IP_CONFIG_GUIDE_TITLE  QStringLiteral("IPè‡ªåŠ¨åŒ¹é…å‘å¯¼")
 LogindDeviceDialog::LogindDeviceDialog(QWidget *parent) :
     NoFlameDlg(parent),
     ui(new Ui::LogindDeviceDialog),
@@ -67,11 +67,11 @@ void LogindDeviceDialog::ipConfigGuide(){
     if (!WindowUtils::isOnLine())
     {
         UIUtils::showTip(*this,
-            QString::fromLocal8Bit("±¾µØÁ¬½Ó¶Ï¿ª£¬Çë²åºÃÍøÏß»ò¿ªÆô±¾µØÁ¬½Ó£¡"));
+            QString::fromLocal8Bit("æœ¬åœ°è¿æ¥æ–­å¼€ï¼Œè¯·æ’å¥½ç½‘çº¿æˆ–å¼€å¯æœ¬åœ°è¿æ¥ï¼"));
         return;
     }
     this->hide();
-    if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("ÊÇ·ñ½øĞĞÏÂÔØÆ÷IPÖÇÄÜÆ¥Åä£¿")))
+    if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("æ˜¯å¦è¿›è¡Œä¸‹è½½å™¨IPæ™ºèƒ½åŒ¹é…ï¼Ÿ")))
     {   
 
         std::shared_ptr<QString> pIP = std::make_shared<QString>();
@@ -79,7 +79,7 @@ void LogindDeviceDialog::ipConfigGuide(){
         std::shared_ptr<QString> pMask = std::make_shared<QString>("255.255.255.0");
         std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÆ¥Åä£¬ÇëÉÔµÈ...."), [=, this]()
+        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½åŒ¹é…ï¼Œè¯·ç¨ç­‰...."), [=, this]()
         {
 
             *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate);
@@ -115,7 +115,7 @@ void LogindDeviceDialog::ipConfigGuide(){
                 this->show();
             }
             else{
-                if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("ÖÇÄÜÊ¶±ğÍø¶ÎÊ§°Ü£¡ÊÇ·ñ½øĞĞÉî¶ÈÆ¥Åä£¿")))
+                if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("æ™ºèƒ½è¯†åˆ«ç½‘æ®µå¤±è´¥ï¼æ˜¯å¦è¿›è¡Œæ·±åº¦åŒ¹é…ï¼Ÿ")))
                 {
                     deepConfig();
                 }
@@ -126,7 +126,7 @@ void LogindDeviceDialog::ipConfigGuide(){
     }
     else{
         netDlg netDlg_(nullptr);
-        netDlg_.setTitleName(QStringLiteral("ÍøÂçÅäÖÃ"));
+        netDlg_.setTitleName(QStringLiteral("ç½‘ç»œé…ç½®"));
         netDlg_.exec();
         this->show();
     }
@@ -137,7 +137,7 @@ void LogindDeviceDialog::deepConfig(){
     std::shared_ptr<QString> pIP = std::make_shared<QString>();
     std::shared_ptr<QString> pNetGate = std::make_shared<QString>();
     std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚÉî¶ÈÆ¥Åä£¬ÇëÉÔµÈ..."), [=, this](){
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æ·±åº¦åŒ¹é…ï¼Œè¯·ç¨ç­‰..."), [=, this](){
         for (int i = 0; i < 255; i++)
         {
             *pNetGate = QString("192.168.%1.1").arg(i);
@@ -171,9 +171,9 @@ void LogindDeviceDialog::deepConfig(){
         }
         else{
             UIUtils::showTip(*this,
-                QString::fromLocal8Bit("ÖÇÄÜÊ¶±ğÍø¶ÎÊ§°Ü£¡ÇëÊÖ¶¯ÉèÖÃ£¡"));
+                QString::fromLocal8Bit("æ™ºèƒ½è¯†åˆ«ç½‘æ®µå¤±è´¥ï¼è¯·æ‰‹åŠ¨è®¾ç½®ï¼"));
             netDlg netDlg_(nullptr);
-            netDlg_.setTitleName(QStringLiteral("ÍøÂçÅäÖÃ"));
+            netDlg_.setTitleName(QStringLiteral("ç½‘ç»œé…ç½®"));
             netDlg_.exec();
             this->show();
         }
@@ -247,20 +247,20 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
     if (!WindowUtils::isOnLine())
     {
         UIUtils::showTip(*ui->listViewServers,
-            QString::fromLocal8Bit("±¾µØÁ¬½Ó¶Ï¿ª£¬Çë²åºÃÍøÏß»ò¿ªÆô±¾µØÁ¬½Ó£¡"));
+            QString::fromLocal8Bit("æœ¬åœ°è¿æ¥æ–­å¼€ï¼Œè¯·æ’å¥½ç½‘çº¿æˆ–å¼€å¯æœ¬åœ°è¿æ¥ï¼"));
         return;
     }
 
     FormFactoryItem* pItem = (FormFactoryItem*)ui->listViewServers->getSelectedItem();
     if (nullptr == pItem)
     {
-        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸ö³§ÉÌ£¡"));
+        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªå‚å•†ï¼"));
         return;
     }
     videoserverFactory* pFactory = pItem->getFactory();
     if (pFactory == NULL)
     {
-        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("ÇëÑ¡ÔñÒ»¸ö³§ÉÌ£¡"));
+        UIUtils::showTip(*ui->listViewServers, QString::fromLocal8Bit("è¯·é€‰æ‹©ä¸€ä¸ªå‚å•†ï¼"));
         return;
     }
 
@@ -275,7 +275,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
     qDebug()<<port<<" toUInt():"<<port.toUInt();
     if (port.toStdString().find_first_not_of("1234567890") != std::string::npos || port.isEmpty())
     {
-        UIUtils::showTip(*ui->lineEditPort, QString::fromLocal8Bit("ÇëÊäÈëÕıÈ·µÄ¶Ë¿ÚºÅ£¡"));
+        UIUtils::showTip(*ui->lineEditPort, QString::fromLocal8Bit("è¯·è¾“å…¥æ­£ç¡®çš„ç«¯å£å·ï¼"));
         return;
     }
 
@@ -286,11 +286,11 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 	password = password.trimmed();
 	if (user.isEmpty() && (!(password.isEmpty())))
 	{
-		UIUtils::showTip(*ui->lineEditAccount, QString::fromLocal8Bit("ÇëÊäÈëÓÃ»§Ãû£¡"));
+		UIUtils::showTip(*ui->lineEditAccount, QString::fromLocal8Bit("è¯·è¾“å…¥ç”¨æˆ·åï¼"));
 		return;
 	}
 
-	//Èç¹ûÓÃ»§ÃûÎª¿Õ£¬ÔòÓÃ»§ÃûÓëÃÜÂë¶¼È¡³§ÉÌÄ¬ÈÏ
+	//å¦‚æœç”¨æˆ·åä¸ºç©ºï¼Œåˆ™ç”¨æˆ·åä¸å¯†ç éƒ½å–å‚å•†é»˜è®¤
     if (user.isEmpty())
     {
 		user = UNDEFIN_DEVICE_DEFAULT_USER;
@@ -310,13 +310,13 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 
 	connectThreads.clear();
 	m_bStop = false;
-    qDebug()<<"ÕıÔÚµÇÂ½ÖĞ...";
+    qDebug()<<"æ­£åœ¨ç™»é™†ä¸­...";
     std::shared_ptr<bool> bLock = std::shared_ptr<bool>(new bool(false));
     mResults.clear();
 	ui->pushButtonConnect->setEnabled(false);
 	ui->closeButton->setEnabled(false);
     std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚ³õÊ¼»¯..."), [=]()
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨åˆå§‹åŒ–..."), [=]()
     {
         for (int i = 0; i < mvcIps.size() && (!*bpCancel); i++)
 		{
@@ -338,7 +338,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 std::shared_ptr<LoginServerInfo> pInfo = std::shared_ptr<LoginServerInfo>(new LoginServerInfo());
                 pInfo->factory = pServer->factory()->factory();
                 //pInfo->id = QString::number(QDateTime::currentDateTime().toTime_t());
-				//ÓÃÊ±¼ä×öidÔÚÏß³Ì²¢·¢Ê±È¡ÖµÒ»Ñù,Ôì³ÉÏÂÔØÒì³£
+				//ç”¨æ—¶é—´åšidåœ¨çº¿ç¨‹å¹¶å‘æ—¶å–å€¼ä¸€æ ·,é€ æˆä¸‹è½½å¼‚å¸¸
                 pInfo->id = sIP + QString::number(QDateTime::currentDateTime().toTime_t());
                 pInfo->ip = sIP;
                 pInfo->name = ui->lineEditDeviceName->text();
@@ -386,12 +386,12 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
         }
         if (!*bpCancel)
         {
-            CWaitDlg::setShowMsg(QString::fromLocal8Bit("ÕıÔÚÖÇÄÜµÇÂ¼ÖĞ..."));
+            CWaitDlg::setShowMsg(QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½ç™»å½•ä¸­..."));
         }
        
 // 		char threadsize[16] = {0};
 // 		sprintf_s(threadsize, "connectThreads.size():%d", connectThreads.size());
-// 		Log::instance().AddLog(QString("ÕıÔÚÖÇÄÜµÇÂ¼ÖĞ...") );
+// 		Log::instance().AddLog(QString("æ­£åœ¨æ™ºèƒ½ç™»å½•ä¸­...") );
         for (int i = 0; i < connectThreads.size(); i++)
         {
             connectThreads[i]->join();
@@ -410,7 +410,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 		{
 			if (mResults.size() == 0)
 			{
-				MessageBoxDlg msgDlg(QString::fromLocal8Bit("µÇÂ½Ê§°Ü£¡"));
+				MessageBoxDlg msgDlg(QString::fromLocal8Bit("ç™»é™†å¤±è´¥ï¼"));
 				msgDlg.exec();
 				qDebug() << "pServer->getLastError() end";
 			}
@@ -444,7 +444,7 @@ void LogindDeviceDialog::on_pushButtonDirect_clicked(){
     ui->pushButtonDirect->setEnabled(false);
     std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
 
-    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚÖÇÄÜÊ¶±ğ£¬ÇëÉÔµÈ..."), [=, this]()
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æ™ºèƒ½è¯†åˆ«ï¼Œè¯·ç¨ç­‰..."), [=, this]()
     {
         QString strIP;
         QString strGate;
@@ -459,11 +459,11 @@ void LogindDeviceDialog::on_pushButtonDirect_clicked(){
         if (*bResult)
         {
             UIUtils::showTip(*ui->pushButtonDirect,
-                QString::fromLocal8Bit("Ö±Á¬ÉèÖÃ³É¹¦£¡"));
+                QString::fromLocal8Bit("ç›´è¿è®¾ç½®æˆåŠŸï¼"));
         }
         else{
             UIUtils::showTip(*ui->pushButtonDirect,
-                QString::fromLocal8Bit("Ö±Á¬ÉèÖÃÊ§°Ü£¡Çë¼ì²éÍøÂçÔÙÖØÊÔ£¬»òÕßÊÖ¹¤½øĞĞÅäÖÃ¡£"));
+                QString::fromLocal8Bit("ç›´è¿è®¾ç½®å¤±è´¥ï¼è¯·æ£€æŸ¥ç½‘ç»œå†é‡è¯•ï¼Œæˆ–è€…æ‰‹å·¥è¿›è¡Œé…ç½®ã€‚"));
         }
         ui->pushButtonDirect->setEnabled(true);
     });
@@ -490,11 +490,11 @@ void LogindDeviceDialog::getIps()
         if (netip.isEmpty() || (netip != NET_IP_DEAFAULT && !Utils::isIpV4(netip)))
         {
             UIUtils::showTip(*ui->comboBoxNet,
-                QString::fromLocal8Bit("ÇëÊäÈë»òÑ¡ÔñÓĞĞ§IPÍø¶Î£¡"));
+                QString::fromLocal8Bit("è¯·è¾“å…¥æˆ–é€‰æ‹©æœ‰æ•ˆIPç½‘æ®µï¼"));
             return;
         }
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
-        CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("ÕıÔÚËÑË÷Éè±¸£¬ÇëÉÔµÈ..."), [=, this]()
+        CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("æ­£åœ¨æœç´¢è®¾å¤‡ï¼Œè¯·ç¨ç­‰..."), [=, this]()
 		{
             if (netip != NET_IP_DEAFAULT)
             {
@@ -513,7 +513,7 @@ void LogindDeviceDialog::getIps()
             if (mvcIps.size() == 0)
             {
                 UIUtils::showTip(*ui->checkBoxSearchIp,
-                                 QString::fromLocal8Bit("Î´ÕÒµ½Éè±¸£¡"));
+                                 QString::fromLocal8Bit("æœªæ‰¾åˆ°è®¾å¤‡ï¼"));
             }
         }, bpCancel);
     }
@@ -527,7 +527,7 @@ void LogindDeviceDialog::getIps()
         else
         {
             UIUtils::showTip(*ui->lineEditIP,
-                             QString::fromLocal8Bit("ÇëÊäÈëÓĞĞ§IP£¡"));
+                             QString::fromLocal8Bit("è¯·è¾“å…¥æœ‰æ•ˆIPï¼"));
         }
     }
 }
