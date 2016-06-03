@@ -11,6 +11,37 @@
 #include "pcap.h"
 #include "utils.h"
 
+QString GetNICUuidByHumanReadableName(const QString& HumanReadableName)
+{
+	if (HumanReadableName.isEmpty()) return "";
+
+	QString UUID;
+	QString LocalAdpterName(HumanReadableName);
+
+	foreach(QNetworkInterface nif, QNetworkInterface::allInterfaces()){
+
+		if (!nif.isValid() || nif.humanReadableName() != LocalAdpterName) 
+			continue;
+
+		UUID = nif.name();
+	}
+
+	return UUID;
+}
+
+QString ConvertNICUUIDtoPcapName(pcap_if_t* devs, const QString& uuid)
+{
+	QString pcap_name;
+	
+	for (pcap_if_t *d = devs; d && d->next; d = d->next)
+	{
+		QString tmp(d->name);
+		if (tmp.contains(uuid, Qt::CaseInsensitive))
+			pcap_name = tmp;
+	}
+
+	return pcap_name;
+}
 
 WindowUtils::WindowUtils()
 {
@@ -23,6 +54,12 @@ bool WindowUtils::isValidNetMacaddress(const QString& macaddress)
             && !macaddress.startsWith("00:50:56:C0");
 }
 
+void WindowUtils::GetIPfromLocalNIC(std::vector<QString> &IPs)
+{
+	qDebug() << "GetIPfromLocalNIC start";
+	getLocalIPs(IPs);
+	qDebug() << "GetIPfromLocalNIC end";
+}
 
 void WindowUtils::getLocalIPs(std::vector<QString> &IPs)
 {
@@ -30,7 +67,7 @@ void WindowUtils::getLocalIPs(std::vector<QString> &IPs)
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     foreach(QNetworkInterface i, list) {
         if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()) &&
-             i.humanReadableName() == QString::fromLocal8Bit("本地连接"))
+            i.humanReadableName() == WindowUtils::getLoacalNetName())
         {
             qDebug() << i.humanReadableName();
             foreach(QHostAddress address,i.allAddresses())
@@ -54,19 +91,20 @@ void WindowUtils::getLocalIPs(const QString& sHostName, std::vector<QString> &IP
     IPs.clear();
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     foreach(QNetworkInterface i, list) {
-        if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()))
+        if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()) &&
+            i.humanReadableName() == WindowUtils::getLoacalNetName())
         {
             qDebug() << i.name() << i.humanReadableName();
             
             foreach(QHostAddress address, i.allAddresses())
             {
                 if (address.protocol() == QAbstractSocket::IPv4Protocol
-                    && !address.isLoopback())
+                    && !address.isLoopback() && Utils::isInnerIP(address.toString()))
                 {
                     if (IPs.end() == std::find(IPs.begin(), IPs.end(), address.toString()))
                     {
                         IPs.push_back(address.toString());
-                        qDebug() << address.toString();
+                        qDebug() <<__FILE__ << __FUNCTION__ << __LINE__ << address.toString();
                     }
                 }
             }
@@ -230,8 +268,8 @@ bool WindowUtils::setNetDhcp(const QString& sName){
     return true;
 }
 
-bool WindowUtils::isConnecteTo(const QString& IP){
-    return CPing::instance().Ping(IP.toStdString().c_str(), 500);
+bool WindowUtils::isConnecteTo(const QString& IP, int millSeconds){
+    return CPing::instance().Ping(IP.toStdString().c_str(), millSeconds);
 }
 
 
@@ -341,11 +379,15 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
             {
                 continue;
             }
+
             QString source = QString("%1.%2.%3.%4").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]).arg(arph->sip[3]);
             if (IPs.end() != std::find(IPs.begin(), IPs.end(), source)){
                 continue;
             }
-
+            if (!Utils::isInnerIP(source))
+            {
+                continue;
+            }
             netGate = source;
             if (ip.isEmpty())
             {
@@ -355,9 +397,9 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
             ip = QString("%1.%2.%3.%4").arg(arph->dip[0]).arg(arph->dip[1]).arg(arph->dip[2]).arg(arph->dip[3]);
             if (arph->dip[0] != arph->sip[0] || arph->dip[1] != arph->sip[1] || arph->dip[2] != arph->sip[2] || ip == netGate)
             {
-                if (arph->sip[3] != 1)
+                if (arph->sip[3] != 44)
                 {
-                    ip = QString("%1.%2.%3.1").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]);
+                    ip = QString("%1.%2.%3.44").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]);
                 }
                 else{
                     ip = QString("%1.%2.%3.254").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]);
@@ -382,10 +424,20 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
                 continue;
             }
 
+            if (!Utils::isInnerIP(source))
+            {
+                continue;
+            }
 
             netGate = source;
-            ip = QString("%1.%2.%3.%4").arg(arph->dip[0]).arg(arph->dip[1]).arg(arph->dip[2]).arg(44);
-            qDebug() << "aarp" << ip << netGate;
+            if (arph->sip[3] != 44)
+            {
+                ip = QString("%1.%2.%3.44").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]);
+            }
+            else{
+                ip = QString("%1.%2.%3.254").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]);
+            }
+           
             break;
         }
 
@@ -426,16 +478,18 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     }
 
     qDebug() << alldevs->description << alldevs->name;
+	QString uuid = GetNICUuidByHumanReadableName(WindowUtils::getLoacalNetName());
+	QString pcap_name = ConvertNICUUIDtoPcapName(alldevs, uuid);
 
-    if ((adhandle = pcap_open_live(alldevs->name, 65536, 1, 1000, errbuf)) == NULL)
+	if ((adhandle = pcap_open_live(pcap_name.toStdString().data(), 65536, 1, 1000, errbuf)) == NULL)
     {
-        qDebug() << "pcap_open_live failed!  not surpport by WinPcap ?" << alldevs->name;
+        qDebug() << QString("kevin : pcap_open_live failed!  not surpport by WinPcap ? alldev->name : %1").arg(alldevs->name);
         pcap_freealldevs(alldevs);
         return false;
     }
 
     if (pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL) {
-        qDebug() << "pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL";
+        qDebug() << "kevin : pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL";
         return false;
     }
 
@@ -613,12 +667,13 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     return !ip.isEmpty();
 }
 bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
-    QString sName = QString::fromLocal8Bit("本地连接");
+    QString sName = WindowUtils::getLoacalNetName();
+    qDebug()<<__FILE__<<__FUNCTION__<<__LINE__<<sName;
     WindowUtils::setNetDhcp(sName);
     std::vector<QString> ips;
     int maxPingTime = 1000 * 3;
     ::Sleep(2000);
-    for (WindowUtils::getLocalIPs(sName, ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::getLocalIPs(sName, ips)){
+	for (WindowUtils::GetIPfromLocalNIC(ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::GetIPfromLocalNIC(ips)){
         ::Sleep(1000);
         maxPingTime -= 1000;
     }
@@ -664,5 +719,118 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
         free(pIpAdapterInfo);
     }
 
+    return r;
+}
+const QString& WindowUtils::getLoacalNetName(){
+    static QString localNetName;
+    if (localNetName.isEmpty())
+    {
+        QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+        foreach(QNetworkInterface i, list) {
+            if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()))
+            {
+                qDebug() << i.name() << i.humanReadableName();
+                if (i.humanReadableName().contains(QString::fromLocal8Bit("本地连接")))
+                {
+                    localNetName = i.humanReadableName();
+                    break;
+                }
+            }
+
+        }
+    }
+
+    return localNetName;
+}
+bool WindowUtils::isOnLine(){
+    
+    QString localNetName(WindowUtils::getLoacalNetName());
+    
+    if (localNetName.isEmpty())
+    {
+        return false;
+    }
+
+    QString name;
+    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+    foreach(QNetworkInterface i, list) {
+        if (i.humanReadableName() == localNetName)
+        {
+            name = i.name();
+            break;
+        }
+
+    }
+
+    DWORD dwSize = sizeof (MIB_IFTABLE);
+    DWORD dwRetVal = 0;
+
+    unsigned int i, j;
+
+    /* variables used for GetIfTable and GetIfEntry */
+    char *pIfTable = new char[dwSize];
+    MIB_IFROW *pIfRow;
+
+    if (GetIfTable((MIB_IFTABLE *)pIfTable, &dwSize, 0) == ERROR_INSUFFICIENT_BUFFER) {
+        delete pIfTable;
+        pIfTable = new char[dwSize];
+    }
+   
+    bool r = false;
+    if ((dwRetVal = GetIfTable((MIB_IFTABLE *)pIfTable, &dwSize, 0)) == NO_ERROR) {
+        MIB_IFTABLE *pTable = (MIB_IFTABLE *)pIfTable;
+        if (pTable->dwNumEntries > 0) {
+            MIB_IFROW IfRow;
+            for (i = 0; i < pTable->dwNumEntries; i++) {
+                IfRow.dwIndex = pTable->table[i].dwIndex;
+                if ((dwRetVal = GetIfEntry(&IfRow)) == NO_ERROR) {
+                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << QString::fromStdWString(std::wstring(IfRow.wszName));
+
+                    
+                    if (IfRow.dwType != MIB_IF_TYPE_ETHERNET || !QString::fromStdWString(std::wstring(IfRow.wszName)).contains(name))
+                    {
+                        continue;
+                    }
+                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << QString::fromLocal8Bit((char*)IfRow.bDescr) << IfRow.dwType;
+                    switch (IfRow.dwOperStatus) {
+                    case IF_OPER_STATUS_NON_OPERATIONAL:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Non Operational";
+                        break;
+                    case IF_OPER_STATUS_UNREACHABLE:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Unreasonable";
+                        break;
+                    case IF_OPER_STATUS_DISCONNECTED:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Disconnected";
+                        break;
+                    case IF_OPER_STATUS_CONNECTING:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Connecting";
+                        r = true;
+                        break;
+                    case IF_OPER_STATUS_CONNECTED:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Connected";
+                        r = true;
+                        break;
+                    case IF_OPER_STATUS_OPERATIONAL:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Operational";
+                        r = true;
+                        break;
+                    default:
+                        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "Unknown status" << IfRow.dwAdminStatus;
+                        break;
+                    }
+                }
+
+                else {
+                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "GetIfEntry failed for index with error:" <<
+                         dwRetVal;
+                }
+            }
+        }
+        else {
+            qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "GetIfTable failed with error:" << dwRetVal;
+        }
+
+    }
+    delete pIfTable;
     return r;
 }

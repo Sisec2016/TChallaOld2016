@@ -15,11 +15,14 @@ FOR /F "delims=" %%A IN ('DIR /AD /B %SDKDIR%') DO (
 	REM IF NOT EXIST %CD%\%SDKDEST%\%%A MD %CD%\%SDKDEST%\%%A
 	@ECHO COPY DLL 
 	@ECHO FROM %CD%\%SDKDIR%\%%A\SDK\ 
-	@ECHO TO %CD%\%SDKDEST%\%%A
+	@ECHO TO %CD%\%SDKDEST%\%%A    
 	REM %%A has VideoServer postfix remove it
 	CALL :SUPERCOPY %%A
 	REM XCOPY %CD%\%SDKDIR%\%%A\SDK\*.dll %CD%\%SDKDEST%\test\%DIRNAME:VideoServer=% /S /Q /Y 2>nul
 )
+DEL %CD%\%SDKDEST%\*.pdb /f /s /q /a
+DEL %CD%\%SDKDEST%\*.exp /f /s /q /a
+DEL %CD%\%SDKDEST%\*.lib /f /s /q /a
 ENDLOCAL & GOTO :EOF
 
 :SUPERCOPY [%1 - PARAM]

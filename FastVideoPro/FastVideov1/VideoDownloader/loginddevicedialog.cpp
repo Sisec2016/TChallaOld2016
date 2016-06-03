@@ -3,6 +3,7 @@
 #include "ui_loginddevicedialog.h"
 #include "videoserver.h"
 #include <QCollator>
+#include <QNetworkConfigurationManager>
 
 #include "utils.h"
 #include "uiutils.h"
@@ -18,6 +19,9 @@
 #include "utils.h"
 #include "netdlg.h"
 #include "IPConfigSucessDialog.h"
+#include "Iphlpapi.h"
+
+#pragma comment(lib,"Iphlpapi")
 
 #define     NET_IP_DEAFAULT     QStringLiteral("默认")
 #define     IP_CONFIG_GUIDE_TITLE  QStringLiteral("IP自动匹配向导")
@@ -42,7 +46,7 @@ LogindDeviceDialog::LogindDeviceDialog(QWidget *parent) :
     connect(ui->lineEditFactory, SIGNAL(textChanged(const QString &)), this, SLOT(on_txtSearchFactory_textChanged(const QString &)));
     connect(ui->listViewServers, SIGNAL(onSelected(ListViewItem*)), this, SLOT(on_factory_Selected(ListViewItem*)));
     ui->listViewServers->init(ui->widgetHeader);
-    this->setPage(1);
+
     ui->checkBoxDefaultPort->setChecked(true);
     ui->checkBoxSearchIp->setChecked(true);
     initNetCombobox();
@@ -50,6 +54,7 @@ LogindDeviceDialog::LogindDeviceDialog(QWidget *parent) :
 
     ui->pushButtonDirect->hide();
     ipConfigGuide();
+    this->setPage(1);
 }
 
 LogindDeviceDialog::~LogindDeviceDialog()
@@ -58,6 +63,13 @@ LogindDeviceDialog::~LogindDeviceDialog()
 }
 
 void LogindDeviceDialog::ipConfigGuide(){
+    QNetworkConfigurationManager mgr;
+    if (!WindowUtils::isOnLine())
+    {
+        UIUtils::showTip(*this,
+            QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
+        return;
+    }
     this->hide();
     if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("是否进行下载器IP智能匹配？")))
     {   
@@ -77,14 +89,14 @@ void LogindDeviceDialog::ipConfigGuide(){
             }
             if (!*bResult)
             {
-                *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate, msetIps);
+                *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
                 if (*bpCancel)
                 {
                     return;
                 }
                 if (*bResult)
                 {
-                    if (!WindowUtils::setNetConfig(QStringLiteral("本地连接"), *pIP, "255.255.255.0", *pNetGate, true))
+                    if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
                     {
                         *bResult = false;
                     }
@@ -134,7 +146,7 @@ void LogindDeviceDialog::deepConfig(){
             {
                 return;
             }
-            if (!WindowUtils::setNetConfig(QString::fromLocal8Bit("本地连接"), *pIP, "255.255.255.0", *pNetGate, true))
+            if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
             {
                 continue;
             }
@@ -172,6 +184,8 @@ void LogindDeviceDialog::deepConfig(){
 
 void LogindDeviceDialog::initFactory()
 {
+    
+    std::lock_guard<std::recursive_mutex> lock(mmtPages);
     ui->listViewServers->removeAllItems();
     const std::deque<videoserverFactory *>& Factorys = videoserverFactory::getFactorys();
     std::deque<videoserverFactory *> fs;
@@ -180,27 +194,35 @@ void LogindDeviceDialog::initFactory()
     {
         if (sFilter.isEmpty() || Utils::getChineseSpell(Factorys[i]->name()).toLower().startsWith(sFilter))
         {
-            fs.push_back(Factorys[i]);
+            if (nullptr != Factorys[i])
+            {
+                fs.push_back(Factorys[i]);
+            }
+            
         }
     }
     
     FormFactoryItem* pFirstItem = NULL;
-	for (int i = (mCurrentPage - 1) * NUM_OF_ONEPAGE; i < fs.size() && i < NUM_OF_ONEPAGE + (mCurrentPage - 1) * NUM_OF_ONEPAGE; ++i)
+	for (int i = (mCurrentPage - 1) * NUM_OF_ONEPAGE; i < fs.size() && i < mCurrentPage * NUM_OF_ONEPAGE; ++i)
     {
         FormFactoryItem* pItem = new FormFactoryItem(ui->listViewServers);
         pItem->setFactory(fs[i]);
         ui->listViewServers->addWidgetItem(pItem);
+        
+        mmpPort[pItem] = fs[i]->port();
         if (NULL == pFirstItem)
         {
             pFirstItem = pItem;
+            this->on_factory_Selected(pFirstItem);
         }
     }
 
-    this->on_factory_Selected(pFirstItem);
+
 }
 
 void LogindDeviceDialog::on_btnCloseX_clicked()
 {
+
     emit onClose();
 }
 
@@ -222,6 +244,12 @@ void LogindDeviceDialog::on_lineEditPort_textChanged(const QString &arg1)
 
 void LogindDeviceDialog::on_pushButtonConnect_clicked()
 {
+    if (!WindowUtils::isOnLine())
+    {
+        UIUtils::showTip(*ui->listViewServers,
+            QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
+        return;
+    }
 
     FormFactoryItem* pItem = (FormFactoryItem*)ui->listViewServers->getSelectedItem();
     if (nullptr == pItem)
@@ -328,7 +356,10 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 }
                 pInfo->password = password;
                 pInfo->user = user;
-                if (pServer->login(pInfo, &m_bStop))
+
+                
+
+                if (pServer->login(pInfo, bpCancel.get()))
                 {
                     qDebug()<<"login succeed!";
                     std::lock_guard<std::recursive_mutex>  lockLoginResult(*mtLoginResult);
@@ -398,7 +429,6 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 }
 			}
 
-
 		}
         ui->pushButtonConnect->setEnabled(true);
         ui->closeButton->setEnabled(true);
@@ -420,7 +450,7 @@ void LogindDeviceDialog::on_pushButtonDirect_clicked(){
         QString strGate;
         if (*bResult = WindowUtils::getDirectDevice(strIP, strGate))
         {
-            QString sName = QString::fromLocal8Bit("本地连接");
+            QString sName = WindowUtils::getLoacalNetName();
             WindowUtils::setNetConfig(sName, strIP, "255.255.255.0", strGate, true);
             ui->lineEditIP->setText(strGate);
             ui->checkBoxSearchIp->setChecked(false);
@@ -509,6 +539,7 @@ void LogindDeviceDialog::on_closeButton_clicked()
 
 void LogindDeviceDialog::setPage(int num)
 {
+    std::lock_guard<std::recursive_mutex> lock(mmtPages);
     const std::deque<videoserverFactory *>& Factorys = videoserverFactory::getFactorys();
     std::deque<videoserverFactory *> fs;
     QString sFilter = ui->lineEditFactory->text().toLower();
@@ -520,7 +551,11 @@ void LogindDeviceDialog::setPage(int num)
         }
     }
 
-    int maxPage = fs.size() / NUM_OF_ONEPAGE + 1;
+    int maxPage = fs.size() / NUM_OF_ONEPAGE;
+    if (fs.size() % NUM_OF_ONEPAGE)
+    {
+        maxPage++;
+    }
     if (num < 1)
     {
         num = 1;
@@ -546,12 +581,26 @@ void LogindDeviceDialog::on_lineEditIP_textChanged(const QString &arg1)
 
 void LogindDeviceDialog::on_pushButtonNext_clicked()
 {
-	setPage(++mCurrentPage);
+    __try{
+
+        setPage(++mCurrentPage);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        mCurrentPage--;
+        
+    }
+	
 }
 
 void LogindDeviceDialog::on_pushButtonPre_clicked()
 {
-	setPage(--mCurrentPage);
+    __try{
+        setPage(--mCurrentPage);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
 }
 
 void LogindDeviceDialog::on_checkBoxSearchIp_stateChanged(int state)
@@ -584,20 +633,23 @@ void LogindDeviceDialog::on_checkBoxDefaultPort_stateChanged(int state)
 }
 
 void LogindDeviceDialog::on_factory_Selected(ListViewItem* item){
-    if (ui->checkBoxDefaultPort->isChecked())
+    std::lock_guard<std::recursive_mutex> lock(mmtPages);
+    if (ui->checkBoxDefaultPort->isChecked() && mmpPort.find(item) != mmpPort.end())
     {
-        FormFactoryItem* pItem = (FormFactoryItem*)(item);
-        if (pItem != NULL)
-        {
-            ui->lineEditPort->setText(QString::number(pItem->getFactory()->port()));
-        }
+        ui->lineEditPort->setText(QString::number(mmpPort[item]));
     }
-
+    
 }
 
 void LogindDeviceDialog::on_txtSearchFactory_textChanged(const QString &arg1)
 {
-    setPage(1);
+    __try{
+        setPage(1);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+
+    }
 }
 
 void LogindDeviceDialog::initNetCombobox(){

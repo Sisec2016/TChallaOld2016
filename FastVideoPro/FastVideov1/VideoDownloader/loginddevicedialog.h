@@ -7,6 +7,8 @@
 #include "videoserver.h"
 #include <vector>
 #include <set>
+#include <map>
+#include <mutex>
 #include "listview.h"
 #include "noflamedlg.h"
 
@@ -15,6 +17,8 @@ namespace Ui {
 class LogindDeviceDialog;
 }
 #define NUM_OF_ONEPAGE   7
+
+class FormFactoryItem;
 class LogindDeviceDialog : public NoFlameDlg
 {
     Q_OBJECT
@@ -58,6 +62,8 @@ protected:
     std::set<QString> msetIps;
     std::vector<QString> mvcIps;
     std::vector< std::shared_ptr<LoginServerInfo> > mResults;
+    std::map<ListViewItem*, int> mmpPort;
+    std::recursive_mutex mmtPages;
     int mCurrentPage;
 private:
     Ui::LogindDeviceDialog *ui;

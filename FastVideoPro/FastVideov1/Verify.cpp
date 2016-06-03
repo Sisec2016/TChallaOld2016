@@ -13,7 +13,8 @@ const char* Verify::version()
 #ifdef VERIFY_VERSION
     return "2.0.3";
 #else
-    return "1.2.4";
+    return "1.3.5.1.2";
+
 #endif
 }
 

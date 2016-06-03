@@ -45,7 +45,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\work\downloadVideo\bin\factorys\DH\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\bin\factorys\DH\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">DHVideoServer</TargetName>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</IgnoreImportLibrary>
@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;sdk;..\boostinclude;..\VideoDownloader;debug;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtWidgets;..\..\VideoServer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;sdk;..\boostinclude;..\VideoDownloader;$(SolutionDir)..\common;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtWidgets;..\..\VideoServer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -Zc:strictStrings -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -78,8 +78,8 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_log_setup-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_log-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_system-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_date_time-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_chrono-vc120-mt-1_57.lib;D:/work/common/boost/boost_1_57_0/bin/vc12/libboost_filesystem-vc120-mt-1_57.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>sdk;$(QTDIR)\lib;../boostlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libboost_log_setup-vc120-mt-1_57.lib;libboost_log-vc120-mt-1_57.lib;libboost_system-vc120-mt-1_57.lib;libboost_date_time-vc120-mt-1_57.lib;libboost_chrono-vc120-mt-1_57.lib;libboost_filesystem-vc120-mt-1_57.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>sdk;$(QTDIR)\lib;$(SolutionDir)lib;$(SolutionDir)lib\boostlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -154,7 +154,7 @@
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="5.3" />
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="QTDIR" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

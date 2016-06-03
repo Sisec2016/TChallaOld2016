@@ -26,10 +26,10 @@ Dialog::~Dialog()
 }
 
 QString Dialog::getApllyCode(){
-    unsigned char address[1024];
-    if (getLocalMac(address) > 0)
+	QString PhysicalAddr;
+	if (getLocalMac(PhysicalAddr))
     {
-        QByteArray hash_byte_array = QCryptographicHash::hash((const char*)address, QCryptographicHash::Md5);
+		QByteArray hash_byte_array = QCryptographicHash::hash(PhysicalAddr.toUtf8(), QCryptographicHash::Md5);
         return hash_byte_array.toHex();
     }
     
@@ -61,15 +61,15 @@ void Dialog::ClickButn()
 	QString strAuthy;
 	strAuthy = ui.lineEdit_Author->text();
 	
-	//2af5391074f98ce09537e0c931871966 ÉêÇë
-	//c1c2bcb4493c40fe99ace9c72eb5123f ¼¤»î
+	//2af5391074f98ce09537e0c931871966 ç”³è¯·
+	//c1c2bcb4493c40fe99ace9c72eb5123f æ¿€æ´»
 
     auto hashRe = QCryptographicHash::hash(QString("dwsfdajfaiierueiur%1adkfjaofdlasdfl").arg(m_strApply).toLatin1(), QCryptographicHash::Md5);
     QString md5 = hashRe.toHex();
 
     if (md5 == strAuthy)//
 	{
-		QMessageBox::information(NULL, QString::fromLocal8Bit("ÌáÊ¾"), QString::fromLocal8Bit("ÊÚÈ¨³É¹¦,ÇëÖØĞÂÔËĞĞ³ÌĞò£¡"), QMessageBox::Yes, QMessageBox::Yes);
+		QMessageBox::information(NULL, QString::fromStdWString(L"æç¤º"), QString::fromStdWString(L"æˆæƒæˆåŠŸ,è¯·é‡æ–°è¿è¡Œç¨‹åºï¼"), QMessageBox::Yes, QMessageBox::Yes);
 
 		QFile file(AuthorFile);
 		if (file.open(QIODevice::WriteOnly))
@@ -88,7 +88,7 @@ void Dialog::ClickButn()
 	}
 	else
 	{
-		QMessageBox::information(NULL, QString::fromLocal8Bit("ÌáÊ¾"), QString::fromLocal8Bit("ÊÚÈ¨Ê§°Ü"), QMessageBox::Yes, QMessageBox::Yes);
+		QMessageBox::information(NULL, QString::fromStdWString(L"æç¤º"), QString::fromStdWString(L"æˆæƒå¤±è´¥"), QMessageBox::Yes, QMessageBox::Yes);
 	}
 	return;
 }

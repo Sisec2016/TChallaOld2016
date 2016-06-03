@@ -22,7 +22,7 @@ public:
 
     virtual const char* name()
     {
-        return "dizhipu"; 
+        return "µœ÷«∆÷"; 
     }
 
     virtual int defaultPort()

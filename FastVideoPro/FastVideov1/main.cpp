@@ -14,6 +14,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QString>
 
 #include "videoserversSvr.h"
 #include "dialog.h"
@@ -189,7 +190,6 @@ void checkDirectory(){
 
 int main(int argc, char *argv[])
 {
-    
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
@@ -215,12 +215,12 @@ int main(int argc, char *argv[])
     }
     SvrFactory::startSver();
     initDb();
-	MD5 md5_toApply;//ÓÃÓÚÉú³ÉÉêÇëÂë
+	MD5 md5_toApply;//ç”¨äºç”Ÿæˆç”³è¯·ç 
 
-	unsigned char address[1024];
-	if (getLocalMac(address) > 0)
+	QString PhysicalAddr;
+	if (getLocalMac(PhysicalAddr))
 	{
-		md5_toApply.update((const char *)address);//Éú³ÉÉêÇëÂë
+		md5_toApply.update(PhysicalAddr.toStdString());//ç”Ÿæˆç”³è¯·ç 
 	}
 	else
 	{
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 
     if (!Dialog::hasKey() && !TempAuthDialog::instance().hasAuthority())
 	{
-		//Ã»ÓĞÊÚÈ¨ÎÄ¼ş£¬ÔËĞĞÊÚÈ¨Ãæ°å
+		//æ²¡æœ‰æˆæƒæ–‡ä»¶ï¼Œè¿è¡Œæˆæƒé¢æ¿
 
         Dialog w;
         w.show();
