@@ -8,6 +8,7 @@
 #include <QFile>
 #include <qdebug.h>
 #include <QDateTime>
+#include <algorithm>
 Log logFile("TongWei");
 
 extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory()
@@ -289,7 +290,9 @@ bool VideoServer::GetRecordFileList(std::vector<RecordFile>& files, const std::v
        
 
     }
-
+    std::sort(files.begin(), files.end(), [](const RecordFile& a, const RecordFile& b){
+        return a.beginTime < b.beginTime;
+    });
     logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
    return true;
 }
