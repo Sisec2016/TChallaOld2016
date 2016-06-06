@@ -373,6 +373,23 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 }
                 else
                 {
+					//***Modified by ZHQ:20160606***
+					//***Error information
+					logErrorFact = pInfo->name.trimmed();
+					logErrorInfo = pServer->getLastError().trimmed();
+
+					if (logErrorInfo.left(4) == QString::fromLocal8Bit("句柄无效"))
+						logErrorInfo = QString::fromLocal8Bit("");
+					if (logErrorInfo.left(4) == QString::fromLocal8Bit("没有错误"))
+						logErrorInfo = QString::fromLocal8Bit("");
+					if (logErrorInfo.left(4) == QString::fromLocal8Bit("未知错误"))
+						logErrorInfo = QString::fromLocal8Bit("");
+
+					if (logErrorInfo.isEmpty())
+						logErrorInfo = QString::fromLocal8Bit("（可能不是指定厂商/设备！）");
+					else
+						logErrorInfo = QString::fromLocal8Bit("（%1 或 不是指定厂商/设备！）").arg(logErrorInfo);
+
                     qDebug()<<"login failed:"<<pServer->getLastError()<<pServer->factory()->name();
                 }
             }));
@@ -410,7 +427,14 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
 		{
 			if (mResults.size() == 0)
 			{
-				MessageBoxDlg msgDlg(QString::fromLocal8Bit("登陆失败！"));
+				//***Modified by ZHQ:20160606***
+				if (logErrorFact.left(4) == QString::fromLocal8Bit(UNDEFIN_DEVICE_STR))
+				{
+					logErrorInfo = QString::fromLocal8Bit("(请指定厂商或指定IP地址！)");
+				}
+								
+				MessageBoxDlg msgDlg(QString::fromLocal8Bit("登陆失败！%1").arg(logErrorInfo));
+
 				msgDlg.exec();
 				qDebug() << "pServer->getLastError() end";
 			}
