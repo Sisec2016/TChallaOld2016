@@ -16,6 +16,9 @@ typedef LONG (__stdcall *pHB_SDVR_FindFile)(LONG lUserID,LONG lChannel,DWORD dwF
 typedef LONG (__stdcall *pHB_SDVR_FindNextFile)(LONG lFindHandle,HanBang::LPHB_SDVR_FIND_DATA lpFindData);
 typedef BOOL (__stdcall *pHB_SDVR_FindClose)(LONG lFindHandle);
 typedef LONG (__stdcall *pHB_SDVR_GetFileByName)(LONG lUserID,char *sDVRFileName,char *sSavedFileName);
+//<<<<<<<<<add by zhangyaofa 2016/6/8
+typedef LONG(__stdcall *pHB_SDVR_GetFileByTime)(LONG lUserID, LONG lChannel, HanBang::LPHB_SDVR_TIME lpStartTime, HanBang::LPHB_SDVR_TIME lpStopTime, char *sSavedFileName);
+//>>>>>>>>>add end
 typedef DWORD (__stdcall *pHB_SDVR_GetDownloadTotalSize)(LONG lFileHandle);
 typedef int (__stdcall *pHB_SDVR_GetDownloadPos)(LONG lFileHandle);
 typedef BOOL (__stdcall *pHB_SDVR_StopGetFile)(LONG lFileHandle);
@@ -45,6 +48,9 @@ public:
 	pHB_SDVR_FindNextFile m_pFindNext;
 	pHB_SDVR_FindClose m_pFindClose;
 	pHB_SDVR_GetFileByName m_pDownloadByFile;
+	//<<<<<add by zhangyaofa 2016/6/8
+	pHB_SDVR_GetFileByTime m_pDownloadByTime;
+	//>>>>>add end
 	pHB_SDVR_GetDownloadTotalSize m_pGetDownloadTotal;
 	pHB_SDVR_GetDownloadPos m_pGetDownloadPos;
 	pHB_SDVR_StopGetFile m_pStopDownload;

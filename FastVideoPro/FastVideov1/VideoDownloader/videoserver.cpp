@@ -1332,10 +1332,11 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
 
     if (!r)
     {
+		//addLog(IP.c_str(), __LINE__);	
         this->mLastError = pServer->getLastError();
         addLog("videoserver::sheLogin failed", __LINE__);
     }
-    else{
+    else{		
         addLog("videoserver::sheLogin true", __LINE__);
     }
     return r;
