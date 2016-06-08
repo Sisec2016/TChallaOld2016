@@ -6,6 +6,8 @@
 
 #include "../../VideoServer/log.h"
 
+#define ONEDAY		24 * 60 * 60
+
 Log g_log("DongYang_videoserver");
 
 IVideoServerFactory* VideoServerFactory()
@@ -220,130 +222,157 @@ bool DongYang_videoserver::logout()
 }
 
 bool DongYang_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
-                                                       __time64_t timeEnd)
+	__time64_t timeEnd)
 {
-	g_log.AddLog(string("[1]GetRecordFileList run here"));
-	if (INVALID_HANDLE_VALUE == m_hDevice)
+	if (INVALID_HANDLE_VALUE == m_hDevice) return false;
+
+	if (timeStart >= timeEnd) return false;
+
+	DONGYANG::TimeInfo staTime = { 0 };
+	DONGYANG::TimeInfo stopTime = { 0 };
+
+	InitTime(staTime, stopTime, timeStart, timeEnd);
+
+	__time64_t everydaytime, begintime, endtime;
+	begintime = timeStart;
+
+	struct tm Tm = { 0, 0, 0, staTime.wDay, staTime.wMonth - 1, staTime.wYear - 1900 };
+	everydaytime = mktime(&Tm);
+
+	if (staTime.wDay == stopTime.wDay && staTime.wMonth == stopTime.wMonth && staTime.wYear == stopTime.wYear)
 	{
-		m_sLastError = "请先登录!";
-		g_log.AddLog(string("查找文件失败：") + string(m_sLastError));
-		return false;
+		begintime = timeStart;
+		endtime = timeEnd;
 	}
 
-    if (timeStart >= timeEnd)
-    {
-        m_sLastError = "时间范围不对!";
-		g_log.AddLog(string("查找文件失败：") + string(m_sLastError));
-        return false;
-    }
-
-	//int nChannelCnt = m_total_ch_cnt;
 	__int32 nChannelId = 0;
-	for (int ch = 0; ch < channelVec.size(); ch++)
+	for (; everydaytime < timeEnd; everydaytime += ONEDAY)
 	{
-		nChannelId = channelVec[ch];
-		g_log.AddLog(string("[2]GetRecordFileList run here"));
-		struct tm Tm;
-		DONGYANG::TimeInfo staTime = { 0 };
-		_localtime64_s(&Tm, (const time_t*)&timeStart);
-		//_gmtime64_s(&Tm, (const time_t*)&timeStart);
-		staTime.wYear = Tm.tm_year + 1900;
-		staTime.wMonth = Tm.tm_mon + 1;
-		staTime.wDay = Tm.tm_mday;
-		staTime.wHour = Tm.tm_hour;
-		staTime.wMinute = Tm.tm_min;
-		staTime.wSecond = Tm.tm_sec;
-		
-		DONGYANG::TimeInfo stopTime = { 0 };
-		_localtime64_s(&Tm, (const time_t*)&timeEnd);
-		//_gmtime64_s(&Tm, (const time_t*)&timeEnd);
-		stopTime.wYear = Tm.tm_year + 1900;
-		stopTime.wMonth = Tm.tm_mon + 1;
-		stopTime.wDay = Tm.tm_mday;
-		stopTime.wHour = Tm.tm_hour;
-		stopTime.wMinute = Tm.tm_min;
-		stopTime.wSecond = Tm.tm_sec;
-
-		HANDLE hQuery = INVALID_HANDLE_VALUE;
-		int nRet = Api_DY::Api().m_pDyNetwork_ClientStartFileQuery(&hQuery, m_hDevice, nChannelId, DONGYANG::RECORD_TYPE_ALL, &staTime, &stopTime);
-		g_log.AddLog(string("[3]GetRecordFileList run here"));
-		if (DONGYANG::eRetSuccess != nRet || INVALID_HANDLE_VALUE == hQuery)
+		if (staTime.wDay != stopTime.wDay || staTime.wMonth != stopTime.wMonth || staTime.wYear != stopTime.wYear)
 		{
-			if (DONGYANG::eRetFailNetworkError == nRet)
-			{
-				m_sLastError = GetLastErrorString(nRet);
-				g_log.AddLog(string("查找文件失败：") + string(m_sLastError));
-				break;
+			if (begintime == timeStart)	{
+				timeStart += 1;
+				endtime = everydaytime + ONEDAY - 1;
 			}
-			continue;
+			else
+			{
+				begintime = everydaytime;
+				if ((everydaytime + ONEDAY) > timeEnd)
+				{
+					endtime = timeEnd;
+				}
+				else{
+					endtime = everydaytime + ONEDAY - 1;
+				}
+
+			}
+
 		}
-
-		// get 50 logs once time
-		DONGYANG::RecFileQueryResult cFileResult[50];
-		memset(cFileResult, 0, 50 * sizeof(DONGYANG::RecFileQueryResult));
-		RecordFile rf;
-		g_log.AddLog(string("[4]GetRecordFileList run here"));
-		while (1)
+		DONGYANG::TimeInfo Begin_Time = { 0 };
+		DONGYANG::TimeInfo End_Time = { 0 };
+		InitTime(Begin_Time, End_Time, begintime, endtime);
+		for (int ch = 0; ch < channelVec.size(); ch++)
 		{
-			DWORD dwFileCnt = 50;
-			nRet = Api_DY::Api().m_pDyNetwork_ClientGetFileQueryResult(hQuery, dwFileCnt, (BYTE *)cFileResult, 50 * sizeof(cFileResult));
-			char str[32] = {0};
-			sprintf_s(str, "dwFileCnt:%d", dwFileCnt);
-			g_log.AddLog(string("[5]GetRecordFileList run here") + string(str));
-			if (DONGYANG::eRetSuccess != nRet)
+			nChannelId = channelVec[ch];
+
+			HANDLE hQuery = INVALID_HANDLE_VALUE;
+			int nRet = Api_DY::Api().m_pDyNetwork_ClientStartFileQuery(&hQuery, m_hDevice, nChannelId, DONGYANG::RECORD_TYPE_ALL, &Begin_Time, &End_Time);
+			g_log.AddLog(string("[3]GetRecordFileList run here"));
+			if (DONGYANG::eRetSuccess != nRet || INVALID_HANDLE_VALUE == hQuery)
 			{
-				m_sLastError = GetLastErrorString(nRet);
-				Api_DY::Api().m_pDyNetwork_ClientStopFileQuery(hQuery);
-				g_log.AddLog(string("[2]查找文件失败：") + string(m_sLastError));
-				break;
+				if (DONGYANG::eRetFailNetworkError == nRet)
+					break;
+				continue;
 			}
+			// get 50 logs once time
+			DONGYANG::RecFileQueryResult cFileResult[50];
+			memset(cFileResult, 0, 50 * sizeof(DONGYANG::RecFileQueryResult));
 
-			for (DWORD k = 0; k < dwFileCnt; k++)
+			g_log.AddLog(string("[4]GetRecordFileList run here"));
+			while (1)
 			{
-				struct tm Tm;
-				Tm.tm_year = cFileResult[k].cBeginTime.wYear - 1900;
-				Tm.tm_mon = cFileResult[k].cBeginTime.wMonth - 1;
-				Tm.tm_mday = cFileResult[k].cBeginTime.wDay;
-				Tm.tm_hour = cFileResult[k].cBeginTime.wHour;
-				Tm.tm_min = cFileResult[k].cBeginTime.wMinute;
-				Tm.tm_sec = cFileResult[k].cBeginTime.wMinute;
-				rf.beginTime = _mktime64(&Tm);
+				DWORD dwFileCnt = 50;
+				nRet = Api_DY::Api().m_pDyNetwork_ClientGetFileQueryResult(hQuery, dwFileCnt, (BYTE *)cFileResult, 50 * sizeof(cFileResult));
+				char str[32] = { 0 };
+				sprintf_s(str, "dwFileCnt:%d", dwFileCnt);
+				g_log.AddLog(string("[5]GetRecordFileList run here") + string(str));
+				if (DONGYANG::eRetSuccess != nRet)
+				{
+					Api_DY::Api().m_pDyNetwork_ClientStopFileQuery(hQuery);
+					break;
+				}
 
-				Tm.tm_year = cFileResult[k].cEndTime.wYear - 1900;
-				Tm.tm_mon = cFileResult[k].cEndTime.wMonth - 1;
-				Tm.tm_mday = cFileResult[k].cEndTime.wDay;
-				Tm.tm_hour = cFileResult[k].cEndTime.wHour;
-				Tm.tm_min = cFileResult[k].cEndTime.wMinute;
-				Tm.tm_sec = cFileResult[k].cEndTime.wMinute;
-				rf.endTime = _mktime64(&Tm);
-
-				rf.channel = nChannelId;
-
-// 				{
-					string strFileName(cFileResult[k].acFileName);
-					int iPos = strFileName.rfind('//', strlen(cFileResult[k].acFileName));
-					strFileName.erase(0, iPos+1);
-					int iPos1 = strFileName.rfind('.', strFileName.length());
-					strFileName.erase(iPos1, strFileName.length());
-					rf.name = strFileName.c_str();
-// 					Mutex::ScopedLock lock(m_mtxFileInfo);
-// 					m_mapFileInfo.insert(make_pair(strFileName, string(cFileResult[k].acFileName)));
-// 				}
-				//rf.name = string(cFileResult[k].acFileName);
-				rf.size = cFileResult[k].dwFileSize;
-				rf.setPrivateData(&cFileResult[k], sizeof(DONGYANG::RecFileQueryResult));
-// 				cFileResult[k].cEndTime;
-// 				cFileResult[k].dwFileSize;
-// 				cFileResult[k].dwFileType;
-				files.push_back(rf);
+				SaveToFiles(cFileResult, dwFileCnt, nChannelId, files);
 			}
 		}
 	}
 	g_log.AddLog(string("[6]GetRecordFileList run here"));
-    return true;
+	return true;
+}
+
+void DongYang_videoserver::SaveToFiles(DONGYANG::RecFileQueryResult* cFileResult, DWORD dwFileCnt, __int32 nChannelId,
+	std::vector<RecordFile>& files)
+{
+	RecordFile rf;
+	for (DWORD k = 0; k < dwFileCnt; k++)
+	{
+		struct tm Tm;
+		Tm.tm_year = cFileResult[k].cBeginTime.wYear - 1900;
+		Tm.tm_mon = cFileResult[k].cBeginTime.wMonth - 1;
+		Tm.tm_mday = cFileResult[k].cBeginTime.wDay;
+		Tm.tm_hour = cFileResult[k].cBeginTime.wHour;
+		Tm.tm_min = cFileResult[k].cBeginTime.wMinute;
+		Tm.tm_sec = cFileResult[k].cBeginTime.wMinute;
+		rf.beginTime = _mktime64(&Tm);
+
+		Tm.tm_year = cFileResult[k].cEndTime.wYear - 1900;
+		Tm.tm_mon = cFileResult[k].cEndTime.wMonth - 1;
+		Tm.tm_mday = cFileResult[k].cEndTime.wDay;
+		Tm.tm_hour = cFileResult[k].cEndTime.wHour;
+		Tm.tm_min = cFileResult[k].cEndTime.wMinute;
+		Tm.tm_sec = cFileResult[k].cEndTime.wMinute;
+		rf.endTime = _mktime64(&Tm);
+
+		rf.channel = nChannelId;
+
+
+		string strFileName(cFileResult[k].acFileName);
+		int iPos = strFileName.rfind('//', strlen(cFileResult[k].acFileName));
+		strFileName.erase(0, iPos + 1);
+		int iPos1 = strFileName.rfind('.', strFileName.length());
+		strFileName.erase(iPos1, strFileName.length());
+		rf.name = strFileName.c_str();
+
+		rf.size = cFileResult[k].dwFileSize;
+		rf.setPrivateData(&cFileResult[k], sizeof(DONGYANG::RecFileQueryResult));
+
+		files.push_back(rf);
+	}
 }
 
 
+void DongYang_videoserver::InitTime(DONGYANG::TimeInfo& staTime, DONGYANG::TimeInfo& stopTime, __time64_t timeStart, __time64_t timeEnd)
+{
+	struct tm Tm;
+
+	_localtime64_s(&Tm, (const time_t*)&timeStart);
+	//_gmtime64_s(&Tm, (const time_t*)&timeStart);
+	staTime.wYear = Tm.tm_year + 1900;
+	staTime.wMonth = Tm.tm_mon + 1;
+	staTime.wDay = Tm.tm_mday;
+	staTime.wHour = Tm.tm_hour;
+	staTime.wMinute = Tm.tm_min;
+	staTime.wSecond = Tm.tm_sec;
+
+	_localtime64_s(&Tm, (const time_t*)&timeEnd);
+	//_gmtime64_s(&Tm, (const time_t*)&timeEnd);
+	stopTime.wYear = Tm.tm_year + 1900;
+	stopTime.wMonth = Tm.tm_mon + 1;
+	stopTime.wDay = Tm.tm_mday;
+	stopTime.wHour = Tm.tm_hour;
+	stopTime.wMinute = Tm.tm_min;
+	stopTime.wSecond = Tm.tm_sec;
+}
 
 bool DongYang_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
