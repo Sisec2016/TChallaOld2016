@@ -16,6 +16,8 @@
 #include "H264Play.h"
 #include <algorithm>
 
+#define ONEDAY   24 * 60 * 60
+
 #ifndef NEW_SERVER
 extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory()
 {
@@ -265,51 +267,94 @@ bool gzll_videoserver::downLoad(const char* saveFileName, int nChannelId,__time6
 bool gzll_videoserver::GetRecordFileList(std::vector<RecordFile>& files, __int32 nChannelId, __time64_t timeStart,
                                          __time64_t timeEnd)
 {
+
+	H264_DVR_FINDINFO info;
+	memset(&info, 0, sizeof(info));
+	info.nChannelN0 = nChannelId;
+	info.nFileType = SDK_RECORD_ALL;
+
+	H264_DVR_TIME stime, etime;
     struct tm Tm;
     _localtime64_s(&Tm, (const time_t*)&timeStart);
-
-    H264_DVR_FINDINFO info;
-    memset(&info, 0, sizeof(info));
-    info.nChannelN0 = nChannelId;
-    info.nFileType = SDK_RECORD_ALL;
-    TMToNetTime(Tm, info.startTime);
+	TMToNetTime(Tm, stime);
     _localtime64_s(&Tm, (const time_t*)&timeEnd);
-    TMToNetTime(Tm, info.endTime);
+	TMToNetTime(Tm, etime);
+
+	__time64_t everytime, begintime, endtime;
+	begintime = timeStart;
+
+	struct tm Tms = { 0, 0, 0, stime.dwDay, stime.dwMonth - 1, stime.dwYear - 1900 };
+	everytime = mktime(&Tms);
+	if (stime.dwDay == etime.dwDay && stime.dwMonth == etime.dwMonth && stime.dwYear == etime.dwYear)
+	{
+		begintime = timeStart;
+		endtime = timeEnd;
+	}
+
+	for (; everytime < timeEnd; everytime += ONEDAY)
+	{
+		if (stime.dwDay != etime.dwDay || stime.dwMonth != etime.dwMonth || stime.dwYear != etime.dwYear)
+		{
+			if (begintime == timeStart)
+			{
+				timeStart += 1;
+				endtime = everytime + ONEDAY - 1;
+			}
+			else
+			{
+				begintime = everytime;
+				if ((everytime + ONEDAY) > timeEnd)
+				{
+					endtime = timeEnd;
+				}
+				else{
+					endtime = everytime + ONEDAY - 1;
+				}
+			}
+		}
+	
+		tm STime;
+		tm ETime;
+		_localtime64_s(&STime, (const time_t*)&begintime);
+		_localtime64_s(&ETime, (const time_t*)&endtime);
+		TMToNetTime(STime, info.startTime);
+		TMToNetTime(ETime, info.endTime);
 
 
-    H264_DVR_FILE_DATA nriFileinfo[2000];
-    int fileCount;
-    long hdl = H264_DVR_FindFile(m_lLoginHandle,&info, nriFileinfo, sizeof(nriFileinfo) / sizeof(H264_DVR_FILE_DATA), &fileCount);
-    if (hdl <= 0)
-    {
-        m_sLastError = std::string("查询失败！错误为:") + GZLL_GetLastErrorString();
-        return false;
-    }
-    else
-    {
-        if(fileCount>0)
-        {
-            RecordFile f;
-            for(int i = 0; i < fileCount; i++)
-            {
-                if(nriFileinfo[i].size>0)//视频文件必须大于0(测试中有发现文件大小为0情况,所以必须过滤掉改部分)
-                {
-                    struct tm Tm;
-                    NetTimeToTM(nriFileinfo[i].stBeginTime, Tm);
-                    f.beginTime = _mktime64(&Tm);
-                    NetTimeToTM(nriFileinfo[i].stEndTime, Tm);
-                    f.endTime = _mktime64(&Tm);
+		H264_DVR_FILE_DATA nriFileinfo[2000];
+		int fileCount;
+		long hdl = H264_DVR_FindFile(m_lLoginHandle, &info, nriFileinfo, sizeof(nriFileinfo) / sizeof(H264_DVR_FILE_DATA), &fileCount);
+		if (hdl <= 0)
+		{
+			m_sLastError = std::string("查询失败！错误为:") + GZLL_GetLastErrorString();
+			return false;
+		}
+		else
+		{
+			if (fileCount > 0)
+			{
+				RecordFile f;
+				for (int i = 0; i < fileCount; i++)
+				{
+					if (nriFileinfo[i].size>0)//视频文件必须大于0(测试中有发现文件大小为0情况,所以必须过滤掉改部分)
+					{
+						struct tm Tm;
+						NetTimeToTM(nriFileinfo[i].stBeginTime, Tm);
+						f.beginTime = _mktime64(&Tm);
+						NetTimeToTM(nriFileinfo[i].stEndTime, Tm);
+						f.endTime = _mktime64(&Tm);
 
-                    f.channel = nChannelId;
-                    f.name =    nriFileinfo[i].sFileName;
-                    f.size = nriFileinfo[i].size * 1024;
-                    f.setPrivateData(&nriFileinfo[i], sizeof(H264_DVR_FILE_DATA));
-                    files.push_back(f);
-                }
-            }
-        }
+						f.channel = nChannelId;
+						f.name = nriFileinfo[i].sFileName;
+						f.size = nriFileinfo[i].size * 1024;
+						f.setPrivateData(&nriFileinfo[i], sizeof(H264_DVR_FILE_DATA));
+						files.push_back(f);
+					}
+				}
+			}
 
-    }
+		}
+	}
     return true;
 }
 
