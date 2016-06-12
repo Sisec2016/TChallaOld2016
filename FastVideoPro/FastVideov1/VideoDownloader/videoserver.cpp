@@ -1245,13 +1245,14 @@ QString videoserver::getChannelName(int channel)
 {
     if (m_channels.find(channel) != m_channels.end())
     {
-         QString s = QString::fromLocal8Bit(m_channels.at(channel).c_str());
-         if (s.isEmpty())
-         {
-             s = QString::fromLocal8Bit("通道%1").arg(channel);
-         }
-         s.replace(" ", "");
-         return s;
+        QString s = QString::fromLocal8Bit(m_channels.at(channel).c_str());
+        if (s.isEmpty())
+        {
+            s = QString::fromLocal8Bit("通道%1").arg(channel);
+        }
+
+
+        return s;
     }
 
     return "";
@@ -1319,6 +1320,15 @@ bool videoserver::shestopDownload(download_handle_t h)
     SHE_END_RETURN_FALSE
 }
 
+void earseSpecialChar(std::map<qint32, std::string>& mpChannels){
+    for (auto it = mpChannels.begin(); it != mpChannels.end(); it++)
+    {
+        QString s = QString::fromLocal8Bit(it->second.c_str());
+        s.replace(QRegExp("[\\s\\[\\`\\~\\!\\]@#$%\\^&\\*\\(\\)\\+\\=\\|\\{\\}\\:;'\\,\\\\\\.<>\\/\\?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"), "");
+        it->second = s.toLocal8Bit().data();
+    }
+}
+
 bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int port, const std::string& user, const std::string& password)
 {
     if (nullptr == pServer)
@@ -1338,6 +1348,7 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
     }
     else{		
         addLog("videoserver::sheLogin true", __LINE__);
+        earseSpecialChar(m_channels);
     }
     return r;
 
