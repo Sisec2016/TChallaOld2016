@@ -54,6 +54,7 @@ public:
     void heartBeat();
 signals:
     void finished(DownloadWidget *pSource,int channel, bool isComplete, bool close = false);
+
 protected:
     bool dealHeartbeat(QEvent* event);
     void customEvent(QEvent* event);
@@ -79,6 +80,11 @@ public slots:
 private:
     int  iChannel;
     Ui::DownloadWidget *ui;
+
+private:
+	DWORD getMaxDownloadSpeed();
+public:
+	void initSpeed();
 };
 
 QDataStream & operator << (QDataStream &dataStream, DownloadWidget &d);

@@ -12,6 +12,15 @@
 #include "uiutils.h"
 #include "screenadaption.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "IPHLPAPI.lib")
+
+#include <iphlpapi.h>
+
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
 TaskWidget::TaskWidget(DeviceWidget *pDevice, std::shared_ptr<DownloadTask> t,  const QString& sources, QWidget *parent) :
     QWidget(parent),
     beg(QDateTime::currentDateTime()),
@@ -23,7 +32,7 @@ TaskWidget::TaskWidget(DeviceWidget *pDevice, std::shared_ptr<DownloadTask> t,  
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     this->setAttribute(Qt::WA_TranslucentBackground);
     setTask(pDevice, t);
-    ui->statusLabel->setText(QString::fromLocal8Bit("µ»¥˝"));
+    ui->statusLabel->setText(QString::fromLocal8Bit("Á≠âÂæÖ"));
     ScreenAdaption::instance().adpte(this);
 }
 
@@ -35,7 +44,7 @@ TaskWidget::TaskWidget(QWidget *parent)
     last = beg;
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     this->setAttribute(Qt::WA_TranslucentBackground);
-    ui->statusLabel->setText(QString::fromLocal8Bit("µ»¥˝"));
+    ui->statusLabel->setText(QString::fromLocal8Bit("Á≠âÂæÖ"));
     mTask.reset();
     ScreenAdaption::instance().adpte(this);
 }
@@ -65,6 +74,7 @@ void TaskWidget::setTask(DeviceWidget *pDevice, std::shared_ptr<DownloadTask> t)
         }
     }
 }
+
 void TaskWidget::setProgress(int p)
 {
     if (p >= 0 && p <= 100)
@@ -73,13 +83,13 @@ void TaskWidget::setProgress(int p)
         ui->progressBar->setValue(p);
         if (mTask->mDownloadSize >= mTask->mTotalSize)
         {
-            ui->statusLabel->setText(QString::fromLocal8Bit("ÕÍ≥…"));
+            ui->statusLabel->setText(QString::fromLocal8Bit("ÂÆåÊàê"));
             QPalette pe;
             pe.setColor(QPalette::WindowText, Qt::green);
             ui->statusLabel->setPalette(pe);
             mTask->mDownloadSize = mTask->mTotalSize;
             mTask->mLastDownloadSize = mTask->mTotalSize;
-            ui->timeLabel->setText(QString::fromLocal8Bit("0∑÷0√Î"));
+            ui->timeLabel->setText(QString::fromLocal8Bit("0ÂàÜ0Áßí"));
         }
     }
 }
@@ -106,19 +116,35 @@ void TaskWidget::customEvent(QEvent* event)
     taskEvent* edownload = dynamic_cast<taskEvent *> (event);
     if (edownload != NULL)
     {
+		
         if (!edownload->m_failed && edownload->m_downloadsize < mTask->mTotalSize
                 && mTask->mDownloadSize < mTask->mTotalSize)
         {
             QDateTime end(QDateTime::currentDateTime());
-            qint64 msecs = last.msecsTo(end);
+			qint64 msecs = last.msecsTo(end);
             mTask->mDownloadSize += edownload->m_downloadsize;
+
             if (msecs > 1000)
             {
-                qint64 v = (mTask->mDownloadSize - mTask->mLastDownloadSize) * 1000 / (msecs * 1.0) / BYTES_ONE_KB;
+                qint64 v = (mTask->mDownloadSize - mTask->mLastDownloadSize) * 1000 / (msecs * 1.0) / BYTES_ONE_KB;		
                 int vM = v / KBS_ONE_M;
+
+				//‰∏ãËΩΩÈÄüÂ∫¶
+				int nMB = vM * BIT_ONE_BYTE;
+
                 if (vM * BIT_ONE_BYTE > 0)
                 {
-                    ui->speedLabel->setText(QString("%1Mbps").arg(vM * BIT_ONE_BYTE));
+					DWORD dwPerSpeed = 0;
+					//Ëé∑ÂèñÂΩìÂâçÁΩëÂç°ÁöÑÁΩëÈÄü
+					dwPerSpeed = this->getMaxDownloadSpeed() / 1000 / 1000 / BIT_ONE_BYTE;
+
+					//Ê∑ªÂä†ÈôêÈÄü
+					if (vM > dwPerSpeed)
+					{
+						vM = static_cast<int>(dwPerSpeed);			
+					}
+
+					ui->speedLabel->setText(QString("%1Mbps").arg(nMB));
                 }
                 else
                 {
@@ -135,29 +161,40 @@ void TaskWidget::customEvent(QEvent* event)
 
                     if (leftsecs / 60 > 60)
                     {
-                        ui->timeLabel->setText(QString::fromLocal8Bit("%1 ±%2∑÷").arg(leftsecs / 3600).arg((leftsecs % 3600) / 60));
+                        ui->timeLabel->setText(QString::fromLocal8Bit("%1Êó∂%2ÂàÜ").arg(leftsecs / 3600).arg((leftsecs % 3600) / 60));
                     }
                     else
                     {
-                        ui->timeLabel->setText(QString::fromLocal8Bit("%1∑÷%2√Î").arg(leftsecs / 60).arg(leftsecs % 60));
+                        ui->timeLabel->setText(QString::fromLocal8Bit("%1ÂàÜ%2Áßí").arg(leftsecs / 60).arg(leftsecs % 60));
                     }
                 }
             }
 
+			//Â¢ûÂä†ÊéßÂà∂,Èò≤Ê≠¢ËøõÂ∫¶Êù°ÂõûÊªö
+			int nProgress = mTask->mDownloadSize / (mTask->mTotalSize * 1.0) * 100;
+
+			if (nProgress > ui->progressBar->value())
+			{
+				ui->progressBar->setValue(nProgress);
+			}
+
             ui->progressBar->setValue(mTask->mDownloadSize / (mTask->mTotalSize * 1.0) * 100);
+
             bool bFinshed = mTask->isFinished();
             if (!bFinshed)
             {
-                ui->statusLabel->setText(QString::fromLocal8Bit("œ¬‘ÿ÷–"));
+                ui->statusLabel->setText(QString::fromLocal8Bit("‰∏ãËΩΩ‰∏≠"));
                 if (ui->progressBar->value() == 100)
                 {
                     ui->progressBar->setValue(99);
+					ui->speedLabel->setText(QString("0Kbps"));
                 }
             }
             else
             {
                 ui->progressBar->setValue(100);
-                ui->timeLabel->setText(QString::fromLocal8Bit("0∑÷0√Î"));
+                ui->timeLabel->setText(QString::fromLocal8Bit("0ÂàÜ0Áßí"));
+				ui->speedLabel->setText(QString("0Kbps"));
             }
         }
 
@@ -169,30 +206,30 @@ void TaskWidget::on_cancelButton_clicked()
 {
     if (mCancel)
     {
-        UIUtils::showTip(*mpDevice, QString::fromLocal8Bit("“—»°œ˚¥À»ŒŒÒ£°"));
+        UIUtils::showTip(*mpDevice, QString::fromLocal8Bit("Â∑≤ÂèñÊ∂àÊ≠§‰ªªÂä°ÔºÅ"));
         return;
     }
 
     if (mpDevice == nullptr)
     {
-        UIUtils::showTip(*this, QString::fromLocal8Bit("«Îµ»¥˝ ˝æ›≥ı ºªØÕÍ≥…£°"));
+        UIUtils::showTip(*this, QString::fromLocal8Bit("ËØ∑Á≠âÂæÖÊï∞ÊçÆÂàùÂßãÂåñÂÆåÊàêÔºÅ"));
         return;
     }
 
     if (mpDevice->haveInitTasks())
     {
-        UIUtils::showTip(*mpDevice, QString::fromLocal8Bit("«Îµ»¥˝¥À…Ë±∏À˘”–»ŒŒÒ≥ıªØÕÍ≥…,‘Ÿ»°œ˚¥À»ŒŒÒ£°"));
+        UIUtils::showTip(*mpDevice, QString::fromLocal8Bit("ËØ∑Á≠âÂæÖÊ≠§ËÆæÂ§áÊâÄÊúâ‰ªªÂä°ÂàùÂåñÂÆåÊàê,ÂÜçÂèñÊ∂àÊ≠§‰ªªÂä°ÔºÅ"));
         return;
     }
 
-    MessageBoxDlg msgDlg(QString::fromLocal8Bit(" «∑Ò»∑»œπÿ±’?") , MsgButton::Yes, MsgButton::No);
+    MessageBoxDlg msgDlg(QString::fromLocal8Bit("ÊòØÂê¶Á°ÆËÆ§ÂÖ≥Èó≠?") , MsgButton::Yes, MsgButton::No);
     msgDlg.exec();
     if (msgDlg.isConfirm() == MsgButton::Yes)
     {
         mCancel = true;
 
 		Log::instance().AddLog(QString("[0]on_cancelButton_clicked"));
-        CWaitDlg::waitForDoing(SingleApplication::instance()->mainWidget(), QString::fromLocal8Bit("’˝‘⁄»°œ˚œ¬‘ÿ»ŒŒÒ÷–..."), [=]()
+        CWaitDlg::waitForDoing(SingleApplication::instance()->mainWidget(), QString::fromLocal8Bit("Ê≠£Âú®ÂèñÊ∂à‰∏ãËΩΩ‰ªªÂä°‰∏≠..."), [=]()
         {
             if (mTask.get() != nullptr)
             {
@@ -210,5 +247,121 @@ void TaskWidget::on_cancelButton_clicked()
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
 }
 
+void TaskWidget::setSpeed(int nSpeed)
+{
+	ui->speedLabel->setText(QString("%1Mbps").arg(nSpeed));
+}
 
+DWORD TaskWidget::getMaxDownloadSpeed()
+{
+	DWORD dwSize = 0;
+	DWORD dwRetValDes = 0;
+	DWORD dwSpeed = 0;
+
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	DWORD dwRetValSrc = 0;
+
+	MIB_IFTABLE *pIfTable = NULL;
+	MIB_IFROW *pIfRow = NULL;
+
+	ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+	pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC(sizeof(IP_ADAPTER_INFO));
+
+	if (NULL == pAdapterInfo)
+	{
+		return 1;
+	}
+
+	if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
+	{
+		FREE(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC(ulOutBufLen);
+		if (NULL == pAdapterInfo)
+		{
+			return 1;
+		}
+	}
+
+	pIfTable = (MIB_IFTABLE *)MALLOC(sizeof(MIB_IFTABLE));
+	if (pIfTable == NULL)
+	{
+		return 1;
+	}
+
+	dwSize = sizeof(MIB_IFTABLE);
+
+	if (GetIfTable(pIfTable, &dwSize, FALSE) == ERROR_INSUFFICIENT_BUFFER)
+	{
+		FREE(pIfTable);
+		pIfTable = (MIB_IFTABLE *)MALLOC(dwSize);
+		if (NULL == pIfTable)
+		{
+			return 1;
+		}
+	}
+
+	dwRetValDes = GetIfTable(pIfTable, &dwSize, FALSE);
+	dwRetValSrc = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+	if ((NO_ERROR == dwRetValDes) && (NO_ERROR == dwRetValSrc))
+	{
+		pAdapter = pAdapterInfo;
+		int nNumWntries = 0;
+		//ÊâæÂà∞Êú¨Âú∞Áâ©ÁêÜÁΩëÂç°‰ø°ÊÅØ
+		while (pAdapter)
+		{
+			// ÈÅçÂéÜÊâÄÊúâÁΩëÂç°‰ø°ÊÅØ
+			while (nNumWntries < pIfTable->dwNumEntries)
+			{
+				pIfRow = (MIB_IFROW *)& pIfTable->table[nNumWntries];
+
+				int i = 0;
+				int j = 0;
+
+				while (i < pIfRow->dwPhysAddrLen && j < pAdapter->AddressLength)
+				{
+					if ((int)pIfRow->bPhysAddr[i] == (int)pAdapter->Address[j])
+					{
+						if (j == (pAdapter->AddressLength - 1))
+						{
+							dwSpeed = pIfRow->dwSpeed;
+							break;
+						}
+						i++;
+						j++;
+					}
+					else
+					{
+						break;
+					}
+
+				}
+
+				if (0 != dwSpeed)
+				{
+					break;
+				}
+
+				nNumWntries++;
+			}
+
+			pAdapter = pAdapter->Next;
+		}
+
+	} //
+
+	if (NULL != pIfTable)
+	{
+		FREE(pIfTable);
+		pIfTable = NULL;
+	}
+
+	if (NULL != pAdapterInfo)
+	{
+		FREE(pAdapterInfo);
+		pAdapterInfo = NULL;
+	}
+
+	return dwSpeed;
+}
 

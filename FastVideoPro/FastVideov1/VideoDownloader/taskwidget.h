@@ -27,6 +27,7 @@ public:
     void setProgress(int p);
     int getProgress();
     
+	void setSpeed(int nSpeed);
 
     void setCancel()
     {
@@ -35,7 +36,8 @@ public:
 
 Q_SIGNALS:
     void onSel(TaskWidget* task);
-    void cancelAll(TaskWidget *task);
+    void cancelAll(TaskWidget *task);	
+
 protected:
     virtual void mouseReleaseEvent(QMouseEvent *);
     void customEvent(QEvent* event);
@@ -53,6 +55,10 @@ private:
     bool mCancel;
 private slots:
     void on_cancelButton_clicked();
+
+private:
+	DWORD getMaxDownloadSpeed();
+	
 };
 
 

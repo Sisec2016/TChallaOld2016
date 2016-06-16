@@ -275,6 +275,8 @@ void DeviceWidget::dealDowloadfinished(DownloadWidget *souce, int channel, bool 
             if (this->mpDownloadTask->isFinished())
             {
                 pCurrentTask->widget()->setProgress(100);
+				pCurrentTask->widget()->setSpeed(0);
+		
                 mpFinishTasks.push_back(pCurrentTask);
                 std::thread thrd([&]{
                     nextTask();
