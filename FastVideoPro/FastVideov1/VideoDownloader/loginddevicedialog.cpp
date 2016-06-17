@@ -373,7 +373,7 @@ void LogindDeviceDialog::on_pushButtonConnect_clicked()
                 }
                 else
                 {
-					//***Modified by ZHQ:20160606***
+					//***Modified by ZHQ:20160606 、17***
 					//***Error information
 					logErrorFact = pInfo->name.trimmed();
 					logErrorInfo = pServer->getLastError().trimmed();
