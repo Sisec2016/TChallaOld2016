@@ -6,6 +6,7 @@
 #include <io.h>
 #include <assert.h>
 #include "../../VideoServer/log.h"
+#include <algorithm>
 Log g_log("JunMingShi_videoserver");
 // #include <ATLSTR.H>
 
@@ -413,7 +414,9 @@ bool JunMingShi_videoserver::GetRecordFileList(std::vector<RecordFile>& files, c
         } while (true);
         
 	}
-
+    std::sort(files.begin(), files.end(), [](const RecordFile& a, const RecordFile& b){
+        return a.beginTime < b.beginTime;
+    });
 	return true;
 }
 
@@ -750,6 +753,9 @@ bool JunMingShi_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause
 			m_mapPosPlay.erase(playbackHandle);
 		}
 	}
+
+
+    return true;
 }
 
 bool JunMingShi_videoserver::stopDownload(download_handle_t h)
