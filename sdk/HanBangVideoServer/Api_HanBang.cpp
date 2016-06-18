@@ -80,6 +80,11 @@ Api_HanBang::Api_HanBang()
 
 	m_pGetDownloadBytesSize = (pHB_SDVR_GetDownloadBytesSize)GetProcAddress(m_hMod, "HB_SDVR_GetDownloadBytesSize");
 	assert(m_pGetDownloadBytesSize);
+	
+	//<<<<<<<<<<<<<<<<<<add by zhangyaofa 2016/6/8
+	m_pDownloadByTime = (pHB_SDVR_GetFileByTime)GetProcAddress(m_hMod, "HB_SDVR_GetFileByTime");
+	assert(m_pDownloadByTime);
+	//>>>>>>>>>>>>>>>>>>add end
 } 
 
 Api_HanBang::~Api_HanBang()
