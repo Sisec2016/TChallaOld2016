@@ -380,7 +380,15 @@ bool HanBang_videoserver::downLoadByRecordFile(const char* saveFileName, const R
     g_log.AddLog(QString("m_lLoginHandle:%1, file.channel:%2, struStartTime:%3,%4,%5,%6,%7,%8")
         .arg(m_lLoginHandle).arg(file.channel).arg(struStartTime.dwYear).arg(struStartTime.dwMonth).arg(struStartTime.dwDay)
         .arg(struStartTime.dwHour).arg(struStartTime.dwMinute).arg(struStartTime.dwSecond));
-    hdl = Api_HanBang::Api().m_pDownloadByFile(m_lLoginHandle, (char *)file.name.c_str(), (char *)saveFileName);
+	hdl = Api_HanBang::Api().m_pDownloadByFile(m_lLoginHandle, (char *)file.name.c_str(), (char *)saveFileName);
+	//<<<<<<<<<add by zhangyaofa 2016/6/8
+	if (!hdl)
+	{
+		m_sLastError = GetLastErrorString();
+		g_log.AddLog(string("NET_DVR_GetFileBy failed : ") + m_sLastError + " ÎÄ¼þ£º" + saveFileName);
+		hdl = Api_HanBang::Api().m_pDownloadByTime(m_lLoginHandle, file.channel, &struStartTime, &struStopTime, (char *)saveFileName);		
+	}
+	//>>>>>>>>>>add ebd
     if (!hdl)
     {
         m_sLastError = GetLastErrorString();
