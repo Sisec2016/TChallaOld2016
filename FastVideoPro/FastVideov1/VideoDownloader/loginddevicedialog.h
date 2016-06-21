@@ -66,6 +66,11 @@ protected:
     std::recursive_mutex mmtPages;
     int mCurrentPage;
 private:
+	QString logErrorInfo;
+	//int logErrorNo;
+	//int logErrorFactNo;
+	QString logErrorFact;
+
     Ui::LogindDeviceDialog *ui;
 };
 
