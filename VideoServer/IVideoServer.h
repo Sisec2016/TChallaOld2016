@@ -188,7 +188,7 @@ enum DeviceFactory
     SISC_IPC_GZSTH,                            // 广州市泰豪
     SISC_IPC_SZSAY,                                // 深圳市安裕
     SISC_IPC_GZZT,                              // 广州左田
-	SISC_IPC_JITIAN,							//吉田
+    SISC_IPC_JITIAN,                          //吉田
     SISC_IPC_UNDEFINE = 9999,                         // 未定义
 };
 
