@@ -5,7 +5,7 @@
 #include "avglobal.h"
 #if (defined(WIN32) || defined(WIN64))
 #include <windows.h>
-#ifdef DHCONFIGSDK_EXPORTS
+#ifdef CONFIGSDK_EXPORTS
 
 #ifndef CLIENT_API
 #define CLIENT_API  __declspec(dllexport) 
@@ -24,10 +24,10 @@
 
 #ifndef LLONG
 #if (defined(WIN32) || defined(WIN64))
-#ifdef WIN32
-#define LLONG LONG
-#else //WIN64 
+#ifdef WIN64
 #define LLONG __int64
+#else //WIN32 
+#define LLONG LONG
 #endif
 #else	//linux
 #define LLONG long 
@@ -36,10 +36,10 @@
 
 #ifndef LDWORD
 #if (defined(WIN32) || defined(WIN64))
-#ifdef WIN32
-#define LDWORD DWORD
-#else //WIN64 
+#ifdef WIN64
 #define LDWORD __int64
+#else //WIN32 
+#define LDWORD DWORD
 #endif
 #else	//linux
 #define LDWORD long 
@@ -48,8 +48,11 @@
 
 #else	//linux
 
-//#define CFG_RELEASE_HEADER	//发布头文件
-#ifndef CFG_RELEASE_HEADER
+#ifndef INTERNAL_COMPILE
+#define CFG_RELEASE_HEADER //发布头文件
+#endif
+
+#ifndef CFG_RELEASE_HEADER 
 #include "../Platform/platform.h"
 #endif
 
@@ -64,14 +67,13 @@
 extern "C" {
 #endif
 
-
 /************************************************************************
  ** 常量定义
  ***********************************************************************/
 
-#define MAX_CHANNEL_COUNT		8
+#define MAX_CHANNEL_COUNT		16
 #define MAX_VIDEO_CHANNEL_NUM	256					// 最大通道数256
-#define MAX_CHANNELNAME_LEN		32					// 最大通道名称长度
+#define MAX_CHANNELNAME_LEN		64					// 最大通道名称长度
 #define MAX_VIDEOSTREAM_NUM		3					// 最大码流个数
 #define MAX_VIDEO_COVER_NUM		16					// 最大遮挡区域个数
 #define WEEK_DAY_NUM			7					// 一周的天数
@@ -97,6 +99,8 @@ extern "C" {
 #define MAX_ANALYSE_RULE_NUM	32					// 视频分析设备最大规则个数
 #define MAX_POLYGON_NUM			20					// 视频分析设备区域顶点个数上限
 #define MAX_POLYLINE_NUM		20					// 视频分析设备折线顶点个数上限
+#define MAX_TEMPLATEREGION_NUM  32                  // 视频分析设备模拟区域信息点对个数上限
+#define POINT_PAIR_NUM          2                   // 视频分析设备模拟区域点对包含的点个数
 #define MAX_VEHICLE_SIZE_LIST	4					// 视频分析设备车辆大小个数上限
 #define MAX_VEHICLE_TYPE_LIST	4					// 视频分析设备车辆类型个数上限
 #define MAX_PLATE_TYPE_LIST		32					// 视频分析设备车牌类型个数上限
@@ -121,7 +125,7 @@ extern "C" {
 #define MAX_STRORAGEPOS_NUM     16                  // 最大存储位置上限
 #define	MAX_VIDEODEV_NUM        256                 // 前端设备上限
 #define MAX_REMOTEDEVICENAME_LEN 32					// 最大远程设备名字长度
-#define	MAX_REMOTE_DEV_NUM       64                 // 最大远程设备数量
+#define	MAX_REMOTE_DEV_NUM       256                 // 最大远程设备数量
 #define MAX_PLATEHINT_NUM       8                   // 车牌字符暗示个数上限
 #define MAX_LIGHT_NUM           8                   // 交通灯个数上限
 #define MAX_LIGHTGROUP_NUM      8                   // 交通灯组个数上限
@@ -168,6 +172,16 @@ extern "C" {
 #define MONTH_OF_YEAR			12					// 一年中月份数
 #define MAX_SERVER_NUM          10                  // 服务器最大个数
 #define MAX_REGISTER_NUM        10                  // 主动注册配置最大个数 
+#define MAX_VIDEO_IN_ZOOM       32                  // 单通道最大变速配置个数
+#define	MAX_ANALYSE_SCENE_NUM	32					// 视频分析全局配置场景最大数量
+#define	MAX_CONFIG_NUM			32					// 每个云台的最大配置数
+#define	MAX_PTZ_PRESET_NAME_LEN 64                  // 云台预置点名称长度
+#define CFG_COMMON_STRING_16    16                  // 通用字符串长度16
+#define CFG_COMMON_STRING_32    32                  // 通用字符串长度32
+#define CFG_COMMON_STRING_64    64                  // 通用字符串长度64
+#define CFG_COMMON_STRING_128   128                 // 通用字符串长度128
+#define CFG_COMMON_STRING_256   256                 // 通用字符串长度256
+#define CFG_COMMON_STRING_512   512                 // 通用字符串长度512
 #define AV_CFG_Channel_Name_Len				64			// 通道名称长度
 #define AV_CFG_Weekday_Num					7			// 一周天数
 #define AV_CFG_Max_TimeSection				6			// 时间段数量
@@ -181,7 +195,6 @@ extern "C" {
 #define AV_CFG_Device_Type_Len				32			// 设备具体型号长度
 #define AV_CFG_Device_Name_Len				64			// 机器名称
 #define AV_CFG_Address_Len					128			// 机器部署地点
-#define AV_CFG_Group_Name_Len				64			// 分区名称	
 #define AV_CFG_Max_Path						260			// 路径长度
 #define AV_CFG_Max_Split_Window				128			// 最大分割窗口数量
 #define	AV_CFG_Monitor_Favorite_In_Channel	64			// 每个输出通道的最大轮训画面收藏数量
@@ -196,9 +209,13 @@ extern "C" {
 #define	AV_CFG_Max_Encode_Snap_Format		3			// 抓图编码类型数
 #define AV_CFG_Max_VideoColor				24			// 每个通道最大视频输入颜色配置数量
 #define AV_CFG_Custom_Title_Len				256			// 自定义标题名称长度
+#define AV_CFG_Custom_TitleType_Len         32          // 自定义标题类型长度
 #define AV_CFG_Max_Video_Widget_Cover		16			// 编码区域覆盖最大数量
-#define AV_CFG_Max_Video_Widget_Custom_Title 4			// 编码物件自定义标题最大数量
+#define AV_CFG_Max_Video_Widget_Custom_Title 8			// 编码物件自定义标题最大数量
+#define AV_CFG_Max_Video_Widget_Sensor_Info	2			// 编码物件叠加传感器信息的最大数目
+#define AV_CFG_Max_Description_Num			4			// 叠加区域描述信息的最大个数
 #define AV_CFG_Group_Name_Len				64			// 分组名称长度
+#define AV_CFG_DeviceNo_Len					32			// 设备编号长度
 #define AV_CFG_Group_Memo_Len				128			// 分组说明长度
 #define AV_CFG_Max_Channel_Num				1024		// 最大通道数量
 #define AV_CFG_Time_Format_Len				32			// 时间格式长度
@@ -212,10 +229,46 @@ extern "C" {
 #define AV_CFG_Max_Event_Title_Num			32			// 事件标题最大数量
 #define AV_CFG_Max_Tour_Link_Num			128			// 联动轮巡最大数量
 #define AV_CFG_PIP_BASE						1000		// 画中画分割模式基础值
-
-
+#define DES_KEY_LEN							8			// DES密钥的字节长度
+#define DES_KEY_NUM							3			// 3DES密钥的个数
+#define AES_KEY_LEN							32			// AES密钥的字节长度
+#define MAX_TIME_SCHEDULE_NUM				8			// 时间表元素个数
+#define MAX_SCENE_SUBTYPE_LEN               64          // 场景子类型字符串长度
+#define MAX_SCENE_SUBTYPE_NUM               32          // 场景子类型最大个数    
+#define MAX_VIDEO_IN_FOCUS                  32          // 单通道最大聚焦配置个数
+#define MAX_TIMESPEEDLIMIT_NUM				16			// 最大时间段限速配置个数
+#define MAX_VOICEALERT_NUM					64			// 最大语音提示配置个数
+#define CFG_MAX_LOWER_MATRIX_NUM			16			// 最大下位矩阵数量
+#define CFG_MAX_LOWER_MATRIX_INPUT			64			// 最大下位矩阵输入通道数
+#define CFG_MAX_LOWER_MATRIX_OUTPUT			32			// 最大下位矩阵输出通道数
+#define CFG_MAX_INFRARED_BOARD_TEMPLATE_NUM 16			// 最大红外面板模板数量
+#define	CFG_MAX_INFRARED_KEY_NUM			128			// 最大红外面板按键数量
+#define	CFG_MAX_INFRARED_BOARD_NUM			16			// 最大红外面板数量
+#define MAX_PHONE_NUMBER_LEN				32			// 电话号码最大长度
+#define MAX_AUDIO_OUTPUT_NUM				16			// 音频输出最大通道数
+#define MAX_PSTN_SERVER_NUM					8			// 最大报警电话服务器数
+#define MAX_ALARM_CHANNEL_NUM				32			// 最大报警通道数
+#define MAX_ALARM_DEFENCE_TYPE_NUM			8			// 最大报警防区类型数
+#define MAX_ALARM_SENSE_METHOD_NUM			16			// 最大报警感应器方式数
+#define MAX_EXALARMBOX_PROTOCOL_NUM  		8			// 最大支持扩展报警盒协议数
+#define MAX_EXALARM_CHANNEL_NUM				256			// 最大报警通道数
+#define MAX_EXALARMBOX_NUM					8			// 最大报警盒子数
+#define MAX_MAILTITLE_LEN                   256         // 最大邮件标题长度
+#define MAX_DEVICE_ID_LEN                   48          // 最大设备编码长度
+#define MAX_DEVICE_MARK_LEN                 64          // 最大设备描述长度
+#define MAX_BRAND_NAME_LEN                  64          // 最大设备品牌长度
+#define MAX_ADDRESS_NUM                     16          // 最大串口地址个数
+#define MAX_AIRCONDITION_NUM                16          // 最大空调设备个数
+#define CFG_MAX_COLLECTION_NUM              64          // 最大预案数
+#define MAX_FLOOR_NUM                       128         // 最大楼层数
+#define MAX_SEAT_NUM                        8           // 最大座位数
 #define AV_CFG_Local_Device_ID				"Local"		// 本地设备ID
 #define AV_CFG_Remote_Devce_ID				"Remote"	// 远程设备ID   
+#define MAX_LANE_CONFIG_NUMBER               32         // 车道最大个数
+#define MAX_PRIORITY_NUMBER                 256         // 违章优先级包含违章最大个数
+#define MAX_CATEGORY_TYPE_NUMBER            128         // 子类别类型数
+#define MAX_TRIGGER_MODE_NUMBER             64          // 触发模式个数
+#define MAX_ABNORMAL_DETECT_TYPE            32          // 异常检测类型数
 
 /************************************************************************
  ** 配置命令 对应CLIENT_GetNewDevConfig和CLIENT_SetNewDevConfig接口
@@ -236,6 +289,7 @@ extern "C" {
 #define CFG_CMD_SNAPCAPINFO		"SnapInfo"			// 抓图能力查询(对应CFG_SNAPCAPINFO_INFO)
 #define CFG_CMD_NAS				"NAS"				// 网络存储服务器配置(对应CFG_NAS_INFO)
 #define CFG_CMD_PTZ				"Ptz"				// 云台配置(对应CFG_PTZ_INFO)
+#define	CFG_CMD_PTZ_AUTO_MOVEMENT "PtzAutoMovement" // 云台定时动作配置(对应CFG_PTZ_AUTOMOVE_INFO)
 #define CFG_CMD_WATERMARK		"WaterMark"			// 视频水印配置(对应CFG_WATERMARK_INFO)
 #define CFG_CMD_ANALYSEGLOBAL	"VideoAnalyseGlobal"// 视频分析全局配置(对应CFG_ANALYSEGLOBAL_INFO)
 #define CFG_CMD_ANALYSEMODULE	"VideoAnalyseModule"// 物体的检测模块配置(对应CFG_ANALYSEMODULES_INFO)
@@ -278,6 +332,7 @@ extern "C" {
 #define CFG_CMD_VIDEODIAGNOSIS_PROFILE   "VideoDiagnosisProfile"		// 视频诊断参数表(CFG_VIDEODIAGNOSIS_PROFILE)
 #define CFG_CMD_VIDEODIAGNOSIS_TASK	      "VideoDiagnosisTask"			// 视频诊断任务表(CFG_VIDEODIAGNOSIS_TASK)
 #define CFG_CMD_VIDEODIAGNOSIS_PROJECT    "VideoDiagnosisProject"		// 视频诊断计划表(CFG_VIDEODIAGNOSIS_PROJECT)
+#define CFG_CMD_VIDEODIAGNOSIS_REALPROJECT    "VideoDiagnosisRealProject" // 视频诊断实时计划表(CFG_VIDEODIAGNOSIS_REALPROJECT)
 #define CFG_CMD_VIDEODIAGNOSIS_GLOBAL     "VideoDiagnosisGlobal"		// 视频诊断全局表(CFG_VIDEODIAGNOSIS_GLOBAL)
 #define CFG_CMD_VIDEODIAGNOSIS_TASK_ONE   "VideoDiagnosisTask.x"	    // 视频诊断任务表(CFG_VIDEODIAGNOSIS_TASK)
 #define CFG_CMD_TRAFFIC_WORKSTATE         "WorkState"                   // 设备工作状态相关配置(对应CFG_TRAFFIC_WORKSTATE_INFO)
@@ -317,11 +372,11 @@ extern "C" {
 #define CFG_CMD_ACTIVE_DIR          "ActiveDirectory"   // 活动目录配置
 #define CFG_CMD_FLASH               "FlashLight"        // 补光灯配置(对应 CFG_FLASH_LIGHT)
 #define CFG_CMD_AUDIO_ANALYSERULE   "AudioAnalyseRule"  // 音频分析规则配置(对应 CFG_ANALYSERULES_INFO)
-#define CFG_CMD_JUDICATURE          "Judicature"        // 司法刻录配置(对应 CFG_JUDICATURE_INFO)
+#define CFG_CMD_JUDICATURE          "Judicature"        // 司法刻录配置(对应CFG_JUDICATURE_INFO)
 #define CFG_CMD_GOODS_WEIGHT		"CQDTSet"			// 车载货重配置(对应CFG_GOOD_WEIGHT_INFO)
 #define CFG_CMD_VIDEOIN				"VideoIn"			// 输入通道配置(对应CFG_VIDEO_IN_INFO)
 #define CFG_CMD_ENCODEPLAN          "EncodePlan"        // 刻录光盘编码计划(对应 CFG_ENCODE_PLAN_INFO)
-#define CFG_CMD_PICINPIC            "PicInPic"          // 司法审讯画中画(对应 CFG_PICINPIC_INFO)
+#define CFG_CMD_PICINPIC            "PicInPic"          // 司法审讯画中画(对应 CFG_PICINPIC_INFO)改为数组方式，兼容以前单个配置，根据长度区分
 #define CFG_CMD_BURNFULL            "BurnFull"          // 刻录满事件配置(对应 CFG_BURNFULL_INFO)
 #define CFG_CMD_MASTERSLAVE_GLOBAL  "MasterSlaveTrackerGlobal"   //主从式全局配置（对应）
 #define CFG_CMD_ANALYSEWHOLE	"VideoAnalyseWhole"  // 视频分析整体配置(对应CFG_ANALYSEWHOLE_INFO)
@@ -338,6 +393,100 @@ extern "C" {
 #define CFG_CMD_CLIENT_CUSTOM_DATA  "ClientCustomData"  // 平台自定义信息(对应 CFG_CLIENT_CUSTOM_INFO)
 #define CFG_CMD_BURN_RECORD_FORMAT  "BurnRecordFormat"  // 刻录格式配置(对应 CFG_BURN_RECORD_FORMAT)
 #define CFG_CMD_MULTIBURN           "MultiBurn"         // 多光盘同步刻录(对应 CFG_MULTIBURN_INFO)是一个数组，每一个元素表示一组多光盘同步刻录及校验
+#define	CFG_CMD_ENCODE_ENCRYPT		"EncodeEncrypt"		// 编码加密配置信息( CFG_ENCODE_ENCRYPT_CHN_INFO )
+#define CFG_CMD_VIDEO_IN_ZOOM       "VideoInZoom"       // 云台通道变倍配置(对应 CFG_VIDEO_IN_ZOOM)
+#define CFG_CMD_SNAP				"Snap"				// 抓图配置(对应 CFG_SNAP_INFO)
+#define CFG_CMD_REMOTE_STORAGE_LIMIT    "RemoteStorageLimit"    // 网络存储服务器限制配置(对应 CFG_REMOTE_STORAGELIMIT_GROUP)
+#define CFG_CMD_SPECIAL_DIR			"SpecialDirectoryDefine"	// 特殊用途目录定义(对应 CFG_SPECIAL_DIR_INFO)
+#define CFG_CMD_AUTO_STARTUP_DELAY	"AutoStartupDelay"			// 关机后延时自动开机配置(对应 CFG_AUTO_STARTUP_DELAY_INFO)
+#define CFG_CMD_CANFILTER			"CANFilter"			// CAN透传配置(对应 CFG_CANFILTER_LIST)
+#define CFG_CMD_VIDEOIN_FOCUS       "VideoInFocus"      // 聚焦设置(对应 CFG_VIDEO_IN_FOCUS)
+#define CFG_CMD_ENCODE_ADAPT		"EncodeAdapt"		// 编码自适应配置(对应 CFG_ENCODE_ADAPT_INFO)
+#define CFG_CMD_VIDEOANALYSE_CALIBRATE  "VideoAnalyseCalibrate"  // 视频分析标定配置(对应CFG_VIDEO_ANALYSE_CALIBRATEAREA)
+#define CFG_CMD_PTZ_PRESET           "PtzPreset"        // 云台预置点配置(对应结构PTZ_PRESET_INFO)
+#define CFG_CMD_TIMESPEEDLIMIT		"TimeSpeedLimit"	// 时间段限速值配置(对应结构体 CFG_TIMESPEEDLIMIT_LIST)
+#define CFG_CMD_VOICEALERT			"VoiceAlert"		// 语音提示配置(对应结构体 CFG_VOICEALERT_LIST)
+#define CFG_CMD_DEVICEKEEPALIVE		"DeviceKeepAlive"	// 设备保活配置(对应结构体 CFG_DEVICEKEEPALIVELIST)
+
+#define CFG_CMD_AUDIO_SPIRIT		"AudioSpirit"		// 语音激励(对应 CFG_AUDIO_SPIRIT)
+#define CFG_CMD_COMPOSE_CHANNEL		"ComposeChannel"	// 合成通道配置(对应 CFG_COMPOSE_CHANNEL)
+#define CFG_CMD_LOWER_MATRIX		"LowerMatrix"		// 下位矩阵配置(对应 CFG_LOWER_MATRIX_LIST) 
+#define CFG_CMD_INFRARED_BOARD_TEMPLATE	"InfraredBoardTemplate"	// 红外面板模板(对应 CFG_INFRARED_BOARD_TEMPLATE_GROUP)
+#define CFG_CMD_INFRARED_BOARD		"InfraredBoard"	// 红外面板模板(对应 CFG_INFRARED_BOARD_GROUP)
+#define CFG_CMD_VIDEOIN_EXPOSURE    "VideoInExposure"   // 曝光设置(对应CFG_VIDEOIN_EXPOSURE_INFO)
+
+#define CFG_CMD_ACCESS_GENERAL      "AccessControlGeneral" // 门禁基本配置(对应 CFG_ACCESS_GENERAL_INFO)
+#define CFG_CMD_ACCESS_EVENT        "AccessControl"        // 门禁事件配置(对应 CFG_ACCESS_EVENT_INFO 数组)     
+#define CFG_CMD_WIRELESS			"Wireless"			// 无线网络连接设置(对应 CFG_WIRELESS_INFO)
+#define CFG_CMD_ALARMSERVER			"AlarmServer"		// 报警服务器配置(对应CFG_ALARMCENTER_INFO)
+#define CFG_CMD_COMMGLOBAL			"CommGlobal"		// 报警全局配置(对应CFG_COMMGLOBAL_INFO)
+#define CFG_CMD_ANALOGALARM			"AnalogAlarm"		// 模拟量报警通道配置(对应CFG_ANALOGALARM_INFO)
+#define CFG_CMD_ALARMOUT			"AlarmOut"			// 报警输出通道配置(对应CFG_ALARMOUT_INFO)
+#define CFG_CMD_NTP					"NTP"				// 时间同步服务器(对应CFG_NTP_INFO)
+#define CFG_CMD_ALARMBELL			"AlarmBell"			// 警号配置(对应CFG_ALARMBELL_INFO)
+#define CFG_CMD_MOBILE				"Mobile"			// 移动相关业务配置(对应CFG_MOBILE_INFO)
+#define CFG_CMD_PHONEEVENTNOTIFY	"PhoneEventNotify"	// (对应CFG_PHONEEVENTNOTIFY_INFO)
+#define CFG_CMD_PSTN_ALARM_SERVER	"PSTNAlarmServer"	// 电话报警中心配置(CFG_PSTN_ALARM_CENTER_INFO)
+#define CFG_CMD_AUDIO_OUTPUT_VOLUME	"AudioOutputVolume"	// 音频输出音量(CFG_AUDIO_OUTPUT_VOLUME)
+#define CFG_CMD_ALARMKEYBOARD		"AlarmKeyboard"		// 报警键盘配置(CFG_ALARMKEYBOARD_INFO)
+#define CFG_CMD_POWERFAULT			"PowerFault"		// 电源故障配置(CFG_POWERFAULT_INFO)
+#define CFG_CMD_CHASSISINTRUSION	"ChassisIntrusion"	// 机箱入侵报警(防拆报警)配置(CFG_CHASSISINTRUSION_INFO)
+#define CFG_CMD_EXALARMBOX			"ExAlarmBox"		// 扩展报警盒配置 (CFG_EXALARMBOX_INFO)
+#define CFG_CMD_EXALARMOUTPUT		"ExAlarmOut"		// 扩展报警输出配置(CFG_EXALARMOUTPUT_INFO)
+#define CFG_CMD_EXALARMINPUT		"ExAlarm"			// 扩展报警输入配置(CFG_EXALARMINPUT_INFO)
+#define CFG_CMD_ACCESSTIMESCHEDULE	"AccessTimeSchedule"// 门禁刷卡时间段(CFG_ACCESS_TIMESCHEDULE_INFO)
+#define CFG_CMD_URGENCY				"Emergency"			// 紧急事件配置(CFG_URGENCY_INFO)
+#define CFG_CMD_SENSORSAMPLING		"SensorSampling"	// 传感器采样(CFG_SENSORSAMPLING_INFO)
+#define CFG_CMD_STP					"STP"				// 环网配置(CFG_STP_INFO)
+#define CFG_CMD_ALARM_SUBSYSTEM		"AlarmSubSystem"	// 报警子系统配置(CFG_ALARM_SUBSYSTEM_INFO)
+#define CFG_CMD_BATTERY_LOW_POWER	"BatteryLowPowerAlarm"	// 电池电量低配置(CFG_BATTERY_LOW_POWER_INFO)
+#define CFG_CMD_SNAPLIKAGE          "SnapLinkage"       // 抓图通道联动外设配置(CFG_SNAPLINKAGE_INFO)
+#define CFG_CMD_AUDIOINPUT          "AudioInput"        // 音频输入配置(CFG_AUDIO_INPUT)
+#define CFG_CMD_EMAIL				"Email"				// 邮件发送配置(CFG_EMAIL_INFO)
+#define CFG_CMD_TRAFFIC_TRANSFER_OFFLINE "TrafficTransferOffline"    // 传输离线文件配置(TRAFFIC_TRANSFER_OFFLINE_INFO)
+#define CFG_CMD_COMMSUBSCRIBE		"CommSubscribe"		// 订阅串口数据配置(CFG_DEVCOMM_SUBSCRIBE)
+#define CFG_CMD_PARKINGSPACE_LIGHT_STATE "ParkingSpaceLightState"    // 车位状态对应的车位指示灯(CFG_PARKINGSPACE_LIGHT_STATE)
+#define CFG_CMD_AIRCONDITION		"AirCondition"		// 空调设备配置(CFG_AIRCONDITION_INFO)
+#define CFG_CMD_COMPRESS_PLAY       "CompressPlay"      //压缩回放配置(CFG_COMPRESS_PLAY_INFO)
+#define CFG_CMD_BUILDING            "Building"          // VTO楼层配置(CFG_BUILDING_INFO)
+#define CFG_CMD_BUILDING_EXTERNAL   "BuildingExternal"  // VTO楼层扩展配置(CFG_BUILDING_EXTERNAL_INFO)
+#define CFG_CMD_DIALRULE            "DialRule"          // 拨号规则(CFG_DIALRULE_INFO)
+#define CFG_CMD_OIL_MASS_INFO       "OilMassInfo"       // 车辆油箱配置(CFG_OIL_MASS_INFO)
+#define CFG_CMD_FISHEYE_INFO        "FishEye"           // 鱼眼详细信息配置(CFG_FISHEYE_DETAIL_INFO)
+#define CFG_CMD_VTNOANSWER_FORWARD  "VTNoAnswerForward" // 平台下发呼叫无应答转移配置列表(CFG_VT_NOANSWER_FORWARD_INFO)
+#define CFG_CMD_VTO_CALL            "VTOCall"           // VTO呼叫配置(CFG_VTO_CALL_INFO)
+#define CFG_CMD_MACCONFLICT         "MacConflict"       // MAC冲突报警配置(CFG_MACCONFLICT_INFO)
+#define CFG_CMD_IDLEMOTION_INFO     "IdleMotion"        // 空闲动作配置(CFG_IDLE_MOTION_INFO)
+#define CFG_CMD_MONITORWALL_COLL_TOUR "MonitorWallCollectionTour"   // 电视墙预案轮巡配置(CFG_MONITORWALL_COLLECTION_TOUR_INFO)
+#define CFG_CMD_PSTN_BREAK_LINE     "PSTNBreakLine"     // PSTN断线事件配置(CFG_PSTN_BREAK_LINE_INFO)
+#define CFG_CMD_NET_COLLECTION      "NetCollection"	    // 网络采集设备配置(CFG_NET_COLLECTION_INFO)
+#define CFG_CMD_ALARM_SLOT_BOND     "AlarmSlotBond"     // 虚拟Slot节点与具体物理设备的对应关系(CFG_ALARM_SLOT_BOND_INFO)
+#define CFG_CMD_TRAFFICSTROBE       "TrafficStrobe"     // 道闸配置(CFG_TRAFFICSTROBE_INFO)
+#define CFG_CMD_TRAFFICVOICE        "TrafficVoiceBroadcast"         // 智能交通语音播报配置(CFG_TRAFFICVOICE_BROADCAST)
+#define CFG_CMD_STANDING_TIME       "StandingTime"      // 停车时间配置(CFG_STANDING_TIME_INFO)
+#define CFG_CMD_ENCLOSURE_TIME_SCHEDULE  "EnclosureTimeSchedule"     // 电子围栏报警时间段配置(CFG_ENCLOSURE_TIME_SCHEDULE_INFO)
+#define CFG_CMD_ECKCONFIG			"ECKConfig"			// 停车场出入口控制器配置(CFG_ECKCONFIG_INFO)
+#define CFG_CMD_PARKING_CARD        "ParkingCard"       // 停车场出入口刷卡报警事件配置(CFG_PARKING_CARD_INFO)
+#define CFG_CMD_RCEMERGENCY_CALL     "RCEmergencyCall"  // 紧急呼叫报警事件配置(CFG_RCEMERGENCY_CALL_INFO)
+#define CFG_CMD_LANES_STATE_REPORT   "LanesStateReport" // 车道信息上报配置(CFG_LANES_STATE_REPORT)
+#define CFG_CMD_OPEN_DOOR_GROUP     "OpenDoorGroup"     // 多人多开门方式组合配置(CFG_OPEN_DOOR_GROUP_INFO)
+#define CFG_CMD_OPEN_DOOR_ROUTE     "OpenDoorRoute"     // 开门路线集合，或称防反潜路线配置(CFG_OPEN_DOOR_ROUTE_INFO)
+#define CFG_CMD_BURNPLAN            "BurnPlan"          // 刻录计划配置(对应CFG_BURNPLAN_INFO)
+#define CFG_CMD_SCADA_DEV           "SCADADev"          // 检测采集设备配置(CFG_SCADA_DEV_INFO)
+#define CFG_CMD_VSP_GAYS            "VSP_GAYS"          // 公安一所平台接入配置(CFG_VSP_GAYS_INFO)
+#define CFG_CMD_AUDIODETECT         "AudioDetect"       // 音频检测报警配置(CFG_AUDIO_DETECT_INFO数组)
+#define CFG_CMD_GUIDESCREEN         "GuideScreen"       // 诱导屏系统配置(CFG_GUIDESCREEN_INFO)
+#define CFG_CMD_VTS_CALL_INFO       "VTSCallInfo"       // VTS呼叫配置(CFG_VTS_CALL_INFO)
+#define CFG_CMD_DEV_LIST            "DevList"           // 设备列表配置(CFG_DEV_LIST_INFO)
+#define CFG_CMD_CALIBRATE_MATRIX    "CalibrateMatrix"   // 主从式跟踪器标定矩阵配置(CFG_CALIBRATE_MATRIX_INFO)
+#define CFG_CMD_DEFENCE_AREA_DELAY  "DefenceAreaDelay"  // 防区延时配置(CFG_DEFENCE_AREA_DELAY_INFO)
+#define CFG_CMD_LIGHTING            "Lighting"          // 灯光设置(CFG_LIGHTING_INFO)
+#define CFG_CMD_RAINBRUSHMODE           "RainBrushMode"         // 雨刷模式相关配置(对应CFG_RAINBRUSHMODE_INFO数组)
+#define CFG_CMD_EMERGENCY_RECORD_FOR_PULL   "EmergencyRecordForPull"    // 紧急录像存储配置，用于客户端主动拉的方式。在客户端拉流存储异常之后，进行紧急录像存储(CFG_EMERGENCY_RECORD_FOR_PULL_INFO)
+#define CFG_CMD_ALARM_SHIELD_RULE   "AlarmShieldRule"   // 告警屏蔽规则(CFG_ALARM_SHIELD_RULE_INFO)
+#define CFG_CMD_VIDEOIN_ANALYSERULE "VideoInAnalyseRule"        // 视频通道智能规则配置(CFG_VIDEOIN_ANALYSE_RULE_INFO)
+#define CFG_CMD_ACCESS_WORK_MODE   "AccessWorkMode"   // 门锁工作模式(对应 CFG_ACCESS_WORK_MODE_INFO 数组)
+
 
  /************************************************************************
  ** 能力集命令  对应CLIENT_QueryNewSystemInfo
@@ -369,13 +518,137 @@ extern "C" {
 #define CFG_CAP_CMD_PTZ_ENABLE  	"ptz.factory.instance"					// 获取云台支持信息(CFG_CAP_PTZ_ENABLEINFO )
 #define CFG_CAP_CMD_RECORD			"recordManager.getCaps"                 // 获取录像能力集(CFG_CAP_RECORD_INFO)
 #define CFG_CAP_CMD_BURN_MANAGER    "BurnManager.getCaps"                   // 获取刻录管理能力集( CFG_CAP_BURN_MANAGER)
+#define CFG_CAP_CMD_PTZ     		"ptz.getCurrentProtocolCaps"			// 获取云台能力集(CFG_PTZ_PROTOCOL_CAPS_INFO)
+#define CFG_CMD_ENCODE_GETCAPS      "encode.getCaps"                        // 获取编码能力集(CFG_ENCODECAP)
+#define CFG_CAP_CMD_VIDEOINPUT_EX   "devVideoInput.getCapsEx"               // 视频输入能力集扩展(对应CFG_CAP_VIDEOINPUT_INFO_EX)
+#define CFG_CAP_CMD_ANALYSE_MODE    "intelli.getCaps.AnalyseMode"           // 获取设备智能分析模式(对应 CFG_ANALYSE_MODE)
+#define CFG_CAP_CMD_EVENTMANAGER    "eventManager.getCaps"			// 获取设备报警联动能力,老协议已废除,新开发请使用该字段(CFG_CAP_EVENTMANAGER_INFO)
+#define CFG_CAP_CMD_FILEMANAGER		"FileManager.getCaps"			// 获取文件能力(CFG_CAP_FILEMANAGER)
+#define	CFG_CAP_CMD_LOG				"log.getCaps"					// 获取日志服务能力(CFG_CAP_LOG)
+#define CFG_CAP_CMD_SPEAK			"speak.getCaps"					// 扬声器播放能力(CFG_CAP_SPEAK)
+#define CFG_CAP_CMD_ACCESSCONTROLMANAGER	"accessControlManager.getCaps"	// 门禁能力(CFG_CAP_ACCESSCONTROL)
+#define CFG_CAP_CMD_EXALARM			"alarm.getExAlarmCaps"					// 获取扩展报警能力集, (对应结构体 CFG_CAP_EXALARM_INFO)
+#define CFG_CAP_CMD_EXALARMBOX		"alarm.getExAlarmBoxCaps"				// 获取扩展报警盒能力集, (对应结构体 CFG_CAP_EXALARMBOX_INFO)
+#define CFG_CAP_CMD_RECORDFINDER	"RecordFinder.getCaps"					// 获取查询记录能力集, (对应结构体 CFG_CAP_RECORDFINDER_INFO)
+#define CFG_CAP_CMD_ANALOGALARM		"AnalogAlarm.getCaps"			// 模拟量报警输入通道能力(对应结构体 CFG_CAP_ANALOGALARM)
+#define CFG_CAP_CMD_LOWRATEWPAN		"LowRateWPAN.getCaps"			// 获取LowRateWPAN能力(对应的结构体 CFG_CAP_LOWRATEWPAN)
+
+// 日志能力
+typedef struct tagCFG_CAP_LOG
+{
+	DWORD		dwMaxLogItems;		// 最大日志条数
+	DWORD		dwMaxPageItems;		// 每个分页的最大日志条数
+	BOOL		bSupportStartNo;	// 查询条件是否支持起始序号
+	BOOL		bSupportTypeFilter;	// 查询条件是否支持类型过滤
+	BOOL		bSupportTimeFilter;	// 查询条件是否支持时间过滤
+}CFG_CAP_LOG;
+
+
+#define MAX_AUDIO_PROPERTY_NUM       32          // 音频属性最大个数  
+#define MAX_AUDIO_FORMAT_NUM         16          // 音频格式最大个数 
+
+// 音频编码压缩格式
+enum EM_TALK_AUDIO_TYPE
+{
+	EM_TALK_AUDIO_PCM,
+	EM_TALK_AUDIO_ADPCM, 
+	EM_TALK_AUDIO_G711A, 
+	EM_TALK_AUDIO_G711Mu, 
+	EM_TALK_AUDIO_G726, 
+	EM_TALK_AUDIO_G729, 
+	EM_TALK_AUDIO_MPEG2, 
+	EM_TALK_AUDIO_AMR, 
+	EM_TALK_AUDIO_AAC, 
+};
+
+// 音频属性
+typedef struct CFG_AUDIO_PROPERTY
+{
+	int            nBitRate;               // 码流大小，单位:kbps，比如192kbps
+	int            nSampleBit;             // 采样的位深，如8或16
+	int            nSampleRate;            // 采样率，单位:Hz，比如44100Hz
+}CFG_AUDIO_PROPERTY;
+
+// 支持的音频格式
+typedef struct CFG_CAP_AUDIO_FORMAT
+{
+	EM_TALK_AUDIO_TYPE  emCompression;          // 音频压缩格式，具体见枚举AV_Talk_Audio_Type
+	int		            nPropertyNum;           // 音频属性个数
+	CFG_AUDIO_PROPERTY  stuProperty[MAX_AUDIO_PROPERTY_NUM]; // 音频属性
+}CFG_CAP_AUDIO_FORMAT;
+
+// 扬声器能力
+typedef struct CFG_CAP_SPEAK
+{
+	int						nAudioCapNum;           // 支持的音频格式个数
+	CFG_CAP_AUDIO_FORMAT	stuAudioCap[MAX_AUDIO_FORMAT_NUM]; // 支持的音频格式 
+}CFG_CAP_SPEAK;
+
+// 门禁控制能力
+typedef struct tagCFG_CAP_ACCESSCONTROL
+{
+	int		nAccessControlGroups;	// 门禁组数
+}CFG_CAP_ACCESSCONTROL;
+
+// 传感器感应方式枚举类型
+typedef enum tagEM_SENSE_METHOD
+{
+    EM_SENSE_UNKNOWN = -1,   //未知类型
+	EM_SENSE_DOOR=0,         //门磁
+	EM_SENSE_PASSIVEINFRA,   //被动红外
+	EM_SENSE_GAS,            //气感
+	EM_SENSE_SMOKING,        //烟感
+	EM_SENSE_WATER,          //水感
+	EM_SENSE_ACTIVEFRA,      //主动红外
+	EM_SENSE_GLASS,			 //玻璃破碎
+	EM_SENSE_EMERGENCYSWITCH,//紧急开关
+	EM_SENSE_SHOCK,			 //震动
+	EM_SENSE_DOUBLEMETHOD,	 //双鉴(红外+微波)
+	EM_SENSE_THREEMETHOD,	 //三技术
+	EM_SENSE_TEMP,			 //温度
+	EM_SENSE_HUMIDITY,		 //湿度
+    EM_SENSE_WIND,           //风速
+	EM_SENSE_CALLBUTTON,	 //呼叫按钮
+	EM_SENSE_GASPRESSURE,	 //气体压力
+	EM_SENSE_GASCONCENTRATION,//燃气浓度
+	EM_SENSE_GASFLOW,		 //气体流量
+    EM_SENSE_OIL,            //油量检测
+    EM_SENSE_MILEAGE,        //里程数检测
+	EM_SENSE_OTHER,			 //其他
+	EM_SENSE_NUM             //枚举类型总数
+}EM_SENSE_METHOD;
+
+// 传感器报警方式
+typedef struct tagCFG_EXALARM_SENSE_METHOD
+{
+	int                 nSupportSenseMethodNum;								// 支持的传感器方式数
+	EM_SENSE_METHOD     emSupportSenseMethod[MAX_ALARM_SENSE_METHOD_NUM];   // 支持的传感器方式
+}CFG_EXALARM_SENSE_METHOD;
+
+// 模拟量报警输入通道能力
+typedef struct tagCFG_CAP_ANALOGALARM 
+{
+	DWORD						dwLocalNum;										// 本地模拟量报警输入通道数
+	DWORD						dwExLocalNum;									// 扩展模拟量报警输入通道数
+	int							nAnalogAlarmChannelNum;							// 模拟量报警通道数, 此为0时表示每个通道支持所有类型的传感器
+	CFG_EXALARM_SENSE_METHOD	stuAnalogAlarmChannel[MAX_EXALARM_CHANNEL_NUM];	// 报警通道集合
+}CFG_CAP_ANALOGALARM;
+
+// 获取LowRateWPAN能力结构体
+typedef struct tagCFG_CAP_LOWRATEWPAN
+{
+	int			nMaxPageSize;			// 最大分页查询的对码条数
+}CFG_CAP_LOWRATEWPAN;
+
+
  /************************************************************************
  ** fAnalyzerData回调函数dwDataType类型定义
  ***********************************************************************/
-#define    TYPE_CB_VIDEOSTAT      0x1000000      // 回调解析视频信息摘要类型，对应结构体为CFG_VIDEOSATA_SUMMARY_INFO 
-#define    TYPE_CB_ANARULES       0x1000001      // 回调解析视频输入通道对应的所有事件规则类型，对应结构体为CFG_ANALYSERULES_INFO
-#define    TYPE_CB_VIDEOSYNOPSIS  0x1000002	     // 回调解析浓缩视频的智能帧，对应结构体DH_MSG_OBJECT
-
+#define    TYPE_CB_VIDEOSTAT       0x1000000      // 回调解析视频信息摘要类型，对应结构体为CFG_VIDEOSATA_SUMMARY_INFO 
+#define    TYPE_CB_ANARULES        0x1000001      // 回调解析视频输入通道对应的所有事件规则类型，对应结构体为CFG_ANALYSERULES_INFO
+#define    TYPE_CB_VIDEOSYNOPSIS   0x1000002	  // 回调解析浓缩视频的智能帧，对应结构体DH_MSG_OBJECT
+#define	   TYPE_CB_TRAFFICFLOWINFO 0x1000003	  // 回调解析交通流量信息，对应结构体DEV_EVENT_TRAFFIC_FLOWSTAT_INFO	
+#define    TYPE_CB_TRAFFICFLOWRULE 0x1000004      // 回调解析交通流量规则信息，对应结构体 CFG_TRAFFIC_FLOWSTAT_INFO 	
 /************************************************************************
  ** 配置信息(每个结构体都有能力信息，以区分不同设备程序版本和不同型号设备)
  ***********************************************************************/
@@ -422,6 +695,11 @@ struct AV_CFG_RemoteDevice
 	CFG_RemoteDeviceVideoInput *pVideoInput;            // 视频输入通道，用户申请nMaxVideoInputs个CFG_RemoteDeviceVideoInput空间
 	int                 nMaxVideoInputs;
 	int                 nRetVideoInputs;
+	int					nHttpPort;						// http端口号
+														// 以下3项为国际接入方式相关
+	AV_BOOL				bGB28181;						// 是否有国际接入方式
+	int					nDevLocalPort;					// 设备本地端口
+	char				szDeviceNo[AV_CFG_DeviceNo_Len];// 设备编号
 };
 
 //-----------------------------图像通道属性-------------------------------
@@ -448,6 +726,7 @@ typedef enum tagCFG_VIDEO_COMPRESSION
 	VIDEO_FORMAT_MJPG,								// MJPG
 	VIDEO_FORMAT_FCC_MPEG4,							// FCC-MPEG4
 	VIDEO_FORMAT_H264,								// H.264
+    VIDEO_FORMAT_H265,								// H.265
 } CFG_VIDEO_COMPRESSION;
 // 音频编码模式
 typedef enum tatCFG_AUDIO_FORAMT
@@ -465,6 +744,16 @@ typedef enum tagCFG_BITRATE_CONTROL
 	BITRATE_CBR,									// 固定码流
 	BITRATE_VBR,									// 可变码流
 } CFG_BITRATE_CONTROL;
+
+// H264 编码级别
+typedef enum tagCFG_H264_PROFILE_RANK
+{
+	PROFILE_BASELINE = 1,                       // 提供I/P帧，仅支持progressive(逐行扫描)和CAVLC
+	PROFILE_MAIN,                               // 提供I/P/B帧，支持progressiv和interlaced，提供CAVLC或CABAC
+	PROFILE_EXTENDED,                           // 提供I/P/B/SP/SI帧，仅支持progressive(逐行扫描)和CAVLC
+	PROFILE_HIGH,                               // 即FRExt，Main_Profile基础上新增：8x8 intra prediction(8x8 帧内预测), custom 
+												// quant(自定义量化), lossless video coding(无损视频编码), 更多的yuv格式
+}CFG_H264_PROFILE_RANK;
 
 // 分辨率枚举
 typedef enum tagCFG_CAPTURE_SIZE
@@ -518,6 +807,7 @@ typedef struct tagCFG_VIDEO_FORMAT
 	bool				abIFrameInterval;
 	bool				abImageQuality;
 	bool				abFrameType;
+	bool				abProfile;
 
 	// 信息
 	CFG_VIDEO_COMPRESSION emCompression;			// 视频压缩格式
@@ -525,10 +815,11 @@ typedef struct tagCFG_VIDEO_FORMAT
 	int					nHeight;					// 视频高度
 	CFG_BITRATE_CONTROL	emBitRateControl;			// 码流控制模式
 	int					nBitRate;					// 视频码流(kbps)
-	int					nFrameRate;					// 视频帧率
+	float				nFrameRate;					// 视频帧率
 	int					nIFrameInterval;			// I帧间隔(1-100)，比如50表示每49个B帧或P帧，设置一个I帧。
 	CFG_IMAGE_QUALITY	emImageQuality;				// 图像质量
 	int					nFrameType;					// 打包模式，0－DHAV，1－"PS"
+    CFG_H264_PROFILE_RANK emProfile;                // H.264编码级别
 } CFG_VIDEO_FORMAT;
 
 // 音频格式
@@ -609,6 +900,21 @@ typedef struct tagCFG_POLYLINE
 	int					nY;		
 } CFG_POLYLINE;
 
+typedef enum tagCFG_FLOWSTAT_DIRECTION
+{
+	CFG_DRIVING_DIR_APPROACH ,		//上行，即车辆离设备部署点越来越近
+	CFG_DRIVING_DIR_LEAVE ,				//下行，即车辆离设备部署点越来越远
+}CFG_FLOWSTAT_DIRECTION;
+
+#define  CFG_FLOWSTAT_ADDR_NAME			16						//上下行地点名长
+//车辆流量统计车道方向信息 
+typedef struct tagCFG_TRAFFIC_FLOWSTAT_DIR_INFO
+{
+	CFG_FLOWSTAT_DIRECTION		emDrivingDir;							//行驶方向
+	char						szUpGoing[CFG_FLOWSTAT_ADDR_NAME];			//上行地点 
+	char						szDownGoing[CFG_FLOWSTAT_ADDR_NAME];		//下行地点 
+}CFG_TRAFFIC_FLOWSTAT_DIR_INFO;
+
 // 车道信息
 typedef struct tagCFG_LANE
 {
@@ -638,6 +944,7 @@ typedef struct tagCFG_LANE
 	CFG_POLYLINE       stuPreLine[MAX_POLYLINE_NUM];      // 车道对应的前置线
 	int                nPostLine;
 	CFG_POLYLINE       stuPostLine[MAX_POLYLINE_NUM];     // 车道对应的后置线
+	CFG_TRAFFIC_FLOWSTAT_DIR_INFO stuTrafficFlowDir;	  // 车道流量信息
 }CFG_LANE;
 
 // 交通灯属性
@@ -685,9 +992,9 @@ enum EM_CALIBRATEAREA_TYPE
 // 特殊区域的属性类型
 enum EM_SEPCIALREGION_PROPERTY_TYPE
 {
-	EM_SEPCIALREGION_PROPERTY_TYPE_HIGHLIGHT = 1,            // 高亮，屏幕检测区域具有此特性
+	EM_SEPCIALREGION_PROPERTY_TYPE_HIGHLIGHT = 1,            // 高亮，键盘检测区域具有此特性
 	EM_SEPCIALREGION_PROPERTY_TYPE_REGULARBLINK,             // 规律的闪烁，插卡区域具有此特性
-	EM_SEPCIALREGION_PROPERTY_TYPE_IREGULARBLINK,            // 不规律的闪烁，键盘区域具有此特性
+	EM_SEPCIALREGION_PROPERTY_TYPE_IREGULARBLINK,            // 不规律的闪烁，屏幕区域具有此特性
 	EM_SEPCIALREGION_PROPERTY_TYPE_NUM,
 };
 
@@ -699,9 +1006,7 @@ enum EM_FACEDETECTION_TYPE
 	EM_FACEDETECTION_TYPE_SMALLFACE,						//小脸类型，人脸在视频中的比重大概17%
 	EM_FACEDETECTION_TYPE_LARGEFACE,						//大脸类型，人脸在视频中的比重大概33%
 	EM_FACEDETECTION_TYPE_BOTH,								//检测类型
-};
-
-
+}; 
 
 typedef struct tagCFG_STAFF
 {
@@ -789,6 +1094,35 @@ typedef struct tagCFG_ENCODE_INFO
 	int					nProtocolVer;						// 协议版本号, 只读
 } CFG_ENCODE_INFO;
 
+// 视频输入前端能力集
+typedef struct tagCFG_VIDEO_ENCODECAP
+{
+	int		nMaxCIFFrame;			// CIF P帧最大值 单位Kbits, 默认值40
+	int		nMinCIFFrame;			// CIF P帧最小值 单位Kbits, 默认值7
+}CFG_VIDEO_ENCODECAP;
+
+// 多画面预览工作模式
+typedef enum tagCFG_EM_PREVIEW_MODE
+{
+    CFG_EM_PREVIEW_MODE_UNKNOWN = 0,        // 
+    CFG_EM_PREVIEW_MODE_SNAPSHOT,           // 快照方式
+    CFG_EM_PREVIEW_MODE_SPLITENCODE,        // 分割编码方式
+    CFG_EM_PREVIEW_MODE_SPLITSNAP,          // 分割快照方式
+}CFG_EM_PREVIEW_MODE;
+
+#define MAX_PREVIEW_MODE_SPLIT_TYPE_NUM     8                           // 最大多画面预览窗口分割种类数
+
+// 编码能力集
+typedef struct tagCFG_ENCODECAP
+{
+	int                     nChannelNum;                                // 实际通道数
+	CFG_VIDEO_ENCODECAP     stuVideoEncodeCap[MAX_VIDEO_CHANNEL_NUM];	// 各通道编码能力信息数组
+    CFG_EM_PREVIEW_MODE     emPreviewMode;                              // 多画面预览工作模式
+    int                     nSplitModeNum;                              // 有效的多画面预览窗口分割种类数
+    int                     anSplitMode[MAX_PREVIEW_MODE_SPLIT_TYPE_NUM];// 多画面预览窗口分割数信息, 可以为1, 4, 6, 8, 9, 16, 25, 36...
+                                                                        // -1表示默认[1, 4, 8, 9, 16, …模拟通道数量], 为小于模拟通道数的N的平方数, 如果模拟通道大于8, 也包含8
+}CFG_ENCODECAP;
+
 // 水印配置
 typedef struct tagCFG_WATERMARK_INFO 
 {
@@ -833,6 +1167,7 @@ typedef struct tagCFG_DSPENCODECAP_INFO{
 	BYTE				byImageSize_Assi[256][256]; //表示主码流为各分辨率时，支持的辅码流分辨率，数组下标表示主码流所支持的分辨率值。
 }CFG_DSPENCODECAP_INFO;
 
+
 //-------------------------------录象配置---------------------------------
 
 // 时间段信息
@@ -847,6 +1182,12 @@ typedef struct tagCFG_TIME_SECTION
 	int					nEndSec;
 } CFG_TIME_SECTION;
 
+// 时间表信息
+typedef struct tagCFG_TIME_SCHEDULE
+{
+	CFG_TIME_SECTION	stuTimeSection[MAX_TIME_SCHEDULE_NUM][MAX_REC_TSECT]; // 第一维前7个元素对应每周7天，第8个元素对应节假日，每天最多6个时间段
+} CFG_TIME_SCHEDULE;
+
 // 定时录像配置信息
 typedef struct tagCFG_RECORD_INFO
 {
@@ -856,6 +1197,11 @@ typedef struct tagCFG_RECORD_INFO
 	BOOL				bRedundancyEn;				// 录像冗余开关
 	int					nStreamType;				// 0－主码流，1－辅码流1，2－辅码流2，3－辅码流3
 	int					nProtocolVer;				// 协议版本号, 只读
+
+	// 能力
+	BOOL				abHolidaySchedule;          // 为true时有假日配置信息，bHolidayEn、stuHolTimeSection才有效;
+    BOOL                bHolidayEn;                 // 假日录像使能TRUE:使能,FALSE:未使能
+    CFG_TIME_SECTION    stuHolTimeSection[MAX_REC_TSECT];          // 假日录像时间表
 } CFG_RECORD_INFO;
 
 //-------------------------------报警配置---------------------------------
@@ -944,6 +1290,52 @@ typedef struct tagCFG_TOURLINK
 	int			        nChannels[MAX_VIDEO_CHANNEL_NUM];  // 轮巡通道号列表
 	int			        nChannelCount;		             // 轮巡通道数量
 } CFG_TOURLINK;
+
+// 门禁操作类型
+enum EM_CFG_ACCESSCONTROLTYPE
+{
+	EM_CFG_ACCESSCONTROLTYPE_NULL = 0,					// 不做操作
+	EM_CFG_ACCESSCONTROLTYPE_AUTO,						// 自动
+	EM_CFG_ACCESSCONTROLTYPE_OPEN,						// 开门
+	EM_CFG_ACCESSCONTROLTYPE_CLOSE,						// 关门
+	EM_CFG_ACCESSCONTROLTYPE_OPENALWAYS,				// 永远开启
+	EM_CFG_ACCESSCONTROLTYPE_CLOSEALWAYS,				// 永远关闭
+};
+
+// 门禁联动操作的组合
+
+#define MAX_ACCESSCONTROL_NUM	8						// 最大门禁操作的组合数
+
+
+// 语音呼叫发起方
+typedef enum
+{
+	EM_CALLER_DEVICE = 0,								// 设备发起
+}EM_CALLER_TYPE;
+
+// 呼叫协议
+typedef enum
+{
+	EM_CALLER_PROTOCOL_CELLULAR = 0,					// 手机方式
+}EM_CALLER_PROTOCOL_TYPE;
+
+
+// 语音呼叫联动信息
+typedef struct tagCFG_TALKBACK_INFO
+{
+	BOOL				bCallEnable;					// 语音呼叫使能
+	EM_CALLER_TYPE		emCallerType;					// 语音呼叫发起方
+	EM_CALLER_PROTOCOL_TYPE	emCallerProtocol;			// 语音呼叫协议
+}CFG_TALKBACK_INFO;
+
+// 电话报警中心联动信息
+typedef struct tagCFG_PSTN_ALARM_SERVER
+{
+	BOOL				bNeedReport;						// 是否上报至电话报警中心
+	int					nServerCount;						// 电话报警服务器个数					
+	BYTE 				byDestination[MAX_PSTN_SERVER_NUM];	// 上报的报警中心下标,详见配置CFG_PSTN_ALARM_CENTER_INFO
+}CFG_PSTN_ALARM_SERVER;
+
 // 报警联动信息
 typedef struct tagCFG_ALARM_MSG_HANDLE
 {
@@ -1043,22 +1435,34 @@ typedef struct tagCFG_ALARM_MSG_HANDLE
 	BYTE                byJpegSummary[MAX_SUMMARY_LEN];               // 叠加到JPEG图片的摘要信息
 	BOOL                bFlashEnable;                                 // 是否使能补光灯
 	int                 nFlashLatch;                                  // 补光灯延时时间(秒),延时时间范围：[10,300]
+	
+	bool				abAudioFileName;
+	bool				abAlarmBellEn;
+	bool				abAccessControlEn;
+	bool				abAccessControl;
+
+	char				szAudioFileName[MAX_PATH];					// 联动语音文件绝对路径
+	BOOL				bAlarmBellEn;								// 警号使能
+	BOOL				bAccessControlEn;							// 门禁使能
+
+	DWORD				dwAccessControl;							// 门禁组数
+	EM_CFG_ACCESSCONTROLTYPE	emAccessControlType[MAX_ACCESSCONTROL_NUM];	// 门禁联动操作信息
+	
+	bool				abTalkBack;	
+	CFG_TALKBACK_INFO	stuTalkback;								// 语音呼叫联动信息
+
+	bool				abPSTNAlarmServer;
+	CFG_PSTN_ALARM_SERVER	stuPSTNAlarmServer;						// 电话报警中心联动信息
+    CFG_TIME_SCHEDULE       stuTimeSection;                         // 事件响应时间表
+	bool				abAlarmBellLatch;
+	int					nAlarmBellLatch;							// 警号输出延时时间(10-300秒)
+
 } CFG_ALARM_MSG_HANDLE;
 
-// 传感器感应方式枚举类型
-typedef enum
-{
-	EM_SENSE_DOOR=0,         //门磁
-	EM_SENSE_PASSIVEINFRA,   //被动红外
-	EM_SENSE_GAS,            //气感
-	EM_SENSE_SMOKING,        //烟感
-	EM_SENSE_WATER,          //水感
-	EM_SENSE_ACTIVEFRA,      //主动红外
-	EM_SENSE_NUM             //枚举类型总数
-}EM_SENSE_METHOD;
+
 
 // 报警使能控制方式枚举类型
-typedef enum
+typedef enum tagEM_CTRL_ENABLE
 {
 	EM_CTRL_NORMAL=0,   //不控制使能
 	EM_CTRL_ALWAYS_EN,  //总是使能
@@ -1066,6 +1470,23 @@ typedef enum
 	EM_CTRL_ALWAYS_DIS, //移除
 	EM_CTRL_NUM         //枚举类型总数
 }EM_CTRL_ENABLE;
+
+
+// 防区类型
+typedef enum tagEM_CFG_DEFENCEAREATYPE
+{
+	EM_CFG_DefenceAreaType_Unknown = 0,     // 未知类型
+	EM_CFG_DefenceAreaType_InTime,          // 即时防区 
+	EM_CFG_DefenceAreaType_Delay,           // 延时防区
+	EM_CFG_DefenceAreaType_FullDay,         // 24小时防区
+    EM_CFG_DefenceAreaType_Fire,            // 火警防区
+    EM_CFG_DefenceAreaType_FullDaySound,    // 24小时有声防区
+    EM_CFG_DefenceAreaType_FullDaySlient,   // 24小时无声防区
+    EM_CFG_DefenceAreaType_Entrance1,       // 出入防区1
+    EM_CFG_DefenceAreaType_Entrance2,       // 出入防区2
+    EM_CFG_DefenceAreaType_InSide,          // 内部防区
+    EM_CFG_DefenceAreaType_OutSide,         // 外部防区
+}EM_CFG_DEFENCEAREATYPE;
 
 // 外部报警配置
 typedef struct tagCFG_ALARMIN_INFO
@@ -1078,12 +1499,19 @@ typedef struct tagCFG_ALARMIN_INFO
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT];// 事件响应时间段
 	BOOL				abDevID;									// 
 	char				szDevID[MAX_NAME_LEN];						// 设备ID
-	int                 nPole;                                      //传感器触发模式, 0:高有效，1低有效；
-	                                                                //具体表现为传感器接地or电源，与nAlarmType组合使用
-	EM_SENSE_METHOD     emSense;                                    //传感器感应方式
-	EM_CTRL_ENABLE      emCtrl;                                     //报警使能控制方式
-	int                 nDisDelay;                                  //延时撤防时间,单位为秒,0~300，
+	int                 nPole;                                      // 传感器触发模式, 0:高有效，1低有效；
+	                                                                // 具体表现为传感器接地or电源，与nAlarmType组合使用
+	EM_SENSE_METHOD     emSense;                                    // 传感器感应方式
+	EM_CTRL_ENABLE      emCtrl;                                     // 报警使能控制方式
+	int                 nDisDelay;                                  // 延时撤防时间,防区类型为"Delay"(延时防区)时才有效, 单位: 秒, 最大时间通过查询能力获得
 	                                                                //emCtrl值为EM_CTRL_NORMAL或EM_CTRL_ALWAYS_EN 时有效。
+
+	EM_CFG_DEFENCEAREATYPE emDefenceAreaType;						// 防区类型, 具体支持的类型通过查询能力获得
+	int					nEnableDelay;								// 延时布防时间, 防区类型为"Delay"(延时防区)时才有效, 单位: 秒, 最大时间通过查询能力获得    
+    int                 nSlot;                                      // 根地址, -1表示无效, 0表示本地通道, 1表示连接在第一个串口上的扩展通道, 2、3...以此类推
+    int                 nLevel1;                                    // 第一级级联地址, 表示连接在第nSlot串口上的第nLevel1个探测器或仪表, -1表示无效, 从0开始
+    bool                abLevel2;                                   // 表示nLevel2字段是否存在
+    int                 nLevel2;                                    // 第二级级联地址, 表示连接在第nLevel1个的仪表上的探测器序号, -1表示无效, 从0开始
 } CFG_ALARMIN_INFO;
 
 // 网络输入报警配置
@@ -1106,15 +1534,26 @@ typedef struct tagCFG_MOTION_WINDOW
 	CFG_RECT             stuWindow;            // 动检窗口区域, 坐标位置取值[0, 8192)
 }CFG_MOTION_WINDOW;
 
+typedef struct tagCFG_DETECT_REGION
+{
+    int				     nRegionID;									    // 区域ID
+    char                 szRegionName[CFG_COMMON_STRING_64];            // 动态窗口名称
+    int                  nThreshold;                                    // 面积阀值，取值[0, 100]
+	int					 nSenseLevel;								    // 灵敏度1～6
+	int					 nMotionRow;									// 动态检测区域的行数
+	int					 nMotionCol;									// 动态检测区域的列数
+	BYTE				 byRegion[MAX_MOTION_ROW][MAX_MOTION_COL];	    // 检测区域，最多32*32块区域 
+}CFG_DETECT_REGION;
+
 // 动态检测报警配置
 typedef struct tagCFG_MOTION_INFO 
 {
 	int					 nChannelID;									// 报警通道号(0开始), nVersion=1时，此字段无效
 	BOOL				 bEnable;									    // 使能开关
 	int					 nSenseLevel;								    // 灵敏度1～6
-	int					 nMotionRow;									// 动态检测区域的行数
-	int					 nMotionCol;									// 动态检测区域的列数
-	BYTE				 byRegion[MAX_MOTION_ROW][MAX_MOTION_COL];	    // 检测区域，最多32*32块区域
+	int					 nMotionRow;									// 一代动态检测区域的行数
+	int					 nMotionCol;									// 一代动态检测区域的列数
+	BYTE				 byRegion[MAX_MOTION_ROW][MAX_MOTION_COL];	    // 一代检测区域，最多32*32块区域
 	CFG_ALARM_MSG_HANDLE stuEventHandler;							    // 报警联动
 	CFG_TIME_SECTION	 stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT];   // 事件响应时间段
 	int			         nVersion;                                      // 0, 1, 由能力集确定, 只读, 等于1时以下字段有效
@@ -1123,9 +1562,13 @@ typedef struct tagCFG_MOTION_INFO
 	int                  nVolumeRatio;                                  // 面积占用比,1-100
 	BOOL                 bSRatioEn;                                     // 只读，灵敏度使能，决定nSubRatio值是否有效
 	int                  nSubRatio;                                     // 动检的残差阈值, 1-100
-	BOOL                 abWindow;                                      // 只读，0: nMotionRow, nMotionCol和byRegion字段有效, 1: 下面视频窗口字段 
+	BOOL                 abWindow;                                      // 此字段及以下两个字段已废弃
 	int                  nWindowCount;                                  // 视频窗口个数
 	CFG_MOTION_WINDOW    stuWindows[MAX_MOTION_WINDOW];                 // 视频窗口数组
+	BOOL                 abDetectRegion;                                // 只读，1：nRegionCount，stuRegion有效
+                                                                        //       0：nMotionRow，nMotionCol，byRegion有效
+	int                  nRegionCount;                                  // 三代动态检测区域个数
+	CFG_DETECT_REGION    stuRegion[MAX_MOTION_WINDOW];                  // 三代动态检测区域
 } CFG_MOTION_INFO;
 
 // 视频丢失报警配置
@@ -1184,10 +1627,26 @@ typedef struct tagCFG_IPCONFLICT_INFO
 } CFG_IPCONFLICT_INFO;
 
 // CLIENT_QueryNewSystemInfo 接口的命令 CFG_CAP_ALARM (获取报警能力集)对应结构体
+
+// 传感器报警方式
+typedef struct tagCFG_ALARM_SENSE_METHOD
+{
+	int                 nSupportSenseMethodNum;								// 支持的传感器方式数
+	EM_SENSE_METHOD     emSupportSenseMethod[MAX_ALARM_SENSE_METHOD_NUM];   // 支持的传感器方式
+}CFG_ALARM_SENSE_METHOD;
+
 typedef struct tagCFG_CAP_ALARM_INFO
 {
-	BOOL                bAlarmPir;                      // 设备是否支持PIR(人体热式感应器)报警,外部报警的一种
-	BOOL                bFlashLight;                    // 设备是否支持补光灯
+	BOOL                 bAlarmPir;									// 设备是否支持PIR(人体热式感应器)报警,外部报警的一种
+	BOOL                 bFlashLight;								// 设备是否支持补光灯
+	int					 nDefenceAreaTypeNum;						// 防区类型种类数,为0表示无此字段时报警输入不作为防区使用。
+	EM_CFG_DEFENCEAREATYPE	emDefenceAreaType[MAX_ALARM_DEFENCE_TYPE_NUM];			// 支持防区类型 
+	int				 	 nMaxDelay;									// 延时防区的最大延时时间,单位为秒，只有支持延时防区时此字段才有效。
+	int					 nAlarmChannelNum;							// 报警通道数,为了保持兼容性,此为0时表示每个通道支持所有类型的传感器
+	CFG_ALARM_SENSE_METHOD stuAlarmChannel[MAX_ALARM_CHANNEL_NUM];	// 报警通道集合
+	int					 nAlarmBellCount;							// 警号个数
+	int					 nMaxBackupAlarmServer;						// 最大备用报警中心数,无此字段时默认为0,0表示不支持备用报警中心
+	int					 nMaxPSTNAlarmServer;						// 最大电话报警中心数, 无此字段时默认为0,0表示不支持电话报警中心。
 }CFG_CAP_ALARM_INFO;
 
 // 补光灯配置
@@ -1205,11 +1664,22 @@ typedef struct tagCFG_CUSTOMCASE
 	BOOL                bCaseNoOsdEn;                        // 案件编号叠加使能
 }CFG_CUSTOMCASE;
 
+// 时间
+typedef struct tagCFG_NET_TIME
+{
+    int                 nStructSize;
+    DWORD				dwYear;					// 年
+    DWORD				dwMonth;				// 月
+    DWORD				dwDay;					// 日
+    DWORD				dwHour;					// 时
+    DWORD				dwMinute;				// 分
+    DWORD				dwSecond;				// 秒
+} CFG_NET_TIME;
+
 // 司法刻录配置
 typedef struct tagCFG_JUDICATURE_INFO
 {
-	char                szDiskPassword[MAX_PASSWORD_LEN];// 光盘密码，播发时需输入正确密码才能播放
-
+	char                szDiskPassword[MAX_PASSWORD_LEN];  // 光盘密码(废弃, 使用szPassword和nPasswordLen)
 	char                szCaseNo[MAX_OSD_SUMMARY_LEN];     // 案件编号
 	BOOL                bCaseNoOsdEn;                      // 案件编号叠加使能
 	char                szCaseTitle[MAX_OSD_SUMMARY_LEN];  // 案件名称
@@ -1229,6 +1699,10 @@ typedef struct tagCFG_JUDICATURE_INFO
 
 	BOOL                bDataCheckOsdEn;                   // 光盘刻录数据校验配置 叠加使能
 	BOOL                bAttachFileEn;                     // 附件上传使能
+    char                szPassword[MAX_PASSWORD_LEN];      // 密码, 刻录光盘时、配置读保护密码
+    int                 nPasswordLen;                      // 密码长度
+    CFG_NET_TIME        stuStartTime;                      // 片头信息叠加开始时间
+    int                 nPeriod;                           // 片头信息叠加时间长度，单位：分钟
 }CFG_JUDICATURE_INFO;
 
 // 刻录满事件配置
@@ -1304,12 +1778,15 @@ typedef struct tagCFG_COMM_PROP
 	BYTE				byBaudRate;					// 波特率；0：300，1：600，2：1200，3：2400，4：4800，													
 	                                                // 5：9600，6：19200，7：38400，8：57600，9：115200
 } CFG_COMM_PROP;
+
 // 归位预置点配置
 typedef struct tagCFG_PRESET_HOMING
 {
-	int          nPtzPresetId;   //云台预置点编号	0~65535, -1表示无效
+	int          nPtzPresetId;   //云台预置点编号	0~65535
+ //-1表示无效
 	int          nFreeSec;       //空闲的时间，单位为秒
 }CFG_PRESET_HOMING;
+
 // 云台配置
 typedef struct tagCFG_PTZ_INFO
 {
@@ -1329,7 +1806,55 @@ typedef struct tagCFG_PTZ_INFO
 	int					nCamID;									// 摄像头ID
 	int                 nPort;                                  // 使用的串口端口号
 	CFG_PRESET_HOMING   stuPresetHoming;                        // 一段时间不操作云台，自动归位到某个预置点
+	int                 nControlMode;                           // 控制模式, 0:"RS485"串口控制(默认);1:"Coaxial" 同轴口控制
 } CFG_PTZ_INFO;  
+
+//定时功能类型
+typedef enum tagCFG_PTZ_FUNC_TYPE
+{
+	FUNC_TYPE_TOUR = 0 ,		//巡航
+	FUNC_TYPE_PATTERN  ,		//自动巡迹
+	FUNC_TYPE_PRE	   ,		//预置点
+	FUNC_TYPE_SCAN	   ,		//自动线扫
+	FUNC_TYPE_MAX	   ,		
+}CFG_PTZ_FUNC_TYPE;
+
+
+//自动归位
+typedef struct tagCFG_AUTO_HOMING
+{
+	BOOL	bEnable;		// 自动归位开关
+	int		nTime;			// 空闲时间,表示空闲的时间，单位为秒
+}CFG_AUTO_HOMING;
+
+//定时动作配置
+typedef struct tagCFG_PTZ_PER_AUTOMOVE_INFO
+{
+	BOOL				bEnable;				//	定时动作开关标志 TRUE 开，FALSE 关
+	CFG_TIME_SCHEDULE	stTimeSchedule;			//  时间表类型
+	CFG_PTZ_FUNC_TYPE	emFuncType;				//  定时功能
+	int					nTourId;				// 	巡航编号,		范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wTourMin和wTourMax
+	int					nPatternId;				// 	自动巡迹编号,	范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wPatternMin和wPatternMax
+	int					nPresetId;				//  预置点编号,		范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wPresetMin和wPresetMax
+	int					nScanId;				//	自动线扫编号,	范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wAutoScanMin和wAutoScanMax
+	CFG_AUTO_HOMING		stAutoHoming;			//  自动归位,一段时间不操作云台，自动归位到该时间段内的动作
+	BOOL				bSnapshotEnable;		//	预置点快照使能,只有当emFuncType为FUNC_TYPE_PRE时才有效
+	int					nSnapshortDelayTime;	//	预置点抓拍延时时间,单位秒,只有当emFuncType为FUNC_TYPE_PRE时才有效
+}CFG_PTZ_PER_AUTOMOVE_INFO;
+
+typedef struct tagCFG_PTZ_ALL_AUTOMOVE_INFO
+{
+	CFG_PTZ_PER_AUTOMOVE_INFO stPTZPerInfo[MAX_CONFIG_NUM];		//配置信息
+	int						  nCfgNum;							//获取到的配置个数
+}CFG_PTZ_ALL_AUTOMOVE_INFO;
+
+//云台定时动作配置，注意，此结构针对设备
+typedef struct tagCFG_PTZ_AUTOMOVE_INFO
+{
+	CFG_PTZ_ALL_AUTOMOVE_INFO *pstPTZAutoConfig;				//云台的配置信息
+	int						   nMaxPTZNum;						//结构体申请的云台个数(对于多通道查询，申请不小于设备通数，对于单通道查询，一个就够了)
+	int						   nReturnPTZNum;					//设备返回的云台个数(一般为设备通道数)
+}CFG_PTZ_AUTOMOVE_INFO;
 
 //----------------------------------视频分析设备配置------------------------------------------
 // 场景支持的规则
@@ -1399,6 +1924,9 @@ typedef struct tagCFG_CAP_SCENE
 	bool              bPixel;                                                    // 是否支持像素计量方式
 	bool              bMetric;                                                   // 是否支持实际长度计量方式
 	bool              bCalibratedPixel;                                          // 是否支持远端近端标定后的像素计量方式
+
+	char              szSubType[MAX_SCENE_SUBTYPE_NUM][MAX_SCENE_SUBTYPE_LEN];  // 当前场景下支持的子场景类型
+	int               nSubTypeNum;                                              // 子场景类型个数
 }CFG_CAP_SCENE;
 
 // 场景列表
@@ -1448,6 +1976,7 @@ typedef struct tagCFG_CAP_ANALYSE_INFO
 	int                 nSpecialDetectPropertyNum;                              // 支持的特殊检测区属性个数
 	int			        nSupportedSpecialDetectPropertys[EM_SEPCIALREGION_PROPERTY_TYPE_NUM]; // 支持的特殊检测区属性
 	DWORD				nSupportedVideoChannelType;								// 支持的视频通道类型选择   第0位为1表示支持数字类型,第1位为1表示支持模拟类型,第2为1表示支持混合(数字和模拟)				
+	bool				bSupportMultiSceneSwitch;								// 是否支持多场景切换
 	CFG_VACAP_SUPPORTEDSCENES  stSupportScenes;                                 // 支持的场景能力集
 } CFG_CAP_ANALYSE_INFO;
 
@@ -1457,7 +1986,6 @@ typedef struct tagCFG_CALIBRATEBOX_INFO
 	CFG_POLYGON         stuCenterPoint;                       // 校准框中心点坐标(点的坐标归一化到[0,8191]区间)
 	float               fRatio;                               // 相对基准校准框的比率(比如1表示基准框大小，0.5表示基准框大小的一半)
 }CFG_CALIBRATEBOX_INFO;
-
 
 // 标定区域,普通场景使用
 typedef struct tagCFG_CALIBRATEAREA_INFO
@@ -1499,8 +2027,143 @@ typedef struct tagCFG_FACEDETECTION_SCENCE_INFO
 	EM_FACEDETECTION_TYPE	emDetectType;						// 人脸检测类型
 }CFG_FACEDETECTION_SCENCE_INFO;
 
+// 交通场景
+typedef struct tagCFG_TRAFFIC_SCENE_INFO 
+{
+	BOOL                abCompatibleMode;	
+	int                 nCompatibleMode;                        // 0:"OldTrafficRule" : 交通老规则兼容模式;1:"NewTrafficRule" :  交通新规则兼容模式;-1:字符串错误
+	float				fCameraHeight;							// 摄像头离地高度	单位：米
+	float				fCameraDistance;						// 摄像头离地面检测区域中心的水平距离	单位：米
+	char                szSubType[MAX_NAME_LEN];                // 交通场景的子类型,"Gate" 卡口类型,"Junction" 路口类型 
+																// "Tunnel"隧道类型 , "ParkingSpace"车位检测类型
+																// "Bridge"桥梁类型
+																// "Freeway"高速公路类型                 
+	CFG_POLYGON         stuNearDetectPoint;                     // 近景检测点
+	CFG_POLYGON         stuFarDectectPoint;                     // 远景检测点
+	int                 nNearDistance;                          // NearDetectPoint,转换到实际场景中时,离摄像头垂直线的水平距离
+	int                 nFarDistance;                           // FarDectectPoint,转换到实际场景中时,离摄像头垂直线的水平距离
+	int                 nPlateHintNum;                          // 车牌字符暗示个数
+	char                szPlateHints[MAX_PLATEHINT_NUM][MAX_NAME_LEN]; // 车牌字符暗示数组，在拍摄图片质量较差车牌识别不确定时，根据此数组中的字符进行匹配，数组下标越小，匹配优先级越高
+	int                 nLaneNum;                               // 车道数
+	CFG_LANE            stuLanes[MAX_LANE_NUM];                 // 车道信息
+} CFG_TRAFFIC_SCENE_INFO;
 
+// 普遍场景
+typedef struct tagCFG_NORMAL_SCENE_INFO
+{
+	float				fCameraHeight;							// 摄像头离地高度	单位：米
+	float				fCameraAngle;							// 摄像头与垂方向的夹角	单位度，0~90，
+	float				fCameraDistance;						// 摄像头离地面检测区域中心的水平距离	单位：米
+	CFG_POLYGON			stuLandLineStart;						// 地平线线段起始点(点的坐标坐标归一化到[0,8192)区间。)
+	CFG_POLYGON			stuLandLineEnd;							// 地平线线段终止点(点的坐标坐标归一化到[0,8192)区间。)
+} CFG_NORMAL_SCENE_INFO;
 
+// 交通巡视场景
+typedef struct tagCFG_TRAFFIC_TOUR_SCENE_INFO 
+{
+	int                 nPlateHintNum;                          // 车牌字符暗示个数
+	char                szPlateHints[MAX_PLATEHINT_NUM][MAX_NAME_LEN]; // 车牌字符暗示数组，在拍摄图片质量较差车牌识别不确定时，根据此数组中的字符进行匹配，数组下标越小，匹配优先级越高
+} CFG_TRAFFIC_TOUR_SCENE_INFO;
+
+// 视频分析全局配置场景
+typedef struct tagCFG_ANALYSEGLOBAL_SCENE
+{
+	char				szSceneType[MAX_NAME_LEN];				// 应用场景,详见"支持的场景列表"
+
+	// 以下为场景具体信息, 根据szSceneType决定哪个场景有效
+	union
+	{
+		CFG_FACEDETECTION_SCENCE_INFO	stuFaceDetectionScene;	// 人脸检测场景/人脸识别检查
+		CFG_TRAFFIC_SCENE_INFO			stuTrafficScene;		// 交通场景
+		CFG_NORMAL_SCENE_INFO			stuNormalScene;			// 普通场景/远景场景/中景场景/近景场景/室内场景/人数统计场景
+		CFG_TRAFFIC_TOUR_SCENE_INFO		stuTrafficTourScene;	// 交通巡视场景
+	};
+} CFG_ANALYSEGLOBAL_SCENE;
+
+typedef struct tagCFG_TIME
+{
+	DWORD				dwHour;					// 时
+	DWORD				dwMinute;				// 分
+	DWORD				dwSecond;				// 秒
+}CFG_TIME;
+
+typedef struct tagCFG_TIME_PERIOD
+{
+	CFG_TIME	stuStartTime;				
+	CFG_TIME	stuEndTime;			
+}CFG_TIME_PERIOD;
+
+// 多场景标定区域配置基本单元
+typedef struct tagCFG_CALIBRATEAREA_SCENE_UNIT
+{
+	unsigned int           nCalibrateAreaNum;                                // 此场景内标定区域数
+	CFG_CALIBRATEAREA_INFO stuCalibrateArea[MAX_CALIBRATEBOX_NUM];           // 标定区域(若该字段不存在，则以整幅场景为标定区域)
+}
+CFG_CALIBRATEAREA_SCENE_UNIT;
+
+// 多场景标定区域配置
+typedef struct tagCFG_CALIBRATEAREA_SCENE_INFO
+{
+	DWORD                        dwMaxSceneCalibrateAreaNum;                 // 多场景标定区域最大个数(需要申请此大小内存)
+	DWORD                        dwRetSceneCalibrateAreaNum;                 // 实际包含多场景标定区域个数
+	CFG_CALIBRATEAREA_SCENE_UNIT *pstuCalibrateArea;                         // 多场景标定区域单元
+}
+CFG_CALIBRATEAREA_SCENE_INFO;
+
+// 云台控制坐标单元
+typedef struct tagCFG_PTZ_SPACE_UNIT
+{
+	int                    nPositionX;           //云台水平运动位置，有效范围：[0,3600]
+	int                    nPositionY;           //云台垂直运动位置，有效范围：[-1800,1800]
+	int                    nZoom;                //云台光圈变动位置，有效范围：[0,128]
+}CFG_PTZ_SPACE_UNIT;
+
+// 标定区域配置
+typedef struct tagCFG_CALIBRATEAREA_UNIT
+{
+	int                          nSceneID;                                 // 场景编号
+	int                          nPtzPresetID;                             // 预置点编号
+	BOOL                         abCalibrateArea;                          // 标定区域是否存在
+	CFG_CALIBRATEAREA_SCENE_UNIT stuCalibrateArea;                         // 标定区域
+	CFG_PTZ_SPACE_UNIT           stuPtzPosition;                           // 标定的云台位置
+}
+CFG_VIDEO_ANALYSE_CALIBRATEAREA_UNIT;
+
+// 标定区域配置
+typedef struct tagCFG_VIDEO_ANALYSE_CALIBRATEAREA
+{
+
+	DWORD                                dwMaxSceneCalibrateNum;           // 多场景标定区域最大个数(需要申请此大小内存)
+	DWORD                                dwRetSceneCalibrateNum;           // 实际包含多场景标定区域个数
+	CFG_VIDEO_ANALYSE_CALIBRATEAREA_UNIT *pstuCalibrateAreaUnit;           // 标定区域
+}
+CFG_VIDEO_ANALYSE_CALIBRATEAREA;
+
+// 昼夜算法切换模式
+typedef enum tagCFG_TIMEPERIOD_SWITCH_MODE
+{
+	CFG_TIMEPERIOD_SWITCH_MODE_UNKNOWN,                                     // 未知
+	CFG_TIMEPERIOD_SWITCH_MODE_BYCOLOR,                                    // 通过色彩切换                     
+	CFG_TIMEPERIOD_SWITCH_MODE_BYBRIGHTNESS,                               // 通过亮度切换
+}CFG_TIMEPERIOD_SWITCH_MODE;
+
+// 多场景标定白天和黑夜配置基本单元
+typedef struct tagCFG_TIME_PERIOD_SCENE_UNIT
+{
+	CFG_TIME_PERIOD        stuDayTimePeriod;								 // 标定白天的时间段.(8,20),表示从8点到晚上20点为白天
+	CFG_TIME_PERIOD        stuNightTimePeriod;								 // 标定黑夜的时间段.(20,7)，表示从晚8点到凌晨7点为黑夜
+	CFG_TIMEPERIOD_SWITCH_MODE emSwitchMode;                                  // 昼夜算法切换模式，详见CFG_TIMEPERIOD_SWITCH_MODE
+}
+CFG_TIME_PERIOD_SCENE_UNIT;
+
+// 多场景标定白天和黑夜配置
+typedef struct tagCFG_TIME_PERIOD_SCENE_INFO
+{
+	DWORD                        dwMaxTimePeriodSceneNum;                    // 多场景标定白天和黑夜配置最大个数(需要申请此大小内存)
+	DWORD                        dwRetTimePeriodSceneNum;                    // 实际包含多场景标定白天和黑夜配置个数
+	CFG_TIME_PERIOD_SCENE_UNIT   *pstuTimePeriodScene;                       // 多场景标白天和黑夜配置域单元
+}
+CFG_TIME_PERIOD_SCENE_INFO;
 
 // 视频分析全局配置
 typedef struct tagCFG_ANALYSEGLOBAL_INFO
@@ -1527,7 +2190,7 @@ typedef struct tagCFG_ANALYSEGLOBAL_INFO
 	int                 nStaffNum;                              // 标尺数
 	CFG_STAFF           stuStaffs[MAX_STAFF_NUM];               // 标尺
 
-	int                 nCalibrateAreaNum;                         // 标定区域数
+	unsigned int        nCalibrateAreaNum;                         // 标定区域数
 	CFG_CALIBRATEAREA_INFO stuCalibrateArea[MAX_CALIBRATEBOX_NUM]; // 标定区域(若该字段不存在，则以整幅场景为标定区域)
 
 	BOOL                bFaceRecognition;                          // 人脸识别场景是否有效
@@ -1551,8 +2214,15 @@ typedef struct tagCFG_ANALYSEGLOBAL_INFO
 
 	BOOL				bFaceDetection;							// 人脸检测场景是否有效
 	CFG_FACEDETECTION_SCENCE_INFO	stuFaceDetectionScene;		// 人脸检测场景
+	CFG_TIME_PERIOD		stuDayTimePeriod;						// 标定白天的时间段.(8,20),表示从8点到晚上20点为白天
+	CFG_TIME_PERIOD		stuNightTimePeriod;						// 标定黑夜的时间段.(20,7)，表示从晚8点到凌晨7点为黑夜
+	CFG_TIME_PERIOD_SCENE_INFO      stuTimePeriodSceneInfo;     // 多场景标定白天和黑夜时间段
+	CFG_CALIBRATEAREA_SCENE_INFO    stuCalibrateAreaSceneInfo;  // 多场景标定区域配置信息
+	CFG_TIMEPERIOD_SWITCH_MODE emSwitchMode;                    // 昼夜算法切换模式,详见CFG_TIMEPERIOD_SWITCH_MODE
+	BYTE                bReserved2[2812];                       // 保留字段 用于扩展
 
-	BYTE                bReserved2[2860];                       // 保留字段 用于扩展
+	int					nSceneNum;									// 场景数, >0时表示支持多场景, stuMultiScene有效
+	CFG_ANALYSEGLOBAL_SCENE	stuMultiScene[MAX_ANALYSE_SCENE_NUM];	// 多场景配置
 } CFG_ANALYSEGLOBAL_INFO;
 
 // 尺寸过滤器
@@ -1619,6 +2289,71 @@ typedef struct tagCFG_SPECIALDETECTREGION_INFO
 	int                nPropertyNum;                            // 特殊检测区属性个数
 	int                nPropertys[EM_SEPCIALREGION_PROPERTY_TYPE_NUM];      // 特殊检测区属性
 }CFG_SPECIALDETECT_INFO;
+
+//各类物体的子类型
+typedef enum tagCFG_CATEGORY_TYPE
+{
+    CFG_CATEGORY_TYPE_UNKNOW,                            // 未知类型
+    //车型相关子类别
+    CFG_CATEGORY_VEHICLE_TYPE_MOTOR,                     // "Motor" 机动车           
+    CFG_CATEGORY_VEHICLE_TYPE_NON_MOTOR,                 // "Non-Motor"非机动车        
+    CFG_CATEGORY_VEHICLE_TYPE_BUS,                       // "Bus"公交车        
+    CFG_CATEGORY_VEHICLE_TYPE_BICYCLE,                   // "Bicycle" 自行车        
+    CFG_CATEGORY_VEHICLE_TYPE_MOTORCYCLE,                // "Motorcycle"摩托车        
+    CFG_CATEGORY_VEHICLE_TYPE_UNLICENSEDMOTOR,           // "UnlicensedMotor": 无牌机动车
+    CFG_CATEGORY_VEHICLE_TYPE_LARGECAR,                  // "LargeCar"  大型汽车
+    CFG_CATEGORY_VEHICLE_TYPE_MICROCAR,                  // "MicroCar" 小型汽车
+    CFG_CATEGORY_VEHICLE_TYPE_EMBASSYCAR,                // "EmbassyCar" 使馆汽车
+    CFG_CATEGORY_VEHICLE_TYPE_MARGINALCAR,               // "MarginalCar" 领馆汽车
+    CFG_CATEGORY_VEHICLE_TYPE_AREAOUTCAR,                // "AreaoutCar" 境外汽车
+    CFG_CATEGORY_VEHICLE_TYPE_FOREIGNCAR,                // "ForeignCar" 外籍汽车
+    CFG_CATEGORY_VEHICLE_TYPE_DUALTRIWHEELMOTORCYCLE,    // "DualTriWheelMotorcycle"两、三轮摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_LIGHTMOTORCYCLE,           // "LightMotorcycle" 轻便摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_EMBASSYMOTORCYCLE,         // "EmbassyMotorcycle "使馆摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_MARGINALMOTORCYCLE,        // "MarginalMotorcycle "领馆摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_AREAOUTMOTORCYCLE,         // "AreaoutMotorcycle "境外摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_FOREIGNMOTORCYCLE,         // "ForeignMotorcycle "外籍摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_FARMTRANSMITCAR,           // "FarmTransmitCar" 农用运输车
+    CFG_CATEGORY_VEHICLE_TYPE_TRACTOR,                   // "Tractor" 拖拉机
+    CFG_CATEGORY_VEHICLE_TYPE_TRAILER,                   // "Trailer"  挂车
+    CFG_CATEGORY_VEHICLE_TYPE_COACHCAR,                  // "CoachCar"教练汽车
+    CFG_CATEGORY_VEHICLE_TYPE_COACHMOTORCYCLE,           // "CoachMotorcycle "教练摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_TRIALCAR,                  // "TrialCar" 试验汽车
+    CFG_CATEGORY_VEHICLE_TYPE_TRIALMOTORCYCLE,           // "TrialMotorcycle "试验摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_TEMPORARYENTRYCAR,         // "TemporaryEntryCar"临时入境汽车
+    CFG_CATEGORY_VEHICLE_TYPE_TEMPORARYENTRYMOTORCYCLE,  // "TemporaryEntryMotorcycle"临时入境摩托车
+    CFG_CATEGORY_VEHICLE_TYPE_TEMPORARYSTEERCAR,         // "TemporarySteerCar"临时行驶车
+    CFG_CATEGORY_VEHICLE_TYPE_PASSENGERCAR,              // "PassengerCar" 客车
+    CFG_CATEGORY_VEHICLE_TYPE_LARGETRUCK,                // "LargeTruck" 大货车
+    CFG_CATEGORY_VEHICLE_TYPE_MIDTRUCK,                  // "MidTruck" 中货车
+    CFG_CATEGORY_VEHICLE_TYPE_SALOONCAR,                 // "SaloonCar" 轿车
+    CFG_CATEGORY_VEHICLE_TYPE_MICROBUS,                  // "Microbus"面包车
+    CFG_CATEGORY_VEHICLE_TYPE_MICROTRUCK,                // "MicroTruck"小货车
+    CFG_CATEGORY_VEHICLE_TYPE_TRICYCLE,                  // "Tricycle"三轮车
+    CFG_CATEGORY_VEHICLE_TYPE_PASSERBY,                  // "Passerby" 行人
+
+    //车牌相关子类别
+    CFG_CATEGORY_PLATE_TYPE_NORMAL,                      // "Normal" 蓝牌黑字
+    CFG_CATEGORY_PLATE_TYPE_YELLOW,                      // "Yellow" 黄牌
+    CFG_CATEGORY_PLATE_TYPE_DOUBLEYELLOW,                // "DoubleYellow" 双层黄尾牌
+    CFG_CATEGORY_PLATE_TYPE_POLICE,                      // "Police" 警牌
+    CFG_CATEGORY_PLATE_TYPE_ARMED,                       // "Armed" 武警牌
+    CFG_CATEGORY_PLATE_TYPE_MILITARY,                    // "Military" 部队号牌
+    CFG_CATEGORY_PLATE_TYPE_DOUBLEMILITARY,              // "DoubleMilitary" 部队双层
+    CFG_CATEGORY_PLATE_TYPE_SAR,                         // "SAR" 港澳特区号牌    
+    CFG_CATEGORY_PLATE_TYPE_TRAINNING,                   // "Trainning" 教练车号牌
+    CFG_CATEGORY_PLATE_TYPE_PERSONAL,                    // "Personal" 个性号牌
+    CFG_CATEGORY_PLATE_TYPE_AGRI,                        // "Agri" 农用牌
+    CFG_CATEGORY_PLATE_TYPE_EMBASSY,                     // "Embassy" 使馆号牌
+    CFG_CATEGORY_PLATE_TYPE_MOTO,                        // "Moto" 摩托车号牌
+    CFG_CATEGORY_PLATE_TYPE_TRACTOR,                     // "Tractor" 拖拉机号牌
+    CFG_CATEGORY_PLATE_TYPE_OFFICIALCAR,                 // "OfficialCar " 公务车
+    CFG_CATEGORY_PLATE_TYPE_PERSONALCAR,                 // "PersonalCar" 私家车
+    CFG_CATEGORY_PLATE_TYPE_WARCAR,                      // "WarCar"  军用
+    CFG_CATEGORY_PLATE_TYPE_OTHER,                       // "Other" 其他号牌
+    CFG_CATEGORY_PLATE_TYPE_CIVILAVIATION,               // "Civilaviation" 民航号牌
+    CFG_CATEGORY_PLATE_TYPE_BLACK,                       // "Black" 黑牌
+}CFG_CATEGORY_TYPE;
 
 // 不同区域各种类型物体的检测模块配置
 typedef struct tagCFG_MODULE_INFO
@@ -1708,6 +2443,11 @@ typedef struct tagCFG_MODULE_INFO
 	
 	BOOL                abPlateAnalyseMode;                      // nPlateAnalyseMode是否有效
 	int                 nPlateAnalyseMode;                       // 车牌识别模式，0-只识别车头牌照 1-只识别车尾牌照 2-车头牌照优先（场景中大部分车均是车头牌照）3-车尾牌照优先（场景中大部分车均是车尾牌照）
+
+    //szAttributes属性存在"Category"时生效
+    unsigned int        nCategoryNum;                            // 需要识别物体的子类型总数
+    CFG_CATEGORY_TYPE   emCategoryType[MAX_CATEGORY_TYPE_NUMBER]; // 子类型信息
+
 } CFG_MODULE_INFO;
 
 typedef struct tagCFG_ANALYSEMODULES_INFO
@@ -2077,7 +2817,7 @@ typedef struct tagCFG_FIRE_INFO
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-
+	int					nSensitivity;											// 灵敏度 1~10
 } CFG_FIRE_INFO;
 
 // 事件类型EVENT_IVS_ELECTROSPARKDETECTION(电火花事件)对应的规则配置
@@ -2113,7 +2853,7 @@ typedef struct tagCFG_SMOKE_INFO
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-
+	int					nSensitivity;											// 灵敏度 1~10
 } CFG_SMOKE_INFO;
 
 // 事件类型EVENT_IVS_FLOWSTAT(流量统计事件)对应的规则配置
@@ -2224,7 +2964,9 @@ typedef struct tagCFG_VIDEOABNORMALDETECTION_INFO
 	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
 	int                 nPtzPresetId;											// 云台预置点编号	0~65535
 	int                 nDetectType;                                            // 检测类型数
-	BYTE                bDetectType[8];                                         // 检测类型,0-视频丢失, 1-视频遮挡, 2-画面冻结, 3-过亮, 4-过暗, 5-场景变化
+	BYTE                bDetectType[MAX_ABNORMAL_DETECT_TYPE];                  // 检测类型,0-视频丢失, 1-视频遮挡, 2-画面冻结, 3-过亮, 4-过暗, 5-场景变化
+                                                                                // 6-条纹检测 , 7-噪声检测 , 8-偏色检测 , 9-视频模糊检测 , 10-对比度异常检测
+                                                                                // 11-视频运动 , 12-视频闪烁 , 13-视频颜色 , 14-虚焦检测 , 15-过曝检测
 	int					nMinDuration;											// 最短持续时间	单位：秒，0~65535
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
@@ -2398,6 +3140,7 @@ typedef struct tagCFG_FACEDETECT_INFO
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	int                 nPtzPresetId;											// 云台预置点编号	0~65535
+	int                 nMinDuration;                                           // 最短触发时间,单位：秒 
 }CFG_FACEDETECT_INFO;
 
 //事件类型EVENT_IVS_TRAFFIC_NOPASSING(交通违章-禁止通行事件)对应的数据块描述信息
@@ -2496,45 +3239,64 @@ typedef struct tagCFG_TRAFFIC_RUNREDLIGHT_INFO
 // 事件类型 EVENT_IVS_TRAFFIC_WRONGROUTE (交通违章-不按车道行驶事件)对应的规则配置
 typedef struct tagCFG_TRAFFIC_WRONGROUTE_INFO
 {
-	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
 	
 }CFG_TRAFFIC_WRONGROUTE_INFO;
 
 // 事件类型 EVENT_IVS_TRAFFIC_CROSSLANE (交通违章-违章变道)对应的规则配置
 typedef struct tagCFG_TRAFFIC_CROSSLANE_INFO
 {
-	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
 	
 }CFG_TRAFFIC_CROSSLANE_INFO;
 
 // 事件类型 EVENT_IVS_TRAFFIC_OVERLINE (交通违章-压车道线)对应的规则配置
 typedef struct tagCFG_TRAFFIC_OVERLINE_INFO
 {
-	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
+
 	
 }CFG_TRAFFIC_OVERLINE_INFO;
 
@@ -2574,36 +3336,49 @@ typedef struct tagCFG_TRAFFIC_RETROGRADE_INFO
 	CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 检测区域
 	int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
 	CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
+	int					nMinDuration;											// 最短触发时间	单位：秒
 }CFG_TRAFFIC_RETROGRADE_INFO;
 
 // 事件类型 EVENT_IVS_TRAFFIC_TURNLEFT (交通违章-违章左转事件)对应的规则配置
 typedef struct tagCFG_TRAFFIC_TURNLEFT_INFO
 {
-	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
+
 	
 }CFG_TRAFFIC_TURNLEFT_INFO;
 
 // 事件类型 EVENT_IVS_TRAFFIC_TURNRIGHT (交通违章-违章右转)对应的规则配置
 typedef struct tagCFG_TRAFFIC_TURNRIGHT_INFO
 {
-	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
-	
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
 }CFG_TRAFFIC_TURNRIGHT_INFO;
 
 // 事件类型 EVENT_IVS_TRAFFIC_UTURN (交通违章-违章掉头)对应的规则配置
@@ -2640,6 +3415,7 @@ typedef struct tagCFG_TRAFFIC_OVERSPEED_INFO
 	int					nLane;													// 车道编号
 	int                 nSpeedUpperLimit;                                       // 速度上限
 	int                 nSpeedLowerLimit;                                       // 速度下限
+	int					nMinDuration;											// 最短触发时间	单位：秒
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	
@@ -2657,6 +3433,7 @@ typedef struct tagCFG_TRAFFIC_UNDERSPEED_INFO
 	int					nLane;													// 车道编号
 	int                 nSpeedUpperLimit;                                       // 速度上限
 	int                 nSpeedLowerLimit;                                       // 速度下限
+	int					nMinDuration;											// 最短触发时间	单位：秒
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	
@@ -2665,30 +3442,42 @@ typedef struct tagCFG_TRAFFIC_UNDERSPEED_INFO
 // 事件类型 EVENT_IVS_TRAFFIC_YELLOWPLATEINLANE (交通违章-黄牌车占道事件)对应的规则配置
 typedef struct tagCFG_TRAFFIC_YELLOWPLATEINLANE_INFO
 {
-	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
-	
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
+
 }CFG_TRAFFIC_YELLOWPLATEINLANE_INFO;
 
 // 事件类型 EVENT_IVS_TRAFFIC_VEHICLEINROUTE (交通违章-有车占道事件)对应的规则配置
 typedef struct tagCFG_TRAFFIC_VEHICLEINROUTE_INFO
 {
 	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
-	bool				bRuleEnable;											// 规则使能
-	BYTE                bReserved[3];                                           // 保留字段
-	int					nObjectTypeNum;											// 相应物体类型个数
-	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
-	int                 nPtzPresetId;											// 云台预置点编号	0~65535
-	int					nLane;													// 车道编号
-	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
-	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
 	
 }CFG_TRAFFIC_VEHICLEINROUTE_INFO;
 
@@ -2770,6 +3559,14 @@ enum CFG_EM_LEAVEDETECTION_MODE{
 	CFG_EM_LEAVEDETECTION_MODE_SENTRY,    // 岗哨模式
 	CFG_EM_LEAVEDETECTION_MODE_ERR=255
 };
+
+typedef enum EM_CFG_LEAVEDETECTION_TRIGGERMODE{
+    CFG_LEAVEDETECTION_TRIGGERMODE_UNKNOWN,
+    CFG_LEAVEDETECTION_TRIGGERMODE_NOPERSON,
+    CFG_LEAVEDETECTION_TRIGGERMODE_LEAVE,
+    CFG_LEAVEDETECTION_TRIGGERMODE_STATIC,
+}CFG_LEAVEDETECTION_TRIGGERMODE;
+
 typedef struct tagCFG_IVS_LEAVEDETECTION_INFO
 {
 	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
@@ -2789,6 +3586,8 @@ typedef struct tagCFG_IVS_LEAVEDETECTION_INFO
 
 	int					nDetectRegionPoint;										// 检测区顶点数
 	CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 检测区
+    int                 nTriggerModeCount;										// 触发模式数组有效个数
+    CFG_LEAVEDETECTION_TRIGGERMODE  emTriggerMode[MAX_TRIGGER_MODE_NUMBER];                              // 触发模式数组
 }CFG_IVS_LEAVEDETECTION_INFO;
 
 //事件类型	EVENT_IVS_TRAFFIC_PARKINGONYELLOWBOX(黄网格线抓拍事件)对应的规则配置
@@ -2822,7 +3621,7 @@ typedef struct tagCFG_TRAFFIC_PARKINGSPACEPARKING_INFO
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	
-	int					nLane;													// 车道号
+	int					nLane;													// 车位号
 	int                 nDelayTime;                                             // 检测到报警发生到开始上报的时间, 单位：秒，范围1~65535
 	int					nDetectRegionPoint;										// 检测区域顶点数
 	CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 检测区域
@@ -2840,11 +3639,27 @@ typedef struct tagCFG_TRAFFIC_PARKINGSPACENOPARKING_INFO
 	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
 	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
 	
-	int					nLane;													// 车道号
+	int					nLane;													// 车位号
 	int                 nDelayTime;                                             // 检测到报警发生到开始上报的时间, 单位：秒，范围1~65535
 	int					nDetectRegionPoint;										// 检测区域顶点数
 	CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 检测区域
 }CFG_TRAFFIC_PARKINGSPACENOPARKING_INFO;
+
+//事件类型EVENT_IVS_TRAFFIC_PARKINGSPACEOVERLINE(车位压线事件)对应的规则配置
+typedef struct tagCFG_TRAFFIC_PARKINGSPACEOVERLINE_INFO
+{
+	char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+	bool				bRuleEnable;											// 规则使能
+	bool                bAllowParkingSpaceParkingSnap;                          // 是否允许车位有车上传抓拍，true-表示允许(默认不允许)
+	BYTE                byReserved[2];                                           // 保留字段
+	int					nObjectTypeNum;											// 相应物体类型个数
+	char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+	int                 nPtzPresetId;											// 云台预置点编号	0~65535
+	CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+	
+	int					nLane;													// 车位号
+}CFG_TRAFFIC_PARKINGSPACEOVERLINE_INFO;
 
 //事件类型 EVENT_IVS_TRAFFIC_PEDESTRAIN (交通行人事件)对应的规则配置
 typedef struct tagCFG_TRAFFIC_PEDESTRAIN_INFO
@@ -2882,11 +3697,164 @@ typedef struct tagCFG_TRAFFIC_THROW_INFO
     int                 nMinDuration;                                           // 最短触发时间，单位：秒
 }CFG_TRAFFIC_THROW_INFO;
 
+// 事件类型 EVENT_IVS_TRAFFIC_BACKING (违章倒车事件)对应的规则配置
+typedef struct tagCFG_TRAFFIC_BACKING_INFO
+{
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    int                 nDirectionLinPoint;                                     // 正常行驶方向顶点数
+    CFG_POLYLINE		stuDirectionLine[MAX_POLYLINE_NUM];						// 正常行驶方向，第一个点是起点，最后一个点是终点
+
+}CFG_TRAFFIC_BACKING_INFO;
+
+// 事件类型 EVENT_IVS_TRAFFIC_VEHICLEINBUSROUTE(占用公交车道事件)对应规则配置
+typedef struct tagCFG_TRAFFIC_VEHICLEINBUSROUTE_INFO
+{
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                byCarType;                                              // 抓拍车辆类型，0：非黄牌车 1：蓝牌车 2：非大客车
+    BYTE                bSensitivity;                                           // 灵敏度，取值1-10，数值越大代表灵敏度越高
+    BYTE                bReserved[2];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    int					nLane;													// 车道编号 
+    int                 nDetectRegionPoint;                                     // 检测区顶点数
+    CFG_POLYGON         stuDetectRegion[MAX_POLYGON_NUM];                       // 检测区
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+}CFG_TRAFFIC_VEHICLEINBUSROUTE_INFO;
+
+typedef enum tagCFG_SAFEBELT_SEAT
+{
+    CSS_UNKNOW ,
+    CSS_MAIN_SEAT     ,         //主驾驶座位
+    CSS_SLAVE_SEAT    ,         //副驾驶座位
+}CFG_SAFEBELT_SEAT;
+
+// 事件类型 EVENT_IVS_TRAFFIC_WITHOUT_SAFEBELT(交通未系安全带事件)对应规则配置
+typedef struct tagCFG_TRAFFIC_WITHOUT_SAFEBELT
+{
+    char                szRuleName[MAX_NAME_LEN];                               // 规则名称,不同规则不能重名
+    bool                bRuleEnable;                                            // 规则使能
+    BYTE                bReserved[3];                                           // 保留字段
+    int                 nObjectTypeNum;                                         // 相应物体类型个数
+    char                szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];      // 相应物体类型列表
+    int                 nPtzPresetId;                                           // 云台预置点编号 0~65535
+    CFG_ALARM_MSG_HANDLE stuEventHandler;                                       // 报警联动
+    CFG_TIME_SECTION    stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];         // 事件响应时间段
+
+    int                 nLane;                                                  // 车道编号
+    int                 nSeatNum;                                               // 获取的座位数
+    CFG_SAFEBELT_SEAT   emSnapSeat[MAX_SEAT_NUM];                               // 需要抓拍的驾驶座座位
+}CFG_TRAFFIC_WITHOUT_SAFEBELT;
+
+// 事件类型 EVENT_IVS_GETOUTBEDDETECTION(看守所下床事件)对应规则配置
+typedef struct tagCFG_IVS_GETOUTBEDDETECTION_INFO
+{
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bReserved[3];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+
+    int					nDetectRegionPoint;										// 检测区顶点数
+    CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 检测区,多边形类型，多边形中每个顶点的坐标归一化到[0,8192)区间
+    unsigned int        nMinDuration;                                           // 最短持续时间,单位：秒
+    unsigned int        nReportInterval;                                        // 报告时间间隔,单位：秒
+    int                 nAssisDectLinePointNum;                                 // 辅助检测线点数
+    CFG_POLYLINE        stuAssisDectLine[MAX_POLYLINE_NUM];                     // 辅助检测线
+}CFG_IVS_GETOUTBEDDETECTION_INFO;
+
+// 事件类型 EVENT_IVS_PATROLDETECTION(巡逻检测事件)对应规则配置
+typedef struct tagCFG_IVS_PATROLDETECTION_INFO
+{
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bReserved[3];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int					nDetectRegionPoint;										// 警戒区顶点数
+    CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 警戒区,多边形类型，多边形中每个顶点的坐标归一化到[0,8192)区间
+    unsigned int        nMinDuration;                                           // 最短持续时间,单位：秒
+    unsigned int        nReportInterval;                                        // 报告时间间隔,单位：秒
+    unsigned int        nPatrolTime;                                            // 巡逻时间,单位：秒
+	BOOL                bSizeFileter;                                           // 规则特定的尺寸过滤器是否有效
+	CFG_SIZEFILTER_INFO stuSizeFileter;                                         // 规则特定的尺寸过滤器
+}CFG_IVS_PATROLDETECTION_INFO;
+
+// 事件类型 EVENT_IVS_ONDUTYDETECTION(站岗检测事件)对应规则配置
+typedef struct tagCFG_IVS_ONDUTYDETECTION_INFO
+{
+    char				szRuleName[MAX_NAME_LEN];								// 规则名称,不同规则不能重名
+    bool				bRuleEnable;											// 规则使能
+    BYTE                bReserved[3];                                           // 保留字段
+    int					nObjectTypeNum;											// 相应物体类型个数
+    char				szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];		// 相应物体类型列表
+    int                 nPtzPresetId;											// 云台预置点编号	0~65535
+    CFG_ALARM_MSG_HANDLE stuEventHandler;										// 报警联动
+    CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];			// 事件响应时间段
+    
+    int					nDetectRegionPoint;										// 警戒区顶点数
+    CFG_POLYGON			stuDetectRegion[MAX_POLYGON_NUM];						// 警戒区,多边形类型，多边形中每个顶点的坐标归一化到[0,8192)区间
+    unsigned int        nMinDuration;                                           // 最短持续时间,单位：秒
+    unsigned int        nReportInterval;                                        // 报告时间间隔,单位：秒
+    int                 nTemplateRegionPointPairNum;                            // 模板区域信息点对个数
+    CFG_POLYGON         stuTemplateRegion[MAX_TEMPLATEREGION_NUM][POINT_PAIR_NUM];  // 模板区域信息,个数对应于模板图片个数
+}CFG_IVS_ONDUTYDETECTION_INFO;
+
+// 事件类型 EVENT_IVS_TRAFFIC_DRIVER_SMOKING(驾驶员抽烟事件)对应规则配置
+typedef struct tagCFG_TRAFFIC_DRIVER_SMOKING
+{
+    char                szRuleName[MAX_NAME_LEN];                               // 规则名称,不同规则不能重名
+    bool                bRuleEnable;                                            // 规则使能
+    BYTE                bReserved[3];                                           // 保留字段
+    int                 nObjectTypeNum;                                         // 相应物体类型个数
+    char                szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];      // 相应物体类型列表
+    int                 nPtzPresetId;                                           // 云台预置点编号 0~65535
+    CFG_ALARM_MSG_HANDLE stuEventHandler;                                       // 报警联动
+    CFG_TIME_SECTION    stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];         // 事件响应时间段
+    
+    int                 nLane;                                                  // 车道编号
+}CFG_TRAFFIC_DRIVER_SMOKING;
+
+// 事件类型 EVNET_IVS_TRAFFIC_DRIVER_CALLING(驾驶员打电话事件)对应规则配置
+typedef struct tagCFG_TRAFFIC_DRIVER_CALLING
+{
+    char                szRuleName[MAX_NAME_LEN];                               // 规则名称,不同规则不能重名
+    bool                bRuleEnable;                                            // 规则使能
+    BYTE                bReserved[3];                                           // 保留字段
+    int                 nObjectTypeNum;                                         // 相应物体类型个数
+    char                szObjectTypes[MAX_OBJECT_LIST_SIZE][MAX_NAME_LEN];      // 相应物体类型列表
+    int                 nPtzPresetId;                                           // 云台预置点编号 0~65535
+    CFG_ALARM_MSG_HANDLE stuEventHandler;                                       // 报警联动
+    CFG_TIME_SECTION    stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX];         // 事件响应时间段
+    
+    int                 nLane;                                                  // 车道编号
+}CFG_TRAFFIC_DRIVER_CALLING;
+
 typedef struct tagCFG_RULE_INFO
 {
 	DWORD				dwRuleType;							// 事件类型，详见dhnetsdk.h中"智能分析事件类型"
 	int					nRuleSize;							// 该事件类型规则配置结构体大小
-	
 } CFG_RULE_INFO;
 
 // 每个视频输入通道对应的所有事件规则：缓冲区pRuleBuf填充多个事件规则信息，每个事件规则信息内容为CFG_RULE_INFO+"事件类型对应的规则配置结构体"。
@@ -2898,6 +3866,28 @@ typedef struct tagCFG_ANALYSERULES_INFO
 
 } CFG_ANALYSERULES_INFO;
 
+// 视频分析资源类型
+typedef enum tagCFG_VIDEO_SOURCE_TYPE
+{
+	CFG_VIDEO_SOURCE_REALSTREAM,                            // 实时流
+	CFG_VIDEO_SOURCE_FILESTREAM,                            // 文件流
+}CFG_VIDEO_SOURCE_TYPE;
+
+// 分析源文件类型
+typedef enum tagCFG_SOURCE_FILE_TYPE
+{
+	CFG_SOURCE_FILE_UNKNOWN,                                // 未知类型
+	CFG_SOURCE_FILE_RECORD,                                 // 录像文件
+	CFG_SOURCE_FILE_PICTURE,                                    // 图片文件
+}CFG_SOURCE_FILE_TYPE;
+
+// 视频分析源文件信息
+typedef struct tagCFG_SOURCE_FILE_INFO
+{
+	char                szFilePath[MAX_PATH];               // 文件路径
+	CFG_SOURCE_FILE_TYPE emFileType;                        // 文件类型，详见CFG_SOURCE_FILE_TYPE
+}CFG_SOURCE_FILE_INFO;
+
 // 每个视频输入通道对应的视频分析资源配置信息
 typedef struct tagCFG_ANALYSESOURCE_INFO
 {
@@ -2908,6 +3898,8 @@ typedef struct tagCFG_ANALYSESOURCE_INFO
 	char				szRemoteDevice[MAX_NAME_LEN];			// 设备名
 	BOOL				abDeviceInfo;				        	// 设备信息是否有效
 	AV_CFG_RemoteDevice stuDeviceInfo;					        // 设备信息
+	CFG_VIDEO_SOURCE_TYPE emSourceType;                         // 视频分析源类型，详见CFG_VIDEO_SOURCE_TYPE
+	CFG_SOURCE_FILE_INFO stuSourceFile;                          // 当视频分析源类型为CFG_VIDEO_SOURCE_FILESTREAM时，有效
 } CFG_ANALYSESOURCE_INFO;
 
 //视频分析整体配置，影响设备或服务器整体行为
@@ -2951,21 +3943,102 @@ typedef struct tagBREAKINGSNAPTIMES_INFO
 	int			      nWrongRoute;					    // 不按车道行驶		
 	int               nParkingSpaceParking;             // 车位有车
 	int               nParkingSpaceNoParking;           // 车位无车
+
+	int               nRunYellowLight;					// 闯黄灯
+	int               nStay;							// 违章停留
+	int               nPedestrainPriority;	            // 斑马线行人优先违章
+	int               nVehicleInBusRoute;               // 违章占道
+	int               nBacking;                         // 违章倒车
+	int				  nOverStopLine;					// 压停止线
+	int               nParkingOnYellowBox;           	// 黄网格线停车	
+	int               nRestrictedPlate;					// 受限车牌	
+	int               nNoPassing;						// 禁行	
+    int               nWithoutSafeBelt;                 // 不系安全带
+    int               nDriverSmoking;                   // 驾驶员抽烟
+    int               nDriverCalling;                   // 驾驶员打电话
 }BREAKINGSNAPTIMES_INFO;
+
+
+//OSD黑边
+typedef struct tagBLACK_REGION_INFO
+{
+	int nHeight;			//黑边高度 取值范围：0 ~ ( 8192-原图片高度)
+	int nOSDPosition;		//黑边位置 0=未知 , 1=顶部 , 2=底部
+}BLACK_REGION_INFO;
+
+#define MAX_OSD_CUSTOM_SORT_NUM       8
+#define MAX_OSD_CUSTOM_SORT_ELEM_NUM  8
+#define MAX_OSD_ITEM_ATTR_NUM         8 
+#define MAX_PRE_POX_STR_LEN           32
+#define MAX_OSD_CUSTOM_NAME_LEN       32
+#define MAX_OSD_CUSTOM_VALUE_LEN      256
+
+//全体OSD项共用属性
+typedef struct tagOSD_WHOLE_ATTR
+{
+    BOOL        bPositionAsBlackRegion;     //位置是否同黑边相同,true时，下面的Position无效
+    CFG_RECT    stPostion;                  //位置,不能超过图片范围
+    BOOL        bNewLine;                   //超出矩形范围是否换行,bPositionAsBlackRegion为true时有效
+    BOOL        bLoneVehicle;                //车辆信息独立显示,true 一行显示一辆车信息,false 允许多辆车信息显示在一行
+}OSD_WHOLE_ATTR;
+
+typedef union tagOSD_ATTR_SCHEME
+{
+    OSD_WHOLE_ATTR stWholeAttr;
+}OSD_ATTR_SCHEME;
+
+//OSD具体叠加元素
+typedef struct tagOSD_CUSTOM_ELEMENT
+{
+    int  nNameType;                          //名称类型,	0:szName字段含义参照szOSDOrder字段定义的项
+                                             //             1:"Name"字段表示自定义项，无需解析
+    char szName[MAX_OSD_CUSTOM_VALUE_LEN];                           // 该项名称
+    char szPrefix[MAX_PRE_POX_STR_LEN];      // 叠加前缀字符串	
+    char szPostfix[MAX_PRE_POX_STR_LEN];     //叠加后缀字符串
+    int  nSeperaterCount;                    //后面添加分隔符个数
+    
+}OSD_CUSTOM_ELEMENT;
+
+//OSD叠加内容自定义排序
+typedef struct tagOSD_CUSTOM_SORT
+{
+    OSD_CUSTOM_ELEMENT   stElements[MAX_OSD_CUSTOM_SORT_ELEM_NUM];     //具体叠加元素
+    int                  nElementNum;
+}OSD_CUSTOM_SORT;
+
+#define  MAX_CONF_CHAR 256
+//OSD属性
+typedef struct tagOSD_INFO
+{
+	BLACK_REGION_INFO	stBackRegionInfo;		//OSD黑边属性
+	int					nOSDAttrScheme;		    //OSD属性配置方案 0=未知 , 1=全体OSD项共用属性 , 2=每个OSD项一个属性
+	OSD_ATTR_SCHEME		stOSDAttrScheme;		//OSD属性配置方案内容
+    OSD_CUSTOM_SORT     stOSDCustomSorts[MAX_OSD_CUSTOM_SORT_NUM];    //OSD叠加内容自定义排序
+    int                 nOSDCustomSortNum;
+    int                 nRedLightTimeDisplay;   //OSD红灯时间配置 0=未知,1=违法最后一张,2=所有张
+    char                cSeperater;             //OSD不同项之间的分隔符
+    BYTE		        bReserved[3];           //字节对齐
+    char                szOSDOrder[MAX_CONF_CHAR];    
+    int                 nOSDContentScheme;      //0=未知, 1=Mask , 2=CustomizeSort
+}OSD_INFO;
 
 // Detector -- BEGIN
 // CoilConfig
 typedef struct tagCOILCONFIG_INFO
 {
-	int               nDelayFlashID;                 // 延时闪光灯序号	每个线圈对应的延时闪关灯序号，范围0~5，0表示不延时任何闪光灯
-	int               nFlashSerialNum;               // 闪光灯序号	范围0~5，0表示不打开闪光灯（鄞州项目用）
-	int               nRedDirection;                 // 红灯方向	每个线圈对应的红灯方向：0-不关联,1-左转红灯,2-直行红灯,3-右转红灯,4-待左,5-待直,6-待右, 只在电警中有效
-	int               nTriggerMode ;                 // 线圈触发模式	触发模式：0-入线圈触发1-出线圈触发（鄞州项目用）
+    int               nDelayFlashID;                 // 延时闪光灯序号	每个线圈对应的延时闪关灯序号，范围0~5，0表示不延时任何闪光灯
+    int               nFlashSerialNum;               // 闪光灯序号	范围0~5，0表示不打开闪光灯（鄞州项目用）
+    int               nRedDirection;                 // 红灯方向	每个线圈对应的红灯方向：0-不关联,1-左转红灯,2-直行红灯,3-右转红灯,4-待左,5-待直,6-待右, 只在电警中有效
+    int               nTriggerMode ;                 // 线圈触发模式	触发模式：0-入线圈触发1-出线圈触发（鄞州项目用）
+    int				  nFlashSerialNum2;				 //多抓第二张对应闪光灯序号 范围0~5，0表示不打开闪光灯
+    int				  nFlashSerialNum3;				 //多抓第三张对应闪光灯序号 范围0~5，0表示不打开闪光灯
 }COILCONFIG_INFO;
 
 typedef struct tagDETECTOR_INFO
 {
-	int                nDetectBreaking;                  // 违章类型掩码	从低位到高位依次是：0-正常1-闯红灯2-压线3-逆行4-欠速5-超速6-有车占道7-黄牌占道
+    int                nDetectBreaking;                  // 违章类型掩码	从低位到高位依次是：0-正常1-闯红灯2-压线3-逆行4-欠速5-超速6-有车占道
+                                                         // 7-黄牌占道 8-闯黄灯 9-违章占公交车道 10-不系安全带 11-驾驶员抽烟 12-驾驶员打电话
+
 	COILCONFIG_INFO    arstCoilCfg[MAX_COILCONFIG];      // 线圈配置数组
 	int				   nRoadwayNumber;				     // 车道号	1-16 ; 0表示不启用
 	int                nRoadwayDirection;                // 车道方向（车开往的方向）	0-南向北 1-西南向东北 2-东 3-西北向东南 4-北向南 5-东北向西南 6-东向西 7-东南向西北 8-忽略
@@ -2989,18 +4062,48 @@ typedef struct tagDETECTOR_INFO
 														 // 即车辆离设备部署点越来越远，第二和第三个参数分别代表上行和
 														 // 下行的两个地点，UTF-8编码
 	int                nOverPercentage;                  // 超速百分比，超过限速百分比后抓拍
-
 	int                nCarScheme;                       // 具体的方案Index,具体方案含义参参考打包环境local.png;根据CFG_TRAFFICSNAPSHOT_INFO.abSchemeRange字段区分作用范围
 	int                nSigScheme;                       // 同上，非卡口使用
 	BOOL               bEnable;                          // 车道是否有效，只有有效时才抓拍
+
+	int				   nYellowSpeedLimit[2];			 //黄牌车限速上限和下限 范围0~255km/h
+	int				   nRoadType;						 //工作路段 0 普通公路 1 高速公路
+	int				   nSnapMode;						 //抓拍模式 0-全部抓拍 1-超速抓拍 2-逆向抓拍（鄞州项目用）
+    int                nDelayMode;						 //延时抓拍方案 0-使DelaySnapshotDistance，1-使用DelayTime
+	int                nDelayTime;						 //延时抓拍时间 闯红灯第三张抓拍位置距离最后一个线圈的时间，单位毫秒
+	int				   nTriggerMode;					 //触发模式 0-入线圈触发 1-出线圈触发 2-出入都抓拍 3-关闭
+	int			       nErrorRange;						 //速度误差值，进线圈2与进线圈3之间的速度误差值，若实际误差大于或等于该值，视速度无效，否则取平均速度 0-20
+	double			   dSpeedCorrection;				 //速度校正系数，即速度值为测出的值乘以该系数 
+    int                nDirection[2];                    //相对车道方向需要上报车辆行驶方向,nDirection[0] 0--空 1--正向 ; nDirection[1] 0--空 1--反向	
+    char               szCustomParkNo[CFG_COMMON_STRING_32 + 1]; // 自定义车位号（停车场用）
+    BYTE               btReserved[3];
 }DETECTOR_INFO;
 // Detector -- END
+
+typedef struct tagRADAR_INFO
+{
+    int     nAngle;                 //角度,用于修正雷达探头安装的角度造成的速度误差,范围[0,90]
+    int     nAntiJammingValue;      //抗干扰门槛值
+    int     nComeInValue;           //来向进入门槛值,取值范围[0,65535]
+    int     nComeOutValue;          //来向离开门槛值
+    int     nDelayTime;             //雷达延时,单位ms，范围[0,255]
+    DWORD   nDetectBreaking;        //违章类型掩码,从低位到高位依次是:
+                                    //0-正常,1-闯红灯, 2-压线, 3-逆行,4-欠速
+                                    //5-超速,6-有车占道,7-黄牌占道,8-闯黄灯,9-违章占公交车道
+    int     nDetectMode;            //检测模式  0-车头检测 1-车尾检测 2-双向检测
+    int     nInstallMode;           //雷达安装方式  0-侧面安装 1-上方安装
+    int     nLevel;                 //灵敏度,0级灵敏度最高,范围[0,5]
+    int     nMultiTargetFilter;     //多目标过滤模式,0-正常 1-过滤
+    int     nWentEndValue;          //去向信号结束门槛值
+    int     nWentInValue;           //去向进入门槛值
+    int     nWentOutValue;          //去向离开门槛值
+}RADAR_INFO;
 
 // CFG_CMD_INTELLECTIVETRAFFIC
 typedef struct tagCFG_TRAFFICSNAPSHOT_INFO
 {
 	char                     szDeviceAddress[MAX_DEVICE_ADDRESS];  // 设备地址	UTF-8编码，256字节
-	int                      nVideoTitleMask;                      // OSD叠加类型掩码	从低位到高位分别表示：0-时间 1-地点 2-车牌3-车长 4-车速 5-限速6-大车限速 7-小车限速8-超速 9-违法代码10-车道号 11-车身颜色 12-车牌类型 13-车牌颜色14-红灯点亮时间 15-违章类型 16-雷达方向 17-设备编号 18-标定到期时间 19-车型 20-行驶方向
+	DWORD                    nVideoTitleMask;                      // OSD叠加类型掩码	从低位到高位分别表示：0-时间 1-地点 2-车牌3-车长 4-车速 5-限速6-大车限速 7-小车限速8-超速 9-违法代码10-车道号 11-车身颜色 12-车牌类型 13-车牌颜色14-红灯点亮时间 15-违章类型 16-雷达方向 17-设备编号 18-标定到期时间 19-车型 20-行驶方向
 	int                      nRedLightMargin;                      // 红灯冗余间隔时间	红灯开始的一段时间内，车辆通行不算闯红灯，单位：秒
 	float				     fLongVehicleLengthLevel;              // 超长车长度最小阈值	单位：米，包含
 	float					 arfLargeVehicleLengthLevel[2];        // 大车长度阈值	单位：米，包含小值
@@ -3015,7 +4118,22 @@ typedef struct tagCFG_TRAFFICSNAPSHOT_INFO
 	int                      arnAdaptiveSpeed[2];                  // 速度自适应下限和上限
 	CFG_ALARM_MSG_HANDLE     stuEventHandler;	                   // 交通抓拍联动参数
 	BOOL                     abSchemeRange;                        // TRUE:方案针对相机,以车到0的值为准;FALSE:方案针对车道。不可以修改此字段数据, 只内部使用
-	BYTE		             bReserved[756];                       // 保留字节
+
+    DWORD                    nVideoTitleMask1;					   // 从低位到高位分别表示：0-车标 1-红灯结束时间 2-设备制造厂商 3-小车低限速 4-大车低限速 5-小车高限速 6-大车高限速 7-设备工作模式 8-通用自定义 9-车道自定义 10-抓拍触发源 11-停车场区域12-车辆类型(面包车、轿车等等) 13-中车低限速 14-中车高限速 15-道路方向 16-GPS信息
+    DWORD				     nMergeVideoTitleMask;                 // 合成图片OSD叠加类型掩码	参照nVideoTitleMask字段
+    DWORD				     nMergeVideoTitleMask1;				   // 合成图片OSD叠加类型掩码	参照nVideoTitleMask1字段
+    int                      nTriggerSource;					   // 触发源掩码 0-RS232 1-RS485 2-IO 3-Video 4-Net
+    int						 nSnapMode;							   // 抓拍模式 0-全部抓拍 1-超速抓拍 2-逆向抓拍 3-PK模式
+    int                      nWorkMode;							   // 工作模式 0-自动模式，1-线圈抓拍模式，2-线圈抓拍识别，3-视频抓拍，4-视频识别, 5-混合抓拍（带识别）
+    int                      nCarThreShold;						   // 车长阈值  区分大小车长的阈值，单位: cm
+    int                      nSnapType;							   // 抓拍或抓录选择 0-正常抓拍模式 1-视频抓拍模式 2-黑屏快抓模式
+    int                      nCustomFrameInterval[3];			   // 自定义抓拍帧间隔 第一个元素指车速小于速度自适应下限时的抓拍帧间隔，依次类推
+    int                      nKeepAlive;				           // 与雷达、车检器的默认保活周期 单位秒
+    OSD_INFO				 stOSD;								   // 原始图片OSD参数配置
+    OSD_INFO                 stMergeOSD;                           // 合成图片OSD参数配置
+    CFG_NET_TIME             stValidUntilTime;					   // 标定到期时间，指该时间点之前抓拍照片有效
+    RADAR_INFO               stRadar;
+
 }CFG_TRAFFICSNAPSHOT_INFO;
 
 typedef struct tagCFG_TRAFFICSNAPSHOT_NEW_INFO
@@ -3124,13 +4242,758 @@ typedef struct tagVIOLATIONCODE_INFO
 	char                szParkingSpaceNoParking[MAX_VIOLATIONCODE];              // 车位无车
 	char                szParkingSpaceNoParkingDesc[MAX_VIOLATIONCODE_DESCRIPT]; 				// 违章描述信息
 
-	BYTE		        bReserved[864];
+    char                szWithoutSafeBelt[MAX_VIOLATIONCODE];                       // 不系安全带
+    char                szWithoutSafeBeltShowName[MAX_VIOLATIONCODE_DESCRIPT];      //不系安全带显示名称
+    char                szWithoutSafeBeltDesc[MAX_VIOLATIONCODE_DESCRIPT]; 	         // 不系安全带违章描述信息
+
+    char                szDriverSmoking[MAX_VIOLATIONCODE];                          // 驾驶员抽烟
+    char                szDriverSmokingShowName[MAX_VIOLATIONCODE_DESCRIPT];         //驾驶员抽烟显示名称
+    char                szDriverSmokingDesc[MAX_VIOLATIONCODE_DESCRIPT]; 	         // 驾驶员抽烟带违章描述信息
+
+    char                szDriverCalling[MAX_VIOLATIONCODE];                         // 驾驶员打电话
+    char                szDriverCallingShowName[MAX_VIOLATIONCODE_DESCRIPT];        //  驾驶员打电话显示名称
+    char                szDriverCallingDesc[MAX_VIOLATIONCODE_DESCRIPT]; 	        // 驾驶员打电话违章描述信息
+
+	BYTE		        bReserved[432];
 }VIOLATIONCODE_INFO;
+
+// 车道检测类型
+typedef enum tagEmCheckType
+{
+    EM_CHECK_TYPE_UNKNOWN,             // 不识别的检测类型
+    EM_CHECK_TYPE_PHYSICAL,            // 物理检测
+    EM_CHECK_TYPE_VIDEO,               // 视频检测
+}EM_CHECK_TYPE;
+
+typedef struct tagTrafficEventCheckInfo
+{
+    BOOL                abTrafficGate;                  // 是否携带交通卡口信息
+    EM_CHECK_TYPE       emTrafficGate;                  // 交通卡口检测类型
+
+    BOOL                abTrafficJunction;              // 是否携带交通路口信息
+    EM_CHECK_TYPE       emTrafficJunction;              // 交通路口检测类型
+
+    BOOL                abTrafficTollGate;              // 是否携带新交通卡口信息
+    EM_CHECK_TYPE       emTrafficTollGate;              // 新交通卡口检测类型
+
+    BOOL                abTrafficRunRedLight;           // 是否携带交通闯红灯信息
+    EM_CHECK_TYPE       emTrafficRunRedLight;           // 交通闯红灯检测类型
+    
+    BOOL                abTrafficRunYellowLight;        // 是否携带交通闯黄灯信息
+    EM_CHECK_TYPE       emTrafficRunYellowLight;        // 交通闯黄灯检测类型
+
+    BOOL                abTrafficOverLine;              // 是否携带交通压线信息
+    EM_CHECK_TYPE       emTrafficOverLine;              // 交通压线检测类型
+
+    BOOL                abTrafficOverYellowLine;        // 是否携带交通压黄线信息
+    EM_CHECK_TYPE       emTrafficOverYellowLine;        // 交通压黄线检测类型
+
+    BOOL                abTrafficRetrograde;            // 是否携带交通逆行信息
+    EM_CHECK_TYPE       emTrafficRetrograde;            // 交通逆行检测类型
+
+    BOOL                abTrafficTurnLeft;              // 是否携带交通违章左转信息
+    EM_CHECK_TYPE       emTrafficTurnLeft;              // 交通违章左转检测类型
+
+    BOOL                abTrafficTurnRight;             // 是否携带交通违章右转信息
+    EM_CHECK_TYPE       emTrafficTurnRight;             // 交通路口违章右转类型
+
+    BOOL                abTrafficU_Turn;                // 是否携带交通违章掉头信息
+    EM_CHECK_TYPE       emTrafficU_Turn;                // 交通违章掉头检测类型
+
+    BOOL                abTrafficCrossLane;             // 是否携带交通违章变道信息
+    EM_CHECK_TYPE       emTrafficCrossLane;             // 交通违章变道检测类型
+
+    BOOL                abTrafficParking;               // 是否携带交通违章停车信息
+    EM_CHECK_TYPE       emTrafficParking;               // 交通违章停车检测类型
+
+    BOOL                abTrafficJam;                   // 是否携带交通拥堵信息
+    EM_CHECK_TYPE       emTrafficJam;                   // 交通拥堵检测类型
+
+    BOOL                abTrafficIdle;                  // 是否携带交通交通空闲信息
+    EM_CHECK_TYPE       emTrafficIdle;                  // 交通交通空闲检测类型
+
+    BOOL                abTrafficWaitingArea;           // 是否携带交通违章驶入待行区信息
+    EM_CHECK_TYPE       emTrafficWaitingArea;           // 交通违章驶入待行区检测类型
+
+    BOOL                abTrafficUnderSpeed;            // 是否携带交通欠速信息
+    EM_CHECK_TYPE       emTrafficUnderSpeed;            // 交通欠速检测类型
+
+    BOOL                abTrafficOverSpeed;             // 是否携带交通超速信息
+    EM_CHECK_TYPE       emTrafficOverSpeed;             // 交通超速检测类型
+
+    BOOL                abTrafficWrongRoute;            // 是否携带交通不按车道行驶信息
+    EM_CHECK_TYPE       emTrafficWrongRoute;            // 交通不按车道行驶检测类型
+
+    BOOL                abTrafficYellowInRoute;         // 是否携带交通黄牌占道信息
+    EM_CHECK_TYPE       emTrafficYellowInRoute;         // 交通黄牌占道检测类型
+
+    BOOL                abTrafficVehicleInRoute;        // 是否携带交通有车占道信息
+    EM_CHECK_TYPE       emTrafficVehicleInRoute;        // 交通有车占道检测类型
+
+    BOOL                abTrafficControl;               // 是否携带交通交通管制信息
+    EM_CHECK_TYPE       emTrafficControl;               // 交通交通管制检测类型
+
+    BOOL                abTrafficObjectAlarm;           // 是否携带交通指定类型抓拍信息
+    EM_CHECK_TYPE       emTrafficObjectAlarm;           // 交通指定类型抓拍检测类型
+
+    BOOL                abTrafficAccident;              // 是否携带交通交通事故信息
+    EM_CHECK_TYPE       emTrafficAccident;              // 交通交通事故检测类型
+
+    BOOL                abTrafficStay;                  // 是否携带交通交通停留/滞留信息
+    EM_CHECK_TYPE       emTrafficStay;                  // 交通交通停留/滞留检测类型
+
+    BOOL                abTrafficPedestrainPriority;    // 是否携带交通斑马线行人优先信息
+    EM_CHECK_TYPE       emTrafficPedestrainPriority;    // 交通斑马线行人优先检测类型
+
+    BOOL                abTrafficPedestrain;            // 是否携带交通交通行人事件信息
+    EM_CHECK_TYPE       emTrafficPedestrain;            // 交通交通行人事件检测类型
+
+    BOOL                abTrafficThrow;                 // 是否携带交通交通抛洒物品事件信息
+    EM_CHECK_TYPE       emTrafficThrow;                 // 交通交通抛洒物品事件检测类型
+
+    BOOL                abTrafficVehicleInBusRoute;     // 是否携带交通违章占道信息
+    EM_CHECK_TYPE       emTrafficVehicleInBusRoute;     // 交通违章占道检测类型
+
+    BOOL                abTrafficBacking;               // 是否携带交通违章倒车信息
+    EM_CHECK_TYPE       emTrafficBacking;               // 交通违章倒车检测类型
+
+    BOOL                abTrafficOverStopLine;          // 是否携带交通压停止线信息
+    EM_CHECK_TYPE       emTrafficOverStopLine;          // 交通压停止线检测类型
+
+    BOOL                abTrafficParkingOnYellowBox;    // 是否携带交通黄网格线抓拍信息
+    EM_CHECK_TYPE       emTrafficParkingOnYellowBox;    // 交通黄网格线抓拍检测类型
+
+    BOOL                abTrafficParkingSpaceParking;   // 是否携带交通车位有车信息
+    EM_CHECK_TYPE       emTrafficParkingSpaceParking;   // 交通车位有车检测类型
+
+    BOOL                abTrafficParkingSpaceNoParking; // 是否携带交通车位无车信息
+    EM_CHECK_TYPE       emTrafficParkingSpaceNoParking; // 交通车位无车检测类型
+
+    BOOL                abTrafficParkingSpaceOverLine;  // 是否携带交通车位有车压线信息
+    EM_CHECK_TYPE       emTrafficParkingSpaceOverLine;  // 交通车位有车压线检测类型
+
+    BOOL                abParkingSpaceDetection;        // 是否携带交通多停车位状态检测信息
+    EM_CHECK_TYPE       emParkingSpaceDetection;        // 交通多停车位状态检测检测类型
+
+    BOOL                abTrafficRestrictedPlate;       // 是否携带交通受限车牌信息
+    EM_CHECK_TYPE       emTrafficRestrictedPlate;       // 交通受限车牌检测类型
+
+    BOOL                abTrafficWithoutSafeBelt;       // 是否携带交通不系安全带信息
+    EM_CHECK_TYPE       emTrafficWithoutSafeBelt;       // 交通不系安全带检测类型
+
+    BOOL                abTrafficNoPassing;             // 是否携带交通禁行信息
+    EM_CHECK_TYPE       emTrafficNoPassing;             // 交通禁行检测类型
+
+    BOOL                abVehicleAnalyse;               // 是否携带交通车辆特征检测分析信息
+    EM_CHECK_TYPE       emVehicleAnalyse;               // 交通车辆特征检测类型
+
+    BOOL                abCrossLineDetection;           // 是否携带交通警戒线信息
+    EM_CHECK_TYPE       emCrossLineDetection;           // 交通警戒线检测类型
+
+    BOOL                abCrossFenceDetection;          // 是否携带交通穿越围栏信息
+    EM_CHECK_TYPE       emCrossFenceDetection;          // 交通穿越围栏检测类型
+
+    BOOL                abCrossRegionDetection;         // 是否携带交通警戒区信息
+    EM_CHECK_TYPE       emCrossRegionDetection;         // 交通警戒区检测类型
+
+    BOOL                abPasteDetection;               // 是否携带交通ATM贴条信息
+    EM_CHECK_TYPE       emPasteDetection;               // 交通ATM贴条检测类型
+
+    BOOL                abLeftDetection;                // 是否携带交通物品遗留信息
+    EM_CHECK_TYPE       emLeftDetection;                // 交通物品遗留检测类型
+
+    BOOL                abPreservation;                 // 是否携带交通物品保全信息
+    EM_CHECK_TYPE       emPreservation;                 // 交通物品保全检测类型
+
+    BOOL                abTakenAwayDetection;           // 是否携带交通物品搬移信息
+    EM_CHECK_TYPE       emTakenAwayDetection;           // 交通物品搬移检测类型
+
+    BOOL                abStayDetection;                // 是否携带交通停留/滞留信息
+    EM_CHECK_TYPE       emStayDetection;                // 交通停留/滞留检测类型
+
+    BOOL                abParkingDetection;             // 是否携带交通非法停车信息
+    EM_CHECK_TYPE       emParkingDetection;             // 交通非法停车检测类型
+
+    BOOL                abWanderDetection;              // 是否携带交通徘徊信息
+    EM_CHECK_TYPE       emWanderDetection;              // 交通徘徊检测类型
+
+    BOOL                abMoveDetection;                // 是否携带交通运动信息
+    EM_CHECK_TYPE       emMoveDetection;                // 交通运动检测类型
+
+    BOOL                abTailDetection;                // 是否携带交通尾随信息
+    EM_CHECK_TYPE       emTailDetection;                // 交通尾随检测类型
+
+    BOOL                abRioterDetection;              // 是否携带交通聚集信息
+    EM_CHECK_TYPE       emRioterDetection;              // 交通聚集检测类型
+
+    BOOL                abFightDetection;               // 是否携带交通打架信息
+    EM_CHECK_TYPE       emFightDetection;               // 交通打架检测类型
+
+    BOOL                abRetrogradeDetection;          // 是否携带交通逆行信息
+    EM_CHECK_TYPE       emRetrogradeDetection;          // 交通逆行检测类型
+
+    BOOL                abFireDetection;                // 是否携带交通火焰信息
+    EM_CHECK_TYPE       emFireDetection;                // 交通火焰检测类型
+
+    BOOL                abSmokeDetection;               // 是否携带交通烟雾信息
+    EM_CHECK_TYPE       emSmokeDetection;               // 交通烟雾检测类型
+
+    BOOL                abNumberStat;                   // 是否携带交通数量统计信息
+    EM_CHECK_TYPE       emNumberStat;                   // 交通数量统计检测类型
+
+    BOOL                abVideoAbnormalDetection;       // 是否携带交通视频异常信息
+    EM_CHECK_TYPE       emVideoAbnormalDetection;       // 交通视频异常检测类型
+
+    BOOL                abPrisonerRiseDetection;        // 是否携带看守所囚犯起身检测信息
+    EM_CHECK_TYPE       emPrisonerRiseDetection;        // 看守所囚犯起身检测检测类型
+
+    BOOL                abFaceDetection;                // 是否携带人脸检测信息
+    EM_CHECK_TYPE       emFaceDetection;                // 人脸检测检测类型
+
+    BOOL                abFaceRecognition;              // 是否携带人脸识别信息
+    EM_CHECK_TYPE       emFaceRecognition;              // 人脸识别检测类型
+
+    BOOL                abDensityDetection;             // 是否携带密集度检测信息
+    EM_CHECK_TYPE       emDensityDetection;             // 密集度检测检测类型
+
+    BOOL                abQueueDetection;               // 是否携带排队检测信息
+    EM_CHECK_TYPE       emQueueDetection;               // 排队检测检测类型
+
+    BOOL                abClimbDetection;               // 是否携带攀高检测信息
+    EM_CHECK_TYPE       emClimbDetection;               // 攀高检测类型
+
+    BOOL                abLeaveDetection;               // 是否携带离岗检测信息
+    EM_CHECK_TYPE       emLeaveDetection;               // 离岗检测类型
+
+    BOOL                abVehicleOnPoliceCar;           // 是否携带车载警车信息
+    EM_CHECK_TYPE       emVehicleOnPoliceCar;           // 车载警车检测类型
+
+    BOOL                abVehicleOnBus;                 // 是否携带车载公交信息
+    EM_CHECK_TYPE       emVehicleOnBus;                 // 车载公交检测类型
+
+    BOOL                abVehicleOnSchoolBus;           // 是否携带车载校车信息
+    EM_CHECK_TYPE       emVehicleOnSchoolBus;           // 车载校车检测类型  
+
+}TRAFFIC_EVENT_CHECK_INFO;  
+
+typedef struct tagTrafficEventCheckMask
+{
+    BOOL                abTrafficGate;                  // 是否携带交通卡口信息
+    int                 nTrafficGate;                   // 交通卡口检测模式掩码
+
+    BOOL                abTrafficJunction;              // 是否携带交通路口信息
+    int                 nTrafficJunction;               // 交通路口检测模式掩码
+
+    BOOL                abTrafficTollGate;              // 是否携带新交通卡口信息
+    int                 nTrafficTollGate;               // 新交通卡口检测模式掩码
+
+    BOOL                abTrafficRunRedLight;           // 是否携带交通闯红灯信息
+    int                 nTrafficRunRedLight;            // 交通闯红灯检测模式掩码
+    
+    BOOL                abTrafficRunYellowLight;        // 是否携带交通闯黄灯信息
+    int                 nTrafficRunYellowLight;         // 交通闯黄灯检测模式掩码
+
+    BOOL                abTrafficOverLine;              // 是否携带交通压线信息
+    int                 nTrafficOverLine;               // 交通压线检测模式掩码
+
+    BOOL                abTrafficOverYellowLine;        // 是否携带交通压黄线信息
+    int                 nTrafficOverYellowLine;         // 交通压黄线检测模式掩码
+
+    BOOL                abTrafficRetrograde;            // 是否携带交通逆行信息
+    int                 nTrafficRetrograde;             // 交通逆行检测模式掩码
+
+    BOOL                abTrafficTurnLeft;              // 是否携带交通违章左转信息
+    int                 nTrafficTurnLeft;               // 交通违章左转检测模式掩码
+
+    BOOL                abTrafficTurnRight;             // 是否携带交通违章右转信息
+    int                 nTrafficTurnRight;              // 交通路口违章右转类型
+
+    BOOL                abTrafficU_Turn;                // 是否携带交通违章掉头信息
+    int                 nTrafficU_Turn;                 // 交通违章掉头检测模式掩码
+
+    BOOL                abTrafficCrossLane;             // 是否携带交通违章变道信息
+    int                 nTrafficCrossLane;              // 交通违章变道检测模式掩码
+
+    BOOL                abTrafficParking;               // 是否携带交通违章停车信息
+    int                 nTrafficParking;                // 交通违章停车检测模式掩码
+
+    BOOL                abTrafficJam;                   // 是否携带交通拥堵信息
+    int                 nTrafficJam;                    // 交通拥堵检测模式掩码
+
+    BOOL                abTrafficIdle;                  // 是否携带交通交通空闲信息
+    int                 nTrafficIdle;                   // 交通交通空闲检测模式掩码
+
+    BOOL                abTrafficWaitingArea;           // 是否携带交通违章驶入待行区信息
+    int                 nTrafficWaitingArea;            // 交通违章驶入待行区检测模式掩码
+
+    BOOL                abTrafficUnderSpeed;            // 是否携带交通欠速信息
+    int                 nTrafficUnderSpeed;             // 交通欠速检测模式掩码
+
+    BOOL                abTrafficOverSpeed;             // 是否携带交通超速信息
+    int                 nTrafficOverSpeed;              // 交通超速检测模式掩码
+
+    BOOL                abTrafficWrongRoute;            // 是否携带交通不按车道行驶信息
+    int                 nTrafficWrongRoute;             // 交通不按车道行驶检测模式掩码
+
+    BOOL                abTrafficYellowInRoute;         // 是否携带交通黄牌占道信息
+    int                 nTrafficYellowInRoute;          // 交通黄牌占道检测模式掩码
+
+    BOOL                abTrafficVehicleInRoute;        // 是否携带交通有车占道信息
+    int                 nTrafficVehicleInRoute;         // 交通有车占道检测模式掩码
+
+    BOOL                abTrafficControl;               // 是否携带交通交通管制信息
+    int                 nTrafficControl;                // 交通交通管制检测模式掩码
+
+    BOOL                abTrafficObjectAlarm;           // 是否携带交通指定类型抓拍信息
+    int                 nTrafficObjectAlarm;            // 交通指定类型抓拍检测模式掩码
+
+    BOOL                abTrafficAccident;              // 是否携带交通交通事故信息
+    int                 nTrafficAccident;               // 交通交通事故检测模式掩码
+
+    BOOL                abTrafficStay;                  // 是否携带交通交通停留/滞留信息
+    int                 nTrafficStay;                   // 交通交通停留/滞留检测模式掩码
+
+    BOOL                abTrafficPedestrainPriority;    // 是否携带交通斑马线行人优先信息
+    int                 nTrafficPedestrainPriority;     // 交通斑马线行人优先检测模式掩码
+
+    BOOL                abTrafficPedestrain;            // 是否携带交通交通行人事件信息
+    int                 nTrafficPedestrain;             // 交通交通行人事件检测模式掩码
+
+    BOOL                abTrafficThrow;                 // 是否携带交通交通抛洒物品事件信息
+    int                 nTrafficThrow;                  // 交通交通抛洒物品事件检测模式掩码
+
+    BOOL                abTrafficVehicleInBusRoute;     // 是否携带交通违章占道信息
+    int                 nTrafficVehicleInBusRoute;      // 交通违章占道检测模式掩码
+
+    BOOL                abTrafficBacking;               // 是否携带交通违章倒车信息
+    int                 nTrafficBacking;                // 交通违章倒车检测模式掩码
+
+    BOOL                abTrafficOverStopLine;          // 是否携带交通压停止线信息
+    int                 nTrafficOverStopLine;           // 交通压停止线检测模式掩码
+
+    BOOL                abTrafficParkingOnYellowBox;    // 是否携带交通黄网格线抓拍信息
+    int                 nTrafficParkingOnYellowBox;     // 交通黄网格线抓拍检测模式掩码
+
+    BOOL                abTrafficParkingSpaceParking;   // 是否携带交通车位有车信息
+    int                 nTrafficParkingSpaceParking;    // 交通车位有车检测模式掩码
+
+    BOOL                abTrafficParkingSpaceNoParking; // 是否携带交通车位无车信息
+    int                 nTrafficParkingSpaceNoParking;  // 交通车位无车检测模式掩码
+
+    BOOL                abTrafficParkingSpaceOverLine;  // 是否携带交通车位有车压线信息
+    int                 nTrafficParkingSpaceOverLine;   // 交通车位有车压线检测模式掩码
+
+    BOOL                abParkingSpaceDetection;        // 是否携带交通多停车位状态检测信息
+    int                 nParkingSpaceDetection;         // 交通多停车位状态检测检测模式掩码
+
+    BOOL                abTrafficRestrictedPlate;       // 是否携带交通受限车牌信息
+    int                 nTrafficRestrictedPlate;        // 交通受限车牌检测模式掩码
+
+    BOOL                abTrafficWithoutSafeBelt;       // 是否携带交通不系安全带信息
+    int                 nTrafficWithoutSafeBelt;        // 交通不系安全带检测模式掩码
+
+    BOOL                abTrafficNoPassing;             // 是否携带交通禁行信息
+    int                 nTrafficNoPassing;              // 交通禁行检测模式掩码
+
+    BOOL                abVehicleAnalyse;               // 是否携带交通车辆特征检测分析信息
+    int                 nVehicleAnalyse;                // 交通车辆特征检测模式掩码
+
+    BOOL                abCrossLineDetection;           // 是否携带交通警戒线信息
+    int                 nCrossLineDetection;            // 交通警戒线检测模式掩码
+
+    BOOL                abCrossFenceDetection;          // 是否携带交通穿越围栏信息
+    int                 nCrossFenceDetection;           // 交通穿越围栏检测模式掩码
+
+    BOOL                abCrossRegionDetection;         // 是否携带交通警戒区信息
+    int                 nCrossRegionDetection;          // 交通警戒区检测模式掩码
+
+    BOOL                abPasteDetection;               // 是否携带交通ATM贴条信息
+    int                 nPasteDetection;                // 交通ATM贴条检测模式掩码
+
+    BOOL                abLeftDetection;                // 是否携带交通物品遗留信息
+    int                 nLeftDetection;                 // 交通物品遗留检测模式掩码
+
+    BOOL                abPreservation;                 // 是否携带交通物品保全信息
+    int                 nPreservation;                  // 交通物品保全检测模式掩码
+
+    BOOL                abTakenAwayDetection;           // 是否携带交通物品搬移信息
+    int                 nTakenAwayDetection;            // 交通物品搬移检测模式掩码
+
+    BOOL                abStayDetection;                // 是否携带交通停留/滞留信息
+    int                 nStayDetection;                 // 交通停留/滞留检测模式掩码
+
+    BOOL                abParkingDetection;             // 是否携带交通非法停车信息
+    int                 nParkingDetection;              // 交通非法停车检测模式掩码
+
+    BOOL                abWanderDetection;              // 是否携带交通徘徊信息
+    int                 nWanderDetection;               // 交通徘徊检测模式掩码
+
+    BOOL                abMoveDetection;                // 是否携带交通运动信息
+    int                 nMoveDetection;                 // 交通运动检测模式掩码
+
+    BOOL                abTailDetection;                // 是否携带交通尾随信息
+    int                 nTailDetection;                 // 交通尾随检测模式掩码
+
+    BOOL                abRioterDetection;              // 是否携带交通聚集信息
+    int                 nRioterDetection;               // 交通聚集检测模式掩码
+
+    BOOL                abFightDetection;               // 是否携带交通打架信息
+    int                 nFightDetection;                // 交通打架检测模式掩码
+
+    BOOL                abRetrogradeDetection;          // 是否携带交通逆行信息
+    int                 nRetrogradeDetection;           // 交通逆行检测模式掩码
+
+    BOOL                abFireDetection;                // 是否携带交通火焰信息
+    int                 nFireDetection;                 // 交通火焰检测模式掩码
+
+    BOOL                abSmokeDetection;               // 是否携带交通烟雾信息
+    int                 nSmokeDetection;                // 交通烟雾检测模式掩码
+
+    BOOL                abNumberStat;                   // 是否携带交通数量统计信息
+    int                 nNumberStat;                    // 交通数量统计检测模式掩码
+
+    BOOL                abVideoAbnormalDetection;       // 是否携带交通视频异常信息
+    int                 nVideoAbnormalDetection;        // 交通视频异常检测模式掩码
+
+    BOOL                abPrisonerRiseDetection;        // 是否携带看守所囚犯起身检测信息
+    int                 nPrisonerRiseDetection;         // 看守所囚犯起身检测检测模式掩码
+
+    BOOL                abFaceDetection;                // 是否携带人脸检测信息
+    int                 nFaceDetection;                 // 人脸检测检测模式掩码
+
+    BOOL                abFaceRecognition;              // 是否携带人脸识别信息
+    int                 nFaceRecognition;               // 人脸识别检测模式掩码
+
+    BOOL                abDensityDetection;             // 是否携带密集度检测信息
+    int                 nDensityDetection;              // 密集度检测检测模式掩码
+
+    BOOL                abQueueDetection;               // 是否携带排队检测信息
+    int                 nQueueDetection;                // 排队检测检测模式掩码
+
+    BOOL                abClimbDetection;               // 是否携带攀高检测信息
+    int                 nClimbDetection;                // 攀高检测模式掩码
+
+    BOOL                abLeaveDetection;               // 是否携带离岗检测信息
+    int                 nLeaveDetection;                // 离岗检测模式掩码
+
+    BOOL                abVehicleOnPoliceCar;           // 是否携带车载警车信息
+    int                 nVehicleOnPoliceCar;            // 车载警车检测模式掩码
+
+    BOOL                abVehicleOnBus;                 // 是否携带车载公交信息
+    int                 nVehicleOnBus;                  // 车载公交检测模式掩码
+
+    BOOL                abVehicleOnSchoolBus;           // 是否携带车载校车信息
+    int                 nVehicleOnSchoolBus;            // 车载校车检测模式掩码  
+
+}TRAFFIC_EVENT_CHECK_MASK;  
+
+// 违章抓拍时间配置表
+typedef struct tagTimeScheduleInfo
+{
+    BOOL                bEnable;                                              // 是否启用时间表
+    CFG_TIME_SECTION    stuTimeSchedule[WEEK_DAY_NUM][MAX_REC_TSECT];         // 时间表
+}TIME_SCHEDULE_INFO;
+
+// 违章抓拍自定义时间配置
+typedef struct tagViolationTimeSchedule
+{
+    BOOL                abTrafficGate;                  // 是否携带交通卡口信息
+    TIME_SCHEDULE_INFO  stTrafficGate;                  // 交通卡口时间配置
+
+    BOOL                abTrafficJunction;              // 是否携带交通路口信息
+    TIME_SCHEDULE_INFO  stTrafficJunction;              // 交通路口时间配置
+
+    BOOL                abTrafficTollGate;              // 是否携带新交通卡口信息
+    TIME_SCHEDULE_INFO  stTrafficTollGate;              // 新交通卡口时间配置
+
+    BOOL                abTrafficRunRedLight;           // 是否携带交通闯红灯信息
+    TIME_SCHEDULE_INFO  stTrafficRunRedLight;           // 交通闯红灯时间配置
+    
+    BOOL                abTrafficRunYellowLight;        // 是否携带交通闯黄灯信息
+    TIME_SCHEDULE_INFO  stTrafficRunYellowLight;        // 交通闯黄灯时间配置
+
+    BOOL                abTrafficOverLine;              // 是否携带交通压线信息
+    TIME_SCHEDULE_INFO  stTrafficOverLine;              // 交通压线时间配置
+
+    BOOL                abTrafficOverYellowLine;        // 是否携带交通压黄线信息
+    TIME_SCHEDULE_INFO  stTrafficOverYellowLine;        // 交通压黄线时间配置
+
+    BOOL                abTrafficRetrograde;            // 是否携带交通逆行信息
+    TIME_SCHEDULE_INFO  stTrafficRetrograde;            // 交通逆行时间配置
+
+    BOOL                abTrafficTurnLeft;              // 是否携带交通违章左转信息
+    TIME_SCHEDULE_INFO  stTrafficTurnLeft;              // 交通违章左转时间配置
+
+    BOOL                abTrafficTurnRight;             // 是否携带交通违章右转信息
+    TIME_SCHEDULE_INFO  stTrafficTurnRight;             // 交通路口违章右转类型
+
+    BOOL                abTrafficU_Turn;                // 是否携带交通违章掉头信息
+    TIME_SCHEDULE_INFO  stTrafficU_Turn;                // 交通违章掉头时间配置
+
+    BOOL                abTrafficCrossLane;             // 是否携带交通违章变道信息
+    TIME_SCHEDULE_INFO  stTrafficCrossLane;             // 交通违章变道时间配置
+
+    BOOL                abTrafficParking;               // 是否携带交通违章停车信息
+    TIME_SCHEDULE_INFO  stTrafficParking;               // 交通违章停车时间配置
+
+    BOOL                abTrafficJam;                   // 是否携带交通拥堵信息
+    TIME_SCHEDULE_INFO  stTrafficJam;                   // 交通拥堵时间配置
+
+    BOOL                abTrafficIdle;                  // 是否携带交通交通空闲信息
+    TIME_SCHEDULE_INFO  stTrafficIdle;                  // 交通交通空闲时间配置
+
+    BOOL                abTrafficWaitingArea;           // 是否携带交通违章驶入待行区信息
+    TIME_SCHEDULE_INFO  stTrafficWaitingArea;           // 交通违章驶入待行区时间配置
+
+    BOOL                abTrafficUnderSpeed;            // 是否携带交通欠速信息
+    TIME_SCHEDULE_INFO  stTrafficUnderSpeed;            // 交通欠速时间配置
+
+    BOOL                abTrafficOverSpeed;             // 是否携带交通超速信息
+    TIME_SCHEDULE_INFO  stTrafficOverSpeed;             // 交通超速时间配置
+
+    BOOL                abTrafficWrongRoute;            // 是否携带交通不按车道行驶信息
+    TIME_SCHEDULE_INFO  stTrafficWrongRoute;            // 交通不按车道行驶时间配置
+
+    BOOL                abTrafficYellowInRoute;         // 是否携带交通黄牌占道信息
+    TIME_SCHEDULE_INFO  stTrafficYellowInRoute;         // 交通黄牌占道时间配置
+
+    BOOL                abTrafficVehicleInRoute;        // 是否携带交通有车占道信息
+    TIME_SCHEDULE_INFO  stTrafficVehicleInRoute;        // 交通有车占道时间配置
+
+    BOOL                abTrafficControl;               // 是否携带交通交通管制信息
+    TIME_SCHEDULE_INFO  stTrafficControl;               // 交通交通管制时间配置
+
+    BOOL                abTrafficObjectAlarm;           // 是否携带交通指定类型抓拍信息
+    TIME_SCHEDULE_INFO  stTrafficObjectAlarm;           // 交通指定类型抓拍时间配置
+
+    BOOL                abTrafficAccident;              // 是否携带交通交通事故信息
+    TIME_SCHEDULE_INFO  stTrafficAccident;              // 交通交通事故时间配置
+
+    BOOL                abTrafficStay;                  // 是否携带交通交通停留/滞留信息
+    TIME_SCHEDULE_INFO  stTrafficStay;                  // 交通交通停留/滞留时间配置
+
+    BOOL                abTrafficPedestrainPriority;    // 是否携带交通斑马线行人优先信息
+    TIME_SCHEDULE_INFO  stTrafficPedestrainPriority;    // 交通斑马线行人优先时间配置
+
+    BOOL                abTrafficPedestrain;            // 是否携带交通交通行人事件信息
+    TIME_SCHEDULE_INFO  stTrafficPedestrain;            // 交通交通行人事件时间配置
+
+    BOOL                abTrafficThrow;                 // 是否携带交通交通抛洒物品事件信息
+    TIME_SCHEDULE_INFO  stTrafficThrow;                 // 交通交通抛洒物品事件时间配置
+
+    BOOL                abTrafficVehicleInBusRoute;     // 是否携带交通违章占道信息
+    TIME_SCHEDULE_INFO  stTrafficVehicleInBusRoute;     // 交通违章占道时间配置
+
+    BOOL                abTrafficBacking;               // 是否携带交通违章倒车信息
+    TIME_SCHEDULE_INFO  stTrafficBacking;               // 交通违章倒车时间配置
+
+    BOOL                abTrafficOverStopLine;          // 是否携带交通压停止线信息
+    TIME_SCHEDULE_INFO  stTrafficOverStopLine;          // 交通压停止线时间配置
+
+    BOOL                abTrafficParkingOnYellowBox;    // 是否携带交通黄网格线抓拍信息
+    TIME_SCHEDULE_INFO  stTrafficParkingOnYellowBox;    // 交通黄网格线抓拍时间配置
+
+    BOOL                abTrafficParkingSpaceParking;   // 是否携带交通车位有车信息
+    TIME_SCHEDULE_INFO  stTrafficParkingSpaceParking;   // 交通车位有车时间配置
+
+    BOOL                abTrafficParkingSpaceNoParking; // 是否携带交通车位无车信息
+    TIME_SCHEDULE_INFO  stTrafficParkingSpaceNoParking; // 交通车位无车时间配置
+
+    BOOL                abTrafficParkingSpaceOverLine;  // 是否携带交通车位有车压线信息
+    TIME_SCHEDULE_INFO  stTrafficParkingSpaceOverLine;  // 交通车位有车压线时间配置
+
+    BOOL                abParkingSpaceDetection;        // 是否携带交通多停车位状态检测信息
+    TIME_SCHEDULE_INFO  stParkingSpaceDetection;        // 交通多停车位状态检测时间配置
+
+    BOOL                abTrafficRestrictedPlate;       // 是否携带交通受限车牌信息
+    TIME_SCHEDULE_INFO  stTrafficRestrictedPlate;       // 交通受限车牌时间配置
+
+    BOOL                abTrafficWithoutSafeBelt;       // 是否携带交通不系安全带信息
+    TIME_SCHEDULE_INFO  stTrafficWithoutSafeBelt;       // 交通不系安全带时间配置
+
+    BOOL                abTrafficNoPassing;             // 是否携带交通禁行信息
+    TIME_SCHEDULE_INFO  stTrafficNoPassing;             // 交通禁行时间配置
+
+    BOOL                abVehicleAnalyse;               // 是否携带交通车辆特征检测分析信息
+    TIME_SCHEDULE_INFO  stVehicleAnalyse;               // 交通车辆特征时间配置
+
+    BOOL                abCrossLineDetection;           // 是否携带交通警戒线信息
+    TIME_SCHEDULE_INFO  stCrossLineDetection;           // 交通警戒线时间配置
+
+    BOOL                abCrossFenceDetection;          // 是否携带交通穿越围栏信息
+    TIME_SCHEDULE_INFO  stCrossFenceDetection;          // 交通穿越围栏时间配置
+
+    BOOL                abCrossRegionDetection;         // 是否携带交通警戒区信息
+    TIME_SCHEDULE_INFO  stCrossRegionDetection;         // 交通警戒区时间配置
+
+    BOOL                abPasteDetection;               // 是否携带交通ATM贴条信息
+    TIME_SCHEDULE_INFO  stPasteDetection;               // 交通ATM贴条时间配置
+
+    BOOL                abLeftDetection;                // 是否携带交通物品遗留信息
+    TIME_SCHEDULE_INFO  stLeftDetection;                // 交通物品遗留时间配置
+
+    BOOL                abPreservation;                 // 是否携带交通物品保全信息
+    TIME_SCHEDULE_INFO  stPreservation;                 // 交通物品保全时间配置
+
+    BOOL                abTakenAwayDetection;           // 是否携带交通物品搬移信息
+    TIME_SCHEDULE_INFO  stTakenAwayDetection;           // 交通物品搬移时间配置
+
+    BOOL                abStayDetection;                // 是否携带交通停留/滞留信息
+    TIME_SCHEDULE_INFO  stStayDetection;                // 交通停留/滞留时间配置
+
+    BOOL                abParkingDetection;             // 是否携带交通非法停车信息
+    TIME_SCHEDULE_INFO  stParkingDetection;             // 交通非法停车时间配置
+
+    BOOL                abWanderDetection;              // 是否携带交通徘徊信息
+    TIME_SCHEDULE_INFO  stWanderDetection;              // 交通徘徊时间配置
+
+    BOOL                abMoveDetection;                // 是否携带交通运动信息
+    TIME_SCHEDULE_INFO  stMoveDetection;                // 交通运动时间配置
+
+    BOOL                abTailDetection;                // 是否携带交通尾随信息
+    TIME_SCHEDULE_INFO  stTailDetection;                // 交通尾随时间配置
+
+    BOOL                abRioterDetection;              // 是否携带交通聚集信息
+    TIME_SCHEDULE_INFO  stRioterDetection;              // 交通聚集时间配置
+
+    BOOL                abFightDetection;               // 是否携带交通打架信息
+    TIME_SCHEDULE_INFO  stFightDetection;               // 交通打架时间配置
+
+    BOOL                abRetrogradeDetection;          // 是否携带交通逆行信息
+    TIME_SCHEDULE_INFO  stRetrogradeDetection;          // 交通逆行时间配置
+
+    BOOL                abFireDetection;                // 是否携带交通火焰信息
+    TIME_SCHEDULE_INFO  stFireDetection;                // 交通火焰时间配置
+
+    BOOL                abSmokeDetection;               // 是否携带交通烟雾信息
+    TIME_SCHEDULE_INFO  stSmokeDetection;               // 交通烟雾时间配置
+
+    BOOL                abNumberStat;                   // 是否携带交通数量统计信息
+    TIME_SCHEDULE_INFO  stNumberStat;                   // 交通数量统计时间配置
+
+    BOOL                abVideoAbnormalDetection;       // 是否携带交通视频异常信息
+    TIME_SCHEDULE_INFO  stVideoAbnormalDetection;       // 交通视频异常时间配置
+
+    BOOL                abPrisonerRiseDetection;        // 是否携带看守所囚犯起身检测信息
+    TIME_SCHEDULE_INFO  stPrisonerRiseDetection;        // 看守所囚犯起身检测时间配置
+
+    BOOL                abFaceDetection;                // 是否携带人脸检测信息
+    TIME_SCHEDULE_INFO  stFaceDetection;                // 人脸检测时间配置
+
+    BOOL                abFaceRecognition;              // 是否携带人脸识别信息
+    TIME_SCHEDULE_INFO  stFaceRecognition;              // 人脸识别时间配置
+
+    BOOL                abDensityDetection;             // 是否携带密集度检测信息
+    TIME_SCHEDULE_INFO  stDensityDetection;             // 密集度检测时间配置
+
+    BOOL                abQueueDetection;               // 是否携带排队检测信息
+    TIME_SCHEDULE_INFO  stQueueDetection;               // 排队检测时间配置
+
+    BOOL                abClimbDetection;               // 是否携带攀高检测信息
+    TIME_SCHEDULE_INFO  stClimbDetection;               // 攀高时间配置
+
+    BOOL                abLeaveDetection;               // 是否携带离岗检测信息
+    TIME_SCHEDULE_INFO  stLeaveDetection;               // 离岗时间配置
+
+    BOOL                abVehicleOnPoliceCar;           // 是否携带车载警车信息
+    TIME_SCHEDULE_INFO  stVehicleOnPoliceCar;           // 车载警车时间配置
+
+    BOOL                abVehicleOnBus;                 // 是否携带车载公交信息
+    TIME_SCHEDULE_INFO  stVehicleOnBus;                 // 车载公交时间配置
+
+    BOOL                abVehicleOnSchoolBus;           // 是否携带车载校车信息
+    TIME_SCHEDULE_INFO  stVehicleOnSchoolBus;           // 车载校车时间配置  
+}VIOLATION_TIME_SCHEDULE;
+
+// MixModeConfig中关于车道配置信息
+typedef struct tagMixModeLaneInfo
+{
+    unsigned int                nLaneNum;                           // 车道配置个数
+    TRAFFIC_EVENT_CHECK_INFO    stCheckInfo[MAX_LANE_CONFIG_NUMBER];     // 车道配置对应事件检测信息
+}MIX_MODE_LANE_INFO;
+
+// MixModeConfig 混合模式违章配置
+typedef struct tagMIX_MODE_CONFIG
+{
+	BOOL                        bLaneDiffEnable;                    // 是否按车道区分
+	MIX_MODE_LANE_INFO          stLaneInfo;
+    TRAFFIC_EVENT_CHECK_INFO    stCheckInfo;
+}MIX_MODE_CONFIG;
+
+typedef struct tagPeriodOfValidity
+{
+    CFG_NET_TIME            stBeginTime;                    // 标定开始时间 
+    CFG_NET_TIME            stEndTime;                      // 标定到期时间
+}PERIOD_OF_VALIDITY;
+
+// 交通全局配置对应标定相关配置
+typedef struct tagTrafficCalibrationInfo
+{
+    char                    szUnit[CFG_COMMON_STRING_256];              // 标定单位
+    char                    szCertificate[CFG_COMMON_STRING_256];       // 标定证书
+    PERIOD_OF_VALIDITY      stPeriodOfValidity;                         // 标定有效期
+}TRAFFIC_CALIBRATION_INFO;
+
+// 交通配置对应传输策略
+typedef enum tagEmTransferPolicy
+{
+    EM_TRAFFIC_TRANSFER_UNKNOWN,            // 未知策略
+    EM_TRAFFIC_TRANSFER_REALTIME,           // "RealtimePriority" 实时优先
+    EM_TRAFFIC_TRANSFER_SEQUENCE,           // "SequencePriority" 顺序优先
+
+}EM_TRANSFER_POLICY;
+
+// 交通全局配置对应图片命名格式参数配置
+typedef struct tagTrafficNamingFormat
+{
+    char                    szFormat[CFG_COMMON_STRING_256];            // 图片格式
+}TRAFFIC_NAMING_FORMAT;
+
+// 交通全局配置对应灯组状态配置
+typedef struct tagEnableLightStateInfo
+{
+    BOOL                    bEnable;      // 是否启动应用层收到的灯组状态给底层
+}ENABLE_LIGHT_STATE_INFO;
+
 // CFG_CMD_TRAFFICGLOBAL 交通全局配置配置表
 typedef struct tagCFG_TRAFFICGLOBAL_INFO
 {
-	VIOLATIONCODE_INFO   stViolationCode;       // 违章代码配置表
-	BYTE		        bReserved[1024];
+	VIOLATIONCODE_INFO      stViolationCode;                            // 违章代码配置表                          
+    BOOL                    bEnableRedList;                             // 使能红名单检测，使能后，名单内车辆违章不上报
+
+    BOOL                    abViolationTimeSchedule;                    // 是否携带违章抓拍自定义时间配置
+    VIOLATION_TIME_SCHEDULE stViolationTimeSchedule;                    // 违章抓拍自定义时间配置
+    
+    BOOL                    abEnableBlackList;                          // 是否携带使能黑名单检测信息
+    BOOL                    bEnableBlackList;                           // 使能黑名单检测
+
+    BOOL                    abPriority;                                 // 是否携带违章优先级参数
+    unsigned int            nPriority;                                  // 违章优先级个数
+    char                    szPriority[MAX_PRIORITY_NUMBER][CFG_COMMON_STRING_256]; // 违章优先级, 0为最高优先级    
+
+    BOOL                    abNamingFormat;                             // 是否携带图片命名格式参数
+    TRAFFIC_NAMING_FORMAT   stNamingFormat;                             // 图片命名格式参数配置
+
+    BOOL                    abVideoNamingFormat;                        // 是否携带录像命名格式参数
+    TRAFFIC_NAMING_FORMAT   stVideoNamingFormat;                        // 录像命名格式参数配置
+
+    BOOL                    abCalibration;                              // 是否携带标定信息
+    TRAFFIC_CALIBRATION_INFO stCalibration;                             // 标定信息
+    
+    BOOL                    abAddress;                                  // 是否携带查询地址参数
+    char                    szAddress[CFG_COMMON_STRING_256];           // 查询地址，UTF-8编码
+
+    BOOL                    abTransferPolicy;                           // 是否携带传输策略参数
+    EM_TRANSFER_POLICY      emTransferPolicy;                           // 传输策略
+
+    BOOL                    abSupportModeMaskConfig;                    // 是否携带违章掩码 
+    TRAFFIC_EVENT_CHECK_MASK stSupportModeMaskConfig;                   // 违章类型支持的检测模式掩码配置
+
+    BOOL                    abIsEnableLightState;                       // 是否携带灯组状态
+    ENABLE_LIGHT_STATE_INFO stIsEnableLightState;                       // 交通全局配置对应图片命名格式参数配置
+    
+    BOOL                    abMixModeInfo;                              // 是否含有混合模式配置
+    MIX_MODE_CONFIG         stMixModeInfo;                              // 混合模式配置
 }CFG_TRAFFICGLOBAL_INFO;
 
 // CFG_CMD_VIDEOENCODEROI 视频编码ROI(Region of Intrest)配置
@@ -3343,12 +5206,15 @@ typedef struct tagCFG_DEVRECORDGROUP_INFO
 	CFG_DEVRECORD_INFO     stuDevRecordInfo[MAX_CHAN_NUM];       // 通道录像状态信息
 }CFG_DEVRECORDGROUP_INFO;
 
+#define byDahuaII byPrivateII
+#define byDahuaIId byPrivateIId
+
 // 服务状态
 typedef struct tagCFG_IPSERVER_STATUS
 {
 	int                    nSupportedServerNum;                  // 提供的服务个数
-	char                   szSupportServer[MAX_SEVER_NUM][MAX_NAME_LEN];              // 提供的服务名称 Svr Svrd(SVR守护服务) DataBase DataBased(DataBase守护服务) NtpServer NtpServerd(NtpServer守护服务) DahuaII DahuaIId(DahuaII守护服务) Samba Nfs Ftp iScsi 
-	int                    nSvrSuppSubServerNum;                                      // Svr提供的子服务信息个数
+	char                   szSupportServer[MAX_SEVER_NUM][MAX_NAME_LEN];  // 提供的服务名称 Svr Svrd(SVR守护服务) DataBase DataBased(DataBase守护服务) NtpServer NtpServerd(NtpServer守护服务) DahuaII DahuaIId(DahuaII守护服务) Samba Nfs Ftp iScsi 
+	int                    nSvrSuppSubServerNum;                          // Svr提供的子服务信息个数
 	char                   szSvrSuppSubServer[MAX_SEVER_NUM][MAX_NAME_LEN];           // Svr提供的子服务信息 CMS DMS	MTS	SS RMS DBR
 	BYTE                   byCMS;                                // 0:未知 1:运行 2:未运行
 	BYTE                   byDMS;                                // 0:未知 1:运行 2:未运行
@@ -3361,8 +5227,8 @@ typedef struct tagCFG_IPSERVER_STATUS
 	BYTE                   byDataBased;                          // 0:未知 1:运行 2:未运行
 	BYTE                   byNtpServer;                          // 0:未知 1:运行 2:未运行
 	BYTE                   byNtpServerd;                         // 0:未知 1:运行 2:未运行
-	BYTE                   byDahuaII;                            // 0:未知 1:运行 2:未运行
-	BYTE                   byDahuaIId;                           // 0:未知 1:运行 2:未运行
+	BYTE                   byPrivateII;                          // 0:未知 1:运行 2:未运行
+	BYTE                   byPrivateIId;                         // 0:未知 1:运行 2:未运行
 	BYTE                   bySAMBA;                              // 0:未知 1:运行 2:未运行
 	BYTE                   byNFS;                                // 0:未知 1:运行 2:未运行
 	BYTE                   byFTP;                                // 0:未知 1:运行 2:未运行
@@ -3375,7 +5241,7 @@ typedef struct tagCFG_IPSERVER_STATUS
 #define MAX_MATRIX_PLAN               4              // 最大矩阵方案数
 #define MAX_TOUR_MODE                 16             // 最大轮巡队列数
 
-typedef enum MATRIX_VIEW_SPLITMODE
+typedef enum tagMATRIX_VIEW_SPLITMODE
 {
 	MATRIX_VIEW_SPLIT1 = 0,
 	MATRIX_VIEW_SPLIT2,	
@@ -3389,7 +5255,7 @@ typedef enum MATRIX_VIEW_SPLITMODE
 	MATRIX_VIEW_SPLIT25,
 	MATRIX_VIEW_SPLIT36,
 	MATRIX_VIEW_SPLIT_NR,
-};
+}MATRIX_VIEW_SPLITMODE;
 
 // 轮巡模式
 typedef struct tagCFG_TOUR_MODE
@@ -3510,7 +5376,7 @@ typedef struct tagCFG_VIDEO_SCENECHANGE_DETECTION
 }CFG_VIDEO_SCENECHANGE_DETECTION;
 typedef struct tagCFG_VIDEO_DIAGNOSIS_PROFILE
 {
-	char							szName[MAX_PATH];							// 名称
+	char							szName[MAX_PATH];							// 名称Ansi编码
 
 	CFG_VIDEO_DITHER_DETECTION*		pstDither;									// 视频抖动检测
 	CFG_VIDEO_STRIATION_DETECTION*	pstStriation;								// 视频条纹检测
@@ -3571,8 +5437,8 @@ typedef struct tagCFG_TAST_SOURCES
 }CFG_TAST_SOURCES;
 typedef struct tagCFG_DIAGNOSIS_TASK
 {
-	char							szTaskName[MAX_PATH];						// 任务名称
-	char							szProfileName[MAX_PATH]; 					// 本任务使用的诊断参数表名
+	char							szTaskName[MAX_PATH];						// 任务名称Ansi编码
+	char							szProfileName[MAX_PATH]; 					// 本任务使用的诊断参数表名Ansi编码
 	int								nTotalSourceNum;						    // 调用者分配任务数据源的个数  根据能力集获取
 	int								nReturnSourceNum;							// 返回实际任务数据源的个数
 	CFG_TAST_SOURCES*				pstSources;									// 任务数据源 调用者分配内存nTotalSourceNum个
@@ -3589,12 +5455,14 @@ typedef struct tagCFG_VIDEODIAGNOSIS_TASK
 typedef struct tagPROJECT_TASK
 {
 	BOOL							bEnable;									// 任务是否使能
-	char							szTaskName[MAX_PATH];						// 任务名称
+	char							szTaskName[MAX_PATH];						// 任务名称Ansi编码
 	CFG_TIME_SECTION				stTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT];	// 任务时间段
+	BOOL                            bIsCycle;                                   // 任务是否循环,TRUE表示循环,FALSE表示不循环
 }CFG_PROJECT_TASK;
+
 typedef struct tagDIAGNOSIS_PROJECT
 {
-	char							szProjectName[MAX_PATH];					// 计划名称
+	char							szProjectName[MAX_PATH];					// 计划名称Ansi编码
 	int								nTotalTaskNum;								// 调用者分配任务列表个数  根据能力集获取
 	int								nReturnTaskNum;					    		// 返回实际任务列表个数
 	CFG_PROJECT_TASK*				pstProjectTasks;								// 任务列表 调用者分配内存nTotalTaskNum个
@@ -3607,18 +5475,34 @@ typedef struct tagCFG_VIDEODIAGNOSIS_PROJECT
 	CFG_DIAGNOSIS_PROJECT*			pstProjects;									// 计划配置 调用者分配内存nTotalProjectNum个
 }CFG_VIDEODIAGNOSIS_PROJECT;
 
+// 实时计划相关信息
+typedef struct tagCFG_DIAGNOSIS_REALPROJECT
+{
+	char							szProjectName[MAX_PATH];					// 计划名称Ansi编码
+	CFG_DIAGNOSIS_TASK			    stProjectTask;							    // 任务信息
+}CFG_DIAGNOSIS_REALPROJECT;
+
+// 视频诊断实时计划表
+typedef struct tagCFG_VIDEODIAGNOSIS_REALPROJECT 
+{
+	int								nProjectNum;							    // 实时计划个数
+	CFG_DIAGNOSIS_REALPROJECT*		pstProjects;							    // 计划配置 调用者分配内存nProjectNum个
+}CFG_VIDEODIAGNOSIS_REALPROJECT;
+
 // 视频诊断全局表(CFG_CMD_VIDEODIAGNOSIS_GLOBAL),每个通道支持一个诊断配置 
 typedef struct tagCFG_VIDEODIAGNOSIS_GLOBAL_CHNNL
 {
-	BOOL							bEnable;									// 计划是否使能
-	BOOL							bApplyNow;									// 配置立即应用	立即应用表示参数表，任务，计划的修改立即生效，否则等到当前正在执行的任务完成后生效。
-	char							szProjectName[MAX_PATH];					// 计划名称
+	BOOL                            abProjectName;                              // 计划名称是否有效 
+	char							szProjectName[MAX_PATH];					// 计划名称，Ansi编码
+	BOOL                            abRealProjectName;                          // 实时计划名称是否有效
+	char                            szRealProjectName[MAX_PATH];                // 实时计划名称，Ansi编码   
 }CFG_VIDEODIAGNOSIS_GLOBAL_CHNNL;
+
 typedef struct tagCFG_VIDEODIAGNOSIS_GLOBAL
 {
 	int								nTotalGlobalNum;							// 调用者分配全局配置个数  根据能力集获取
 	int								nReturnGlobalNum;							// 返回实际全局配置个数
-	CFG_VIDEODIAGNOSIS_GLOBAL_CHNNL	*pstGlobals;									// 视频诊断全局配置 调用者分配内存nGlobalCount个CFG_VIDEODIAGNOSIS_GLOBAL_CHNNL
+	CFG_VIDEODIAGNOSIS_GLOBAL_CHNNL	*pstGlobals;								// 视频诊断全局配置 调用者分配内存nGlobalCount个CFG_VIDEODIAGNOSIS_GLOBAL_CHNNL
 }CFG_VIDEODIAGNOSIS_GLOBAL;
 
 // 视频诊断服务能力集(CFG_CAP_CMD_VIDEODIAGNOSIS_SERVER)
@@ -3667,6 +5551,21 @@ typedef struct tagCFG_MASTERSLAVETRACKER_INFO
 	    int                nChannels;	//主从式跟踪器通道数目
 }CFG_MASTERSLAVETRACKER_INFO;
 
+#define  MAX_CAMERA_TYPE	64
+#define	 MAX_TYPE_STRING	64
+
+typedef struct tagCFG_CAMERA_PER_TYPE_INFO
+{
+	char				szCameraType[MAX_TYPE_STRING];	//相机型号
+	char				szLensType[MAX_TYPE_STRING];	//相机镜头型号	镜头型号和相机型号相关，可以为空值
+}CFG_CAMERA_PER_TYPE_INFO;
+
+typedef struct tagCFG_CAMERA_TYPE_INFO
+{
+	int							nCameraTypeNum;						//该类型的相机所具有的不同型号数
+	CFG_CAMERA_PER_TYPE_INFO	stCameraTypeInfos[MAX_CAMERA_TYPE]; //具体的型号信息
+}CFG_CAMERA_TYPE_INFO;
+
 // 变倍类型
 typedef enum tagCFG_ZOOM_TYPE
 {
@@ -3688,33 +5587,38 @@ typedef enum tagCFG_TRACKING_MODE
 	TRACKING_MODE_NUM
 }CFG_TRACKING_MODE;
 
+
 // 主从式跟踪器全局配置基本结构体
 typedef struct tagCFG_MASTERSLAVE_GLOBAL_INFO
 {
-	int                nStructSize;
-	float              fMaxZoom;                    // 最大变倍倍数
-	float              fMinZoom;                    // 最小变倍倍数
-	float              fExpectMultiple;             // 期望倍数（基准倍数），最小变倍倍数<期望倍数<最大变倍倍数
-	float              fPollTrackTime;              // 轮询跟踪时长，单位：秒；>0.0
-	float              fPointTrackTime;             // 定点跟踪时长,单位：秒；>0.0在报警跟踪、自动选定物体跟踪、混合跟踪模式下有效
-    float              fObjectTrackTime;            // 手动选定物体跟踪时长, 单位：秒；>0.0在报警跟踪、自动选定物体跟踪、混合跟踪模式下有效
-	float              fExpectAngleX;               // 期望倍数对应球机角度x(水平)
-    float              fExpectAngleY;               // 期望倍数对应球机角度y(垂直)
-	CFG_SIZE           stTargetFaceSize;            // 靶面尺寸(单位：毫米), 球机设备参数，与球机有关
-	float              fMinFocus;                   // 最小焦距(单位：毫米)
-	float              fMaxFocus;                   // 最大焦距(单位：毫米)
-	CFG_ZOOM_TYPE      emZoomType;                  // 变倍类型
-	CFG_TRACKING_MODE  emTrackingMode;              // 跟踪模式
+	int						nStructSize;
+	float					fMaxZoom;						// 最大变倍倍数
+	float					fMinZoom;						// 最小变倍倍数
+	float					fExpectMultiple;				// 期望倍数（基准倍数），最小变倍倍数<期望倍数<最大变倍倍数
+	float					fPollTrackTime;					// 轮询跟踪时长，单位：秒；>0.0
+	float					fPointTrackTime;				// 定点跟踪时长,单位：秒；>0.0在报警跟踪、自动选定物体跟踪、混合跟踪模式下有效
+    float					fObjectTrackTime;				// 手动选定物体跟踪时长, 单位：秒；>0.0在报警跟踪、自动选定物体跟踪、混合跟踪模式下有效
+	float					fExpectAngleX;					// 期望倍数对应球机角度x(水平)
+    float					fExpectAngleY;					// 期望倍数对应球机角度y(垂直)
+	CFG_SIZE				stTargetFaceSize;				// 靶面尺寸(单位：毫米), 球机设备参数，与球机有关
+	float					fMinFocus;						// 最小焦距(单位：毫米)
+	float					fMaxFocus;						// 最大焦距(单位：毫米)
+	CFG_ZOOM_TYPE			emZoomType;						// 变倍类型
+	CFG_TRACKING_MODE		emTrackingMode;					// 跟踪模式
+	CFG_CAMERA_TYPE_INFO	stCameraInfo;					// 枪式摄像机
+	CFG_CAMERA_TYPE_INFO	stDomeInfo;						// 球式摄像机
+	int						nTrackZoomLevel;				// 跟踪倍数等级	-5<= TrackZoomLevel <=5 0表示用默认算法方式
+	BOOL					bReturnPtzPreset;				// TRUE，跟踪后返回预置点 , FALSE，跟踪后不返回预置点
 }CFG_MASTERSLAVE_GLOBAL_INFO;
-
-
+	
 // 获取主从式设备能力集
 typedef struct tagCFG_CAP_MASTERSLAVE_INFO
 {
 	int                     nStructSize;
 	BYTE                    byTrackingMode[TRACKING_MODE_NUM]; // 数组下标表示CFG_TRACKING_MODE枚举相对应模式，1表示支持
+	CFG_CAMERA_TYPE_INFO	stCameraInfo;  // 枪式摄像机
+	CFG_CAMERA_TYPE_INFO	stDomeInfo;	   // 球式摄像机
 }CFG_CAP_MASTERSLAVE_INFO;
-
 
 
 // 获取服务器报警联动能力集
@@ -3778,6 +5682,7 @@ typedef struct tagCFG_TRAFFIC_FLOWSTAT_ALARM_INFO
 	int                             nInterval;                            // 报警间隔时间, 单位:秒, 范围1~65535
 	int                             nReportTimes;                         // 上报次数,1~255
 	CFG_TIME_SECTION                stCurrentTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT_EX]; // 当前计划时间段
+	CFG_ALARM_MSG_HANDLE            stuEventHandler;					  // 报警联动
 }CFG_TRAFFIC_FLOWSTAT_ALARM_INFO;
 
 typedef struct tagCFG_TRAFFIC_FLOWSTAT_INFO_CHNL
@@ -3791,6 +5696,7 @@ typedef struct tagCFG_TRAFFIC_FLOWSTAT_INFO_CHNL
     int                              nDetectRegionPoint;                    // 检测区顶点数
     CFG_POLYGON                      stuDetectRegion[MAX_POLYGON_NUM];      // 检测区域
 	char                             szName[MAX_NAME_LEN];                  // 当前车道规则名称，不同规则不能重名
+	int								 nPresetID;								// 云台所在预置点编号(仅球机有效)
 }CFG_TRAFFIC_FLOWSTAT_INFO_LANE;
 
 // 交通流量统计配置(CFG_CMD_TRAFFIC_FLOWSTAT)
@@ -3803,6 +5709,9 @@ typedef struct tagCFG_TRAFFIC_FLOWSTAT_INFO
 	int								nPeriod;									// 统计周期，单位分钟
 	int								nLaneNum;									// 车道数
 	CFG_TRAFFIC_FLOWSTAT_INFO_LANE	stuTrafficFlowstat[MAX_LANE_NUM];			// 每个车道的流量配置，下标对应车道号
+	DWORD                           dwLaneExtraMaxNum;                           // 车道数扩充最大值(用于申请内存),多场景应用多余的车道信息需要
+	DWORD                           dwLaneExtraRetNum;                           // 多场景应用多余的车道数实际个数
+	CFG_TRAFFIC_FLOWSTAT_INFO_LANE  *pstuTrafficFlowstat;                       // 多场景的车道数, stuTrafficFlowstat数组放不开的车道在这里继续保存，序号从车道MAX_LANE_NUM+1开始
 }CFG_TRAFFIC_FLOWSTAT_INFO;
 
 //-----------------------------------视频输入前端选项-------------------------------------------
@@ -3810,7 +5719,18 @@ typedef struct tagCFG_TRAFFIC_FLOWSTAT_INFO
 // 视频输入夜晚特殊配置选项，在晚上光线较暗时自动切换到夜晚的配置参数
 typedef struct tagCFG_VIDEO_IN_NIGHT_OPTIONS
 {
-	BYTE				bySwitchMode;			// 0-不切换，总是使用白天配置；1-根据亮度切换；2-根据时间切换；3-不切换，总是使用夜晚配置；4-使用普通配置； 
+	BYTE				bySwitchMode;			//已废弃,使用CFG_VIDEO_IN_OPTIONS里面的bySwitchMode
+                                                //0-不切换，总是使用白天配置；1-根据亮度切换；2-根据时间切换；3-不切换，总是使用夜晚配置；4-使用普通配置
+	BYTE				byProfile;				// 当前使用的配置文件.
+												// 0-白天
+												// 1-晚上
+												// 2-Normal
+												// 0，1,2都为临时配置，使图像生效，便于查看图像调试效果，不点击确定，离开页面不保存至设备。
+												///3-非临时配置，点击确定后保存至设备，与SwitchMode结合使用，根据SwitchMode决定最终生效的配置。
+												// SwitchMode=0，Profile=3，设置白天配置到设备；
+												// SwitchMode=1，Profile=3，则设置夜晚配置到设备
+												// SwitchMode=2，Profile=3，根据日出日落时间段切换，白天时间段使用白天配置，夜晚时间段使用夜晚配置，保存至设备；
+												// SwitchMode=4，Profile=3；使用普通配置，保存至设备
 	BYTE				byBrightnessThreshold ;	// 亮度阈值 0~100	
 	BYTE				bySunriseHour;			// 大致日出和日落时间，日落之后日出之前，将采用夜晚特殊的配置。
 	BYTE				bySunriseMinute;		// 00:00:00 ~ 23:59:59
@@ -3840,7 +5760,9 @@ typedef struct tagCFG_VIDEO_IN_NIGHT_OPTIONS
 	BYTE                byWideDynamicRange;     // 宽动态值 0-关闭，1~100-为真实范围值
 	BYTE                byGlareInhibition;		// 强光抑制 0-关闭， 1~100为范围值
 	CFG_RECT			stuBacklightRegion;     // 背光补偿区域
-	BYTE				reserved[76];			// 保留
+	BYTE                byFocusMode;            // 0-关闭，1-辅助聚焦，2-自动聚焦
+	bool				bFlip;					// 翻转
+	BYTE				reserved[74];			// 保留
 } CFG_VIDEO_IN_NIGHT_OPTIONS;
 
 typedef struct tagCFG_VIDEO_IN_NORMAL_OPTIONS
@@ -3867,7 +5789,9 @@ typedef struct tagCFG_VIDEO_IN_NORMAL_OPTIONS
 	BYTE                byWideDynamicRange;     // 宽动态值 0-关闭，1~100-为真实范围值
 	BYTE                byGlareInhibition;		// 强光抑制 0-关闭， 1~100为范围值
 	CFG_RECT			stuBacklightRegion;     // 背光补偿区域
-	BYTE				reserved[76];			// 保留
+	BYTE                byFocusMode;            // 0-关闭，1-辅助聚焦，2-自动聚焦
+	bool				bFlip;					// 翻转
+	BYTE				reserved[74];			// 保留
 }CFG_VIDEO_IN_NORMAL_OPTIONS;
 
 
@@ -3900,6 +5824,20 @@ typedef struct tagCFG_VIDEO_IN_SNAPSHOT_OPTIONS
 	BYTE				reversed[112];			// 保留
 } CFG_VIDEO_IN_SNAPSHOT_OPTIONS;
 
+// 鱼眼矫正模式
+typedef enum
+{
+    CFG_CALIBRATE_MODE_UNKOWN,                  // 未知模式 
+    CFG_CALIBRATE_MODE_ORIGIAL,                 // 原始图像模式
+    CFG_CALIBRATE_MODE_CONFIG,                  // 配置模式
+    CFG_CALIBRATE_MODE_PANORAMA,                // 全景模式
+    CFG_CALIBRATE_MODE_DOUBLEPANORAMA,          // 双全景模式
+    CFG_CALIBRATE_MODE_ORIGIALPLUSTHREEEPTZREGION, // 1+3模式（一个原始鱼眼图像加3个EPtz图像）
+    CFG_CALIBRATE_MODE_SINGLE,                  // 单画面EPtz模式（只有一个EPtz画面）
+    CFG_CALIBRATE_MODE_FOUREPTZREGION,          // 4画面模式（4个EPtz控制画面）
+    CFG_CALIBRATE_MODE_NORMAL,                  // 普通模式
+}CFG_CALIBRATE_MODE;
+
 // 鱼眼镜头配置
 typedef struct tagCFG_FISH_EYE
 {
@@ -3907,6 +5845,7 @@ typedef struct tagCFG_FISH_EYE
 	unsigned int        nRadius;                // 鱼眼半径大小,范围[0,8192]
 	float               fDirection;             // 镜头旋转方向,旋转角度[0,360.0]
 	BYTE                byPlaceHolder;          // 镜头安装方式	1顶装，2壁装；3地装,默认1
+    BYTE                byCalibrateMode;        // 鱼眼矫正模式,详见CFG_CALIBRATE_MODE枚举值
 	BYTE				reversed[31];			// 保留
 }CFG_FISH_EYE;
 // 视频输入前端选项
@@ -3932,14 +5871,15 @@ typedef struct tagCFG_VIDEO_IN_OPTIONS
 	BYTE				byRotate90;				// 0-不旋转，1-顺时针90°，2-逆时针90°	
 	float               fExternalSyncPhase;		// 外同步的相位设置 0~360	
 	BYTE                byExternalSync;			// 外部同步信号输入,0-内部同步 1-外部同步
-	BYTE				reserved0;				// 保留
+	BYTE				bySwitchMode;			//0-不切换，总是使用白天配置；1-根据亮度切换；2-根据时间切换；3-不切换，总是使用夜晚配置；4-使用普通配置
 	BYTE				byDoubleExposure;		// 双快门, 0-不启用，1-双快门全帧率，即图像和视频只有快门参数不同，2-双快门半帧率，即图像和视频快门及白平衡参数均不同
 	BYTE                byWideDynamicRange;     // 宽动态值
 	CFG_VIDEO_IN_NIGHT_OPTIONS stuNightOptions;	// 夜晚参数
 	CFG_FLASH_CONTROL	stuFlash;				// 闪光灯配置
 	CFG_VIDEO_IN_SNAPSHOT_OPTIONS stuSnapshot;	// 抓拍参数, 双快门时有效
 	CFG_FISH_EYE        stuFishEye;             // 鱼眼镜头
-	BYTE                reserved[29];           // 保留
+	BYTE                byFocusMode;            // 0-关闭，1-辅助聚焦，2-自动聚焦
+	BYTE                reserved[28];           // 保留
 	BYTE				byGainMin;				// 增益下限
 	BYTE				byGainMax;				// 增益上限
 	BYTE				byAntiFlicker;			// 防闪烁模式 0-Outdoor 1-50Hz防闪烁 2-60Hz防闪烁
@@ -4010,18 +5950,6 @@ typedef struct tagCFG_MULTICASTS_INFO_OUT
 	CFG_MULTICASTS_INFO  stuRTPMulticast;  //RTP的组播配置
 	CFG_MULTICASTS_INFO  stuDHIIMulticast; //DHII的组播配置
 }CFG_MULTICASTS_INFO_OUT;
-
-// 时间
-typedef struct tagCFG_NET_TIME
-{
-	int                 nStructSize;
-	DWORD				dwYear;					// 年
-	DWORD				dwMonth;				// 月
-	DWORD				dwDay;					// 日
-	DWORD				dwHour;					// 时
-	DWORD				dwMinute;				// 分
-	DWORD				dwSecond;				// 秒
-} CFG_NET_TIME;
 
 typedef struct tagCFG_ACTIVEUSER_INFO
 {
@@ -4132,6 +6060,7 @@ typedef struct tagCFG_SCENE
 	int					   nSceneDuration;						//跟踪持续时间:0秒: 一直跟踪;1~300:跟踪持续时间
 	double		           dSceneMaxZoom;					    //归一化到0~1;为null表示使用全局MaxZoom值
 	CFG_POSITION_LIMIT	   stuPositionLimit;                    //限位参数
+    int                    nSceneRegression;                    //归位时间，1~10秒:跟踪丢失后回到原场景的时间
 }CFG_SCENE;
 // 智能跟踪场景配置结构体
 typedef struct tagCFG_INTELLITRACKSCENE_INFO
@@ -4147,6 +6076,69 @@ typedef struct tagCFG_INTELLITRACKSCENE_INFO
 	int				  nSceneCount;						 //支持的场景个数
 	CFG_SCENE		  stuScene[MAX_TRACKSCENE_NUM];	     //场景列表
 }CFG_INTELLITRACKSCENE_INFO;
+
+// 鱼眼详细配置
+
+#define   CFG_MAX_FISHEYE_WINDOW_NUM               8         // 最大鱼眼窗口数
+#define   CFG_MAX_FISHEYE_MODE_NUM                 8         // 最大鱼眼模式数   
+// 鱼眼窗口位置信息
+typedef struct tagCFG_FISHEYE_WINDOW_INFO
+{
+    DWORD             dwWindowID;                        // 窗口ID
+    int               nFocusX;                           // EPtz（电子云台）的焦点横坐标
+    int               nFocusY;                           // EPtz (电子云台）的焦点纵坐标   
+    int               nHorizontalAngle;                  // EPtz的水平角度
+    int               nVerticalAngle;                    // EPtz的垂直角度
+}CFG_FISHEYE_WINDOW_INFO;
+
+// 鱼眼各模式的窗口位置信息
+typedef struct tagCFG_FISHEYE_MODE_INFO
+{
+    int                nModeType;                        // 模式类型，详见 CFG_CALIBRATE_MODE
+    int                nWindowNum;                       // 当前模式下的窗口数
+    CFG_FISHEYE_WINDOW_INFO stuWindwos[CFG_MAX_FISHEYE_WINDOW_NUM]; // 具体窗口信息 
+}CFG_FISHEYE_MODE_INFO;
+
+typedef struct tagCFG_FISHEYE_DETAIL_INFO
+{
+    int                nModeNum;                         // 模块数
+    CFG_FISHEYE_MODE_INFO stuModes[CFG_MAX_FISHEYE_MODE_NUM]; // 具体模块信息  
+}CFG_FISHEYE_DETAIL_INFO;
+
+// 平台下发呼叫无应答转移配置列表
+#define   CFG_MAX_NOANSWER_FORWARD_GROUP_NUM                    32         // 最大无应答前转列表个数
+#define   CFG_MAX_FORWARD_NUMBERS_NUM                           32         // 最大无应答转移号码个数
+
+// 无应答转移配置
+typedef struct tagCFG_VT_NOANSWER_FORWARD_GROUP
+{
+    char                    szRoomNumber[CFG_COMMON_STRING_32];          // 被呼叫号码
+    int                     nForwardNumbersNum;                          // 无应答转移号码个数
+    char                    szForwardNumbers[CFG_MAX_FORWARD_NUMBERS_NUM][CFG_COMMON_STRING_64]; // 无应答转移号码列表  
+}CFG_VT_NOANSWER_FORWARD_GROUP;
+
+// 平台下发呼叫无应答转移配置列表信息
+typedef struct tagCFG_VT_NOANSWER_FORWARD_INFO
+{
+    BOOL                            bEnable;                                        // 无应答转移使能
+    int                             nGroupNum;                                      // 无应答转移配置列表有效个数，范围：0 ~ CFG_MAX_NOANSWER_FORWARD_GROUP_NUM
+    CFG_VT_NOANSWER_FORWARD_GROUP   stuGroups[CFG_MAX_NOANSWER_FORWARD_GROUP_NUM];  // 无应答转移配置列表  
+}CFG_VT_NOANSWER_FORWARD_INFO;
+
+// VTO呼叫配置
+typedef struct tagCFG_VTO_CALL_INFO
+{
+    BOOL                            bAreaEnable;                                        // 跨区域联网使能
+    char                            szAreaNumber[CFG_COMMON_STRING_32];                  // 区域编码
+    BOOL                            bMiddleNumberCallEnable;                            // 中号呼叫开关
+    char                            szVTHMiddleNumberPrefix[CFG_COMMON_STRING_16];       // VTH中号前缀，固定长度4位
+    char                            szVTHLongNumberPrefix[CFG_COMMON_STRING_32];         // VTH长号前缀，固定长度8位
+    char                            szVTOShortNumber[CFG_COMMON_STRING_16];              // VTO短号，固定长度4位
+    char                            szVTOMiddleNumberPrefix[CFG_COMMON_STRING_16];       // VTO中号前缀，固定长度4位
+    char                            szVTOLongNumbrPrefix[CFG_COMMON_STRING_32];          // VTO长号前缀，固定长度12位
+    char                            szVTSLongNumber[CFG_COMMON_STRING_32];               // VTS长号，固定长度18位
+    char                            szVillaCallVTHNum[CFG_COMMON_STRING_32];             // 别墅机呼叫号码
+}CFG_VTO_CALL_INFO;
 
 /************************工作状态配置**********************************/
 
@@ -4225,7 +6217,7 @@ typedef struct tagCFG_STORAGEPOINT_INFO
 {
 	DWORD dwSize;
 	EM_STORAGEPOINT_TYPE emStoragePointType;// 存储点类型
-	char szLocalDir[MAX_DIRECTORY_LEN];     //本地工作目录组名称, 空表示不录到本地
+	char nLocalDir;                         //本地工作目录组名称, 空表示不录到本地
 	char szCompressDir[MAX_DIRECTORY_LEN];  //实时压缩存储目录组，空表示不使用实时压缩存储。
 	char szRedundantDir[MAX_DIRECTORY_LEN]; //冗余工作目录组名称,空表示没有冗余录像。
 	char szRemoteDir[MAX_DIRECTORY_LEN];   //远程工作目录组名称,空表示不录到远程。
@@ -4326,6 +6318,7 @@ struct AV_CFG_VideoOutAttr
 	AV_int32			nFormat;						// 0-Auto, 1-TV, 2-VGA, 3-DVI
 	AV_int32			nRefreshRate;					// 刷新频率
 	AV_BOOL				bIQIMode;						// 输出图像增强
+	AV_int32			nScanFormat;					// 扫描模式, 0-逐行, 1-隔行
 };
 
 // 时间段
@@ -4525,6 +6518,21 @@ struct AV_CFG_VideoWidgetCover
 	AV_BOOL				bPreviewBlend;					// 叠加到预览视频
 };
 
+// 通道标题对齐信息
+typedef enum tagEM_TITLE_TEXT_ALIGN
+{
+    EM_TEXT_ALIGN_INVALID,                              // 无效的对齐方式
+    EM_TEXT_ALIGN_LEFT,                                 // 左对齐
+    EM_TEXT_ALIGN_XCENTER,                              // X坐标中对齐
+    EM_TEXT_ALIGN_YCENTER,                              // Y坐标中对齐
+    EM_TEXT_ALIGN_CENTER,                               // 居中
+    EM_TEXT_ALIGN_RIGHT,                                // 右对齐
+    EM_TEXT_ALIGN_TOP,                                  // 按照顶部对齐
+    EM_TEXT_ALIGN_BOTTOM,                               // 按照底部对齐
+    EM_TEXT_ALIGN_LEFTTOP,                              // 按照左上角对齐
+    EM_TEXT_ALIGN_CHANGELINE,                           // 换行对齐
+}EM_TITLE_TEXT_ALIGN;
+
 // 编码物件-通道标题
 struct AV_CFG_VideoWidgetChannelTitle
 {
@@ -4570,6 +6578,27 @@ struct AV_CFG_VideoWidgetCustomTitle
 	AV_CFG_Rect			stuRect;						// 区域, 坐标取值0~8191, 仅使用left和top值, 点(left,top)应和(right,bottom)设置成同样的点
 	char				szText[AV_CFG_Custom_Title_Len];// 标题内容
 	AV_BOOL				bPreviewBlend;					// 叠加到预览视频
+    char                szType[AV_CFG_Custom_TitleType_Len];// 标题类型 "Rtinfo" 实时刻录信息 "Custom" 自定义叠加、温湿度叠加 "Title" :片头信息 "Check"  校验码
+                                                            // 地理信息 "Geography"  ATM卡号信息 "ATMCardInfo" 摄像机编号 "CameraID" 
+    EM_TITLE_TEXT_ALIGN emTextAlign;                    // 标题对齐方式
+};
+
+//  编码物件-叠加传感器信息-叠加内容描述
+struct AV_CFG_VideoWidgetSensorInfo_Description 
+{
+	AV_int32			nStructSize;
+	AV_int32			nSensorID;						// 需要描述的传感器的ID(即模拟量报警通道号)
+};
+
+// 编码物件-叠加传感器信息
+struct AV_CFG_VideoWidgetSensorInfo
+{
+	AV_int32			nStructSize;
+	AV_BOOL				bPreviewBlend;					// 叠加到预览视频
+	AV_BOOL				bEncodeBlend;					// 叠加到主码流视频编码
+	AV_CFG_Rect			stuRect;						// 区域, 坐标取值0~8191
+	AV_int32			nDescriptionNum;				// 叠加区域描述数目
+	AV_CFG_VideoWidgetSensorInfo_Description stuDescription[AV_CFG_Max_Description_Num];// 叠加区域描述信息
 };
 
 // 视频编码物件配置
@@ -4582,6 +6611,8 @@ struct AV_CFG_VideoWidget
 	AV_CFG_VideoWidgetCover			stuCovers[AV_CFG_Max_Video_Widget_Cover];				// 覆盖区域
 	AV_int32						nCustomTitleNum;	// 自定义标题数量
 	AV_CFG_VideoWidgetCustomTitle	stuCustomTitle[AV_CFG_Max_Video_Widget_Custom_Title];	// 自定义标题
+	AV_int32						nSensorInfo;		// 传感器信息叠加区域数目
+	AV_CFG_VideoWidgetSensorInfo	stuSensorInfo[AV_CFG_Max_Video_Widget_Sensor_Info];		// 传感器信息叠加区域信息
 };
 
 // 存储组通道相关配置
@@ -4678,11 +6709,12 @@ struct AV_CFG_AutoMaintain
 	AV_int32			nAutoStartupDay;				// 自动启动日期
 	AV_int32			nAutoStartupHour;				// 自动启动小时
 	AV_int32			nAutoStartupMinute;				// 自动启动分钟
+	AV_BOOL				bAutoRebootEnable;				// true表示开启自动重启，false表示关闭自动重启
 };
 
 #define AV_CFG_Monitor_Name_Len		64			// 电视墙名称长度
-#define AV_CFG_Max_TV_In_Block		64			// 区块中TV的最大数量
-#define AV_CFG_Max_Block_In_Wall	64			// 电视墙中区块的最大数量
+#define AV_CFG_Max_TV_In_Block		128			// 区块中TV的最大数量
+#define AV_CFG_Max_Block_In_Wall	128			// 电视墙中区块的最大数量
 
 // 电视墙输出通道信息
 struct AV_CFG_MonitorWallTVOut
@@ -4716,7 +6748,8 @@ struct AV_CFG_MonitorWall
 	AV_int32			nColumn;							// 网格列数
 	AV_int32			nBlockCount;						// 区块数量
 	AV_CFG_MonitorWallBlock stuBlocks[AV_CFG_Max_Block_In_Wall];// 区块数组
-
+    BOOL                bDisable;                           // 是否禁用, 0-该电视墙有效, 1-该电视墙无效
+    char                szDesc[CFG_COMMON_STRING_256];      // 电视墙描述信息
 };
 
 // 拼接屏
@@ -4909,6 +6942,16 @@ typedef struct tagCFG_REGISTER_SERVER_INFO
 	CFG_SERVER_INFO     stuServers[MAX_SERVER_NUM];         // 服务器数组
 }CFG_REGISTER_SERVER_INFO;
 
+// 带宽不足时码流策略
+typedef enum tagSTREAM_POLICY
+{
+    STREAM_POLICY_UNKNOWN,
+    STREAM_POLICY_NONE = 1,								// 无策略,不开启使能"None"
+    STREAM_POLICY_QUALITY,                              // 画质优先"Quality"  
+    STREAM_POLICY_FLUENCY,                              // 流畅度优先"Fluency"
+    STREAM_POLICY_AUTOADAPT,                            // 自动"AutoAdapt"
+}EM_STREAM_POLICY;
+
 // 网络协议配置
 typedef struct tagCFG_DVRIP_INFO
 {
@@ -4921,6 +6964,7 @@ typedef struct tagCFG_DVRIP_INFO
 	char                szMCASTAddress[MAX_ADDRESS_LEN];    // 组播地址
 	int                 nRegistersNum;                      // 主动注册配置个数
 	CFG_REGISTER_SERVER_INFO stuRegisters[MAX_REGISTER_NUM];// 主动注册配置 
+    EM_STREAM_POLICY    emStreamPolicy;                     // 带宽不足时码流策略
 }CFG_DVRIP_INFO;
 
 // 假期录像计划
@@ -4997,18 +7041,32 @@ typedef struct tagCFG_NETWORK_INFO
 	CFG_NETWORK_INTERFACE	stuInterfaces[MAX_NETWORK_INTERFACE_NUM];	// 网卡列表
 } CFG_NETWORK_INFO;
 
+// 云存储协议类型
+typedef enum tagEM_CFG_NAS_CLOUDPROTOCOL_TYPE
+{
+    EM_CFG_NAS_CLOUDPROTOCOL_TYPE_UNKNOWN,              // 未知
+    EM_CFG_NAS_CLOUDPROTOCOL_TYPE_BAIDU_CLOUD,          // "BaiduCloud"
+    EM_CFG_NAS_CLOUDPROTOCOL_TYPE_GOOGLE_DRIVE,         // "GoogleDrive"
+    EM_CFG_NAS_CLOUDPROTOCOL_TYPE_DROPBOX,              // "Dropbox"
+}EM_CFG_NAS_CLOUDPROTOCOL_TYPE;
+
 // 网络存储配置
 typedef struct tagCFG_NAS_INFO_NEW
 {
-	BOOL				bEnable;						// 使能
-	char				szName[MAX_NAME_LEN];			// 名称
-	int					nPortocol;						// 协议类型, 0-FTP, 1-SMB, 2-ISCSI
-	char				szAddress[MAX_ADDRESS_LEN];		// IP地址或网址
-	int					nPort;							// 端口
-	char				szUser[MAX_USERNAME_LEN];		// 用户名
-	char				szPassword[MAX_PASSWORD_LEN];	// 密码
-	char				szDirectory[MAX_NAME_LEN];		// 共享的目录名
-	int					nCharEncoding;					// 字符编码格式, 0-UTF8, 1-GB2312
+	BOOL				            bEnable;						// 使能
+	char				            szName[MAX_NAME_LEN];			// 名称
+	int					            nPortocol;						// 协议类型, 0-FTP, 1-SMB, 2-ISCSI, 3-NFS, 4-Cloud ,协议类型是 4-Cloud时，具体云协议定义见 emCloudProtocol
+	char				            szAddress[MAX_ADDRESS_LEN];		// IP地址或网址
+    int					            nPort;							// 端口
+    char				            szUser[MAX_USERNAME_LEN];		// 用户名
+    char				            szPassword[MAX_PASSWORD_LEN];	// 密码
+    char				            szDirectory[MAX_NAME_LEN];		// 共享的目录名
+    int					            nCharEncoding;					// 字符编码格式, 0-UTF8, 1-GB2312
+    int					            nTimeOut;						// 超时时间, 单位毫秒
+    unsigned int		            nStreamID;						// 数据流ID
+    CFG_NET_TIME_EX		            stuUpdateTime;					// 更新时间, 该字段值变化后，需要重新初始化iSCSI功能
+    EM_CFG_NAS_CLOUDPROTOCOL_TYPE   emCloudProtocol;                // 云存储协议类型
+    char                            szSubDirectory[CFG_COMMON_STRING_256];               // 客户端设备在服务器上的存储子目录，可以是IP地址，设备序列号，设备机器号，为空使用设备机器号
 } CFG_NAS_INFO_NEW;
 
 // 网络存储服务器配置, 包含多个服务器
@@ -5026,12 +7084,26 @@ typedef struct tagCFG_NAS_INFO_EX
 	CFG_NAS_GROUP_INFO	stuNasGroup;					// nVersion == 1时有效, 支持多个服务器
 } CFG_NAS_INFO_EX;
 
+// 输入信号类型
+typedef enum _EM_CFG_VIDEO_SIGNAL_TYPE
+{
+    EM_CFG_VIDEO_SIGNAL_UNKNOWN, 
+    EM_CFG_VIDEO_SIGNAL_CVBS, 
+    EM_CFG_VIDEO_SIGNAL_SDI, 
+    EM_CFG_VIDEO_SIGNAL_VGA, 
+    EM_CFG_VIDEO_SIGNAL_DVI, 
+    EM_CFG_VIDEO_SIGNAL_HDMI, 
+    EM_CFG_VIDEO_SIGNAL_YPBPR, 
+    EM_CFG_VIDEO_SIGNAL_SFP, 
+    EM_CFG_VIDEO_SIGNAL_HDCVI, 
+} EM_CFG_VIDEO_SIGNAL_TYPE;
+
 // 输入通道基本配置
 typedef struct tagCFG_VIDEO_IN_INFO 
 {
 	char				szDevType[MAX_NAME_LEN];		// 通道类型（指通道连接的设备类型）
 	char				szDevID[MAX_NAME_LEN];			// 摄像头唯一编号
-	char				szChnName[MAX_NAME_LEN];		// 通道名词
+	char				szChnName[MAX_NAME_LEN];		// 通道名称
 	char				szManufacturer[MAX_NAME_LEN];	// 厂商
 	char				szModel[MAX_NAME_LEN];			// 设备型号
 	char				szAddress[MAX_ADDRESS_LEN];		// 安装地址
@@ -5046,6 +7118,8 @@ typedef struct tagCFG_VIDEO_IN_INFO
 	BOOL				bSecrecy;						// 保密属性, FALSE不涉密, TRUE涉密
 	char				szUpperDevID[MAX_NAME_LEN];		// 上级连接设备设备ID
 	int					nUpperDevOutChn;				// 上级连接设备输出通道号
+    char				szRemoteName[MAX_NAME_LEN];		// 远程通道名称
+    EM_CFG_VIDEO_SIGNAL_TYPE emSignalType;              // 输入信号类型
 } CFG_VIDEO_IN_INFO;
 
 // 刻录光盘编码计划(对应命令 CFG_CMD_ENCODEPLAN)，每个通道(包括画中画通道)一个配置结构体
@@ -5150,9 +7224,9 @@ typedef struct tagCFG_DISPLAY_SOURCE
 	char				szDeviceID[MAX_NAME_LEN];		// 设备ID
 	char				szControlID[MAX_NAME_LEN];		// 控制ID
 	int					nVideoChannel;					// 视频通道号
-	int					nVideoStream;					// 视频码流, -1-自动, 0-主码流, 1-辅码流1, 2-辅码流2, 3-辅码流3 
+	int					nVideoStream;					// 视频码流, -1-自动, 0-主码流, 1-辅码流1, 2-辅码流2, 3-辅码流3, 5-预览码流
 	int					nAudioChannel;					// 音频通道号
-	int					nAudioStream;					// 音频码流, -1-自动, 0-主码流, 1-辅码流1, 2-辅码流2, 3-辅码流3 
+	int					nAudioStream;					// 音频码流, -1-自动, 0-主码流, 1-辅码流1, 2-辅码流2, 3-辅码流3, 5-预览码流
 	BOOL				abDeviceInfo;					// 设备信息是否有效
 	AV_CFG_RemoteDevice stuDeviceInfo;					// 设备信息
 } CFG_DISPLAY_SOURCE;
@@ -5228,12 +7302,19 @@ typedef struct tagCFG_PARKINGSPACE_STATUS_INFO
 	int                  nLaneType;                      // 0：普通车位 1：专有车位
 } CFG_PARKINGSPACE_STATUS_INFO;
 
+#define CFG_MAX_BINARY_NUM      128						// 自定义数据最大个数
+
 // 平台自定义信息
 typedef struct tagCFG_CLIENT_CUSTOM_INFO
 {
-	char                 szDescription[MAX_PATH];        // 描述信息,不同平台自定义描述信息,目前支持"LiFang"
-	char*                pData;                          // 自定义数据缓冲，数据中间不能存在二进制的0也就是字符'\0'
-	int                  nDataLen;                       // 用户申请的长度，不同平台自己确定
+	char                szDescription[MAX_PATH];        // 描述信息,不同平台自定义描述信息,目前支持"LiFang"
+	char*               pData;                          // 自定义数据缓冲, 数据中间不能存在二进制的0, 也就是字符'\0'
+	int                 nDataLen;                       // 用户申请的长度, 不同平台自己确定
+    bool                abBinary;                       // false表示pData和nDataLen有效, 而nBinaryNum和dwBinary无效
+                                                        // true表示pData和nDataLen无效, 而nBinaryNum和dwBinary有效
+    BYTE                byReserved[3];
+    int                 nBinaryNum;                     // dwBinary数组有效成员个数
+    DWORD               dwBinary[CFG_MAX_BINARY_NUM];   // 自定义数据
 } CFG_CLIENT_CUSTOM_INFO;
 
 // 刻录格式配置,兼容性考虑：无此配置时默认DHAV格式
@@ -5250,6 +7331,24 @@ typedef struct tagCFG_MULTIBURN_INFO
     char                 szDataCheckSpeed[MAX_PATH];     // 校验速度 "High":高速（头尾数据校验）,"Normal":正常（随机数据校验）,"Low":低速 （全盘数据校验）
 }CFG_MULTIBURN_INFO;
 
+// 单个网络存储服务器限制配置
+typedef struct tagCFG_REMOTE_STORAGE_LIMIT
+{
+    char				        szName[MAX_NAME_LEN];                       // 名称
+    int							nFileLen;									// 文件长度 单位,MB
+	int							nInterval;									// 相邻文件时间间隔 单位,秒
+	CFG_CHANNEL_TIME_SECTION	*pstuChnTime;        	                    // 存储时间段数组，用户分配内存
+	int                         nMaxChnCount;                               // 最大通道数，用户填写
+    int                         nRetChnCount;                               // 返回的通道数,保存设置时的有效通道数
+}CFG_REMOTE_STORAGE_LIMIT;
+
+// 网络存储服务器限制配置
+typedef struct tagCFG_REMOTE_STORAGELIMIT_GROUP
+{
+	CFG_REMOTE_STORAGE_LIMIT    stuRemoteStorageLimit[MAX_NAS_NUM];         // 网络存储服务器配置数组
+    int                         nLimitCount;                                // 有效的网络服务器数
+}CFG_REMOTE_STORAGELIMIT_GROUP;
+
 // 获取刻录管理能力集
 typedef struct tagCFG_CAP_BURN_MANAGER	
 {
@@ -5265,7 +7364,2006 @@ typedef struct tagCFG_CAP_RECORD_INFO
 	DWORD dwMaxPreRecordTime;							 //最大预录时间
 	DWORD dwMaxRemoteBitrate;							 //最大接入总码流,单位kbps
 	DWORD dwMaxRemoteRawBitrate;						 //最大接入祼码流（包括路数、分辨率、帧率，色深按16bpp计算）
+    DWORD dwMaxStreams;                                  //最大录像码流个数
 } CFG_CAP_RECORD_INFO;
+
+//-------------------------------编码加密---------------------------------
+typedef  enum tagCFG_ENCRYPT_ALGO_TYPE
+{
+	ALGO_TYPE_AES	 , 
+	ALGO_TYPE_UNKNOW ,
+}CFG_ENCRYPT_ALGO_TYPE;
+
+// 码流加密算法工作模式
+typedef enum  tagCFG_ENCRYPT_ALGO_WORKMODE
+{
+	ENCRYPT_ALGO_WORKMODE_ECB,     // ECB模式
+	ENCRYPT_ALGO_WORKMODE_CBC,     // CBC模式
+	ENCRYPT_ALGO_WORKMODE_CFB,     // CFB模式
+	ENCRYPT_ALGO_WORKMODE_OFB,     // OFB模式
+	ENCRYPT_ALGO_WORKMODE_UNKNOW ,
+}CFG_ENCRYPT_ALGO_WORKMODE;
+
+typedef union tagCFG_ENCRYPT_KEY_INFO
+{
+	BYTE byAesKey[AES_KEY_LEN];							// aes密钥
+}CFG_ENCRYPT_KEY_INFO;
+
+//码流加密配置信息
+typedef struct tagCFG_STREAM_ENCRYPT_INFO
+{
+	BOOL						bEncryptEnable;		// 是否加密
+	CFG_ENCRYPT_ALGO_TYPE		emEncrptAlgoType;	// 加密算法类型: 参见枚举类型CFG_ENCRYPT_ALGO_TYPE
+	CFG_ENCRYPT_ALGO_WORKMODE	emAlgoWorkMode;		// 工作模式,参考枚举类型 CFG_ENCRYPT_ALGO_WORKMODE
+	WORD						wEncryptLenth;		// 密钥长度，当前为AES算法类型时，表示密钥位数(目前支持128，192，256位三种, 如: wEncryptLenth为128，则密钥信息ENCRYPT_KEY_INFO里的byAesKey[0]~[15])
+	CFG_ENCRYPT_KEY_INFO		stuEncryptKeys;		// 通道的密钥信息 
+	CFG_NET_TIME				stuPreTime;			// 加密计划的开始时间
+}CFG_STREAM_ENCRYPT_INFO;
+
+//码流加密配置通道信息
+typedef struct tagCFG_ENCODE_ENCRYPT_CHN_INFO
+{
+	int						 nChannelID;					// 通道号(0开始)
+	CFG_STREAM_ENCRYPT_INFO *pstEncodeEncryptInfo;			// 每个通道的配置列表,用户需配置
+												            // nMaxEncryptInputs个CFG_STREAM_ENCRYPT
+	BYTE					 nMaxEncryptInputs; 
+	BYTE					 nRetEncryptOutputs;			// 解析出CFG_STREAM_ENCRYPT的个数
+}CFG_ENCODE_ENCRYPT_CHN_INFO;
+
+
+//编码自适应策略类型
+typedef  enum tagCFG_ENCRYPT_POLICY_TYPE
+{
+	ENCRYPT_POLICY_UNKNOWN ,		//未知
+	ENCRYPT_POLICY_NONE ,		//无策略，不开启自适应功能
+	ENCRYPT_POLICY_QUALITY ,    //画质优先，优先保证分辨率，降低帧率
+	ENCRYPT_POLICY_FLUENCY ,	//流畅优先，优先保证流畅性，降低分辨率
+}CFG_ENCRYPT_POLICY_TYPE;
+
+//编码流畅优先策略
+typedef enum tagCFG_ENCRYPT_FLUENCY_MODE
+{
+	ENCRYPT_FLUENCY_UNKNOWN ,		//未知
+	ENCRYPT_FLUENCY_FAST ,			//快恢复(网速变好时，立即恢复)
+	ENCRYPT_FLUENCY_SLOW ,			//慢恢复(同一时间只能有一个通道恢复)
+	ENCRYPT_FLUENCY_SYNC ,			//同步恢复(如果有通道下降，则其它通道不恢复)
+	ENCRYPT_FLUENCY_SLOWSYNC ,		//慢同步恢复(结合慢恢复和同步恢复)
+}CFG_ENCRYPT_FLUENCY_MODE;
+
+//编码自适应配置
+typedef struct tagCFG_ENCODE_ADAPT_INFO
+{
+	CFG_ENCRYPT_POLICY_TYPE		emPolicyType;		//自适应策略类型
+	CFG_ENCRYPT_FLUENCY_MODE	emFluencyMode;		//流畅优先策略
+}CFG_ENCODE_ADAPT_INFO;
+
+// 变倍设置基本信息单元
+typedef struct tagCFG_VIDEO_IN_ZOOM_UNIT
+{
+	int         nSpeed;									 //变倍速率(0~7)
+	BOOL		bDigitalZoom;							 //是否数字变倍
+	int			nZoomLimit;								 //当前速率下最大变倍上限(0~13)。
+} CFG_VIDEO_IN_ZOOM_UNIT;
+
+// 单通道变倍设置基本信息
+typedef struct tagCFG_VIDEO_IN_ZOOM	
+{
+	int						nChannelIndex;				 //通道号
+	int						nVideoInZoomRealNum;		 //配置使用个数
+	CFG_VIDEO_IN_ZOOM_UNIT  stVideoInZoomUnit[MAX_VIDEO_IN_ZOOM];		 //通道变速配置单元信息
+	
+} CFG_VIDEO_IN_ZOOM;
+
+// 抓图配置
+typedef struct tagCFG_SNAP_INFO 
+{
+	CFG_TIME_SCHEDULE		stuTimeSchedule;			// 时间表, 每个时间段掩码按位定义如下: 
+														// Bit0-定时抓图
+														// Bit1-动态检测抓图
+														// Bit2-报警抓图
+														// Bit3-卡号抓图
+														// Bit4~Bit31-保留
+} CFG_SNAP_INFO;
+
+//云台转动角度范围，单位：度
+typedef struct tagCFG_PTZ_MOTION_RANGE
+{
+	int                 nHorizontalAngleMin;       // 水平角度范围最小值,单位:度
+	int                 nHorizontalAngleMax;       // 水平角度范围最大值,单位:度
+	int                 nVerticalAngleMin;          // 垂直角度范围最小值,单位:度
+	int                 nVerticalAngleMax;          // 垂直角度范围最大值,单位:度
+}CFG_PTZ_MOTION_RANGE;
+
+//支持的焦距模式对应枚举
+typedef enum tagSUPPORT_FOCUS_MODE
+{
+    ENUM_SUPPORT_FOCUS_CAR        = 1,                // 看清车模式         
+	ENUM_SUPPORT_FOCUS_PLATE      = 2,                // 看清车牌模式 
+	ENUM_SUPPORT_FOCUS_PEOPLE     = 3,                // 看清人模式     
+	ENUM_SUPPORT_FOCUS_FACE       = 4,                // 看清人脸模式     
+}EM_SUPPORT_FOCUS_MODE;
+
+//云台转动角度范围，单位：度
+typedef struct tagCFG_PTZ_LIGHTING_CONTROL
+{
+	char                szMode[CFG_COMMON_STRING_32];  // 手动灯光控制模式
+	                                                   // on-off"：直接开关模式,
+	                                                   // "adjustLight"：手动调节亮度模式
+
+	DWORD               dwNearLightNumber;             // 近光灯组数量
+	DWORD               dwFarLightNumber;              // 远光灯组数量
+}CFG_PTZ_LIGHTING_CONTROL;
+
+//获取云台能力集信息
+typedef struct tagCFG_PTZ_PROTOCOL_CAPS_INFO
+{
+	int                 nStructSize;
+    BOOL                bPan;                       // 是否支持云台水平摆动
+	BOOL                bTile;                      // 是否支持云台垂直摆动
+	BOOL                bZoom;                      // 是否支持云台变倍
+	BOOL                bIris;                      // 是否支持云台光圈调节
+	BOOL                bPreset;                    // 是否支持预置点
+	BOOL                bRemovePreset;              // 是否支持清除预置点
+	BOOL                bTour;                      // 是否支持自动巡航线路
+	BOOL                bRemoveTour;                // 是否支持清除巡航
+	BOOL                bPattern;                   // 是否支持轨迹线路
+	BOOL                bAutoPan;                   // 是否支持自动水平摆动
+	BOOL                bAutoScan;                  // 是否支持自动扫描
+	BOOL                bAux;                       // 是否支持辅助功能
+	BOOL                bAlarm;                     // 是否支持报警功能
+	BOOL                bLight;                     // 是否支持灯光, 内容见下面"stuPtzLightingControl"
+	BOOL                bWiper;                     // 是否支持雨刷
+	BOOL                bFlip;                      // 是否支持镜头翻转
+	BOOL                bMenu;                      // 是否支持云台内置菜单
+	BOOL                bMoveRelatively;            // 是否支持云台按相对坐标定位
+	BOOL                bMoveAbsolutely;            // 是否支持云台按绝对坐标定位
+	BOOL                bReset;                     // 是否支持云台复位
+	BOOL                bGetStatus;                 // 是否支持获取云台运动状态及方位坐标
+	BOOL                bSupportLimit;              // 是否支持限位
+	BOOL                bPtzDevice;                 // 是否支持云台设备
+	BOOL                bIsSupportViewRange;        // 是否支持云台可视域
+
+	WORD				wCamAddrMin;		    	// 通道地址的最小值
+	WORD				wCamAddrMax;			    // 通道地址的最大值
+	WORD				wMonAddrMin;    			// 监视地址的最小值
+	WORD				wMonAddrMax;	    		// 监视地址的最大值
+	WORD				wPresetMin;			    	// 预置点的最小值
+	WORD				wPresetMax;				    // 预置点的最大值
+	WORD				wTourMin;    				// 自动巡航线路的最小值
+	WORD				wTourMax;	    			// 自动巡航线路的最大值
+	WORD				wPatternMin;	    		// 轨迹线路的最小值
+	WORD				wPatternMax;		    	// 轨迹线路的最大值
+	WORD				wTileSpeedMin;			    // 垂直速度的最小值
+	WORD				wTileSpeedMax;    			// 垂直速度的最大值
+	WORD				wPanSpeedMin;	    		// 水平速度的最小值
+	WORD				wPanSpeedMax;		    	// 水平速度的最大值
+	WORD				wAutoScanMin;			    // 自动扫描的最小值
+	WORD				wAutoScanMax;    			// 自动扫描的最大值
+	WORD				wAuxMin;		    		// 辅助功能的最小值
+	WORD				wAuxMax;			    	// 辅助功能的最大值
+
+	DWORD				dwInterval;				    // 发送命令的时间间隔
+	DWORD				dwType;				        // 协议的类型，0-本地云台，1-远程云台
+	DWORD				dwAlarmLen;				    // 协议的报警长度
+	DWORD				dwNearLightNumber;		    // 近光灯组数量,0~4,为0时表示不支持
+	DWORD				dwFarLightNumber;		    // 远光灯组数量,0~4,为0时表示不支持
+
+	DWORD               dwSupportViewRangeType;     // 支持的可视域数据获取方式掩码,从低位到高位依次数,目前支持
+	                                                // 第1位:为1表示支持"ElectronicCompass" 电子罗盘方式
+
+	DWORD               dwSupportFocusMode;         // 支持的支持的焦距模式掩码,从低位到高位依次数,见#EM_SUPPORT_FOCUS_MODE
+	                  
+	char				szName[MAX_PROTOCOL_NAME_LEN];                       // 操作的协议名
+	char                szAuxs[CFG_COMMON_STRING_32][CFG_COMMON_STRING_32];  //云台辅助功能名称列表
+
+	CFG_PTZ_MOTION_RANGE stuPtzMotionRange;         // 云台转动角度范围，单位：度
+	CFG_PTZ_LIGHTING_CONTROL stuPtzLightingControl; // 灯光控制内容
+	BOOL				bSupportPresetTimeSection;	// 是否支持预置点时间段配置的功能
+}CFG_PTZ_PROTOCOL_CAPS_INFO;
+// 特殊用途目录定义
+typedef struct tagCFG_SPECIAL_DIR_INFO 
+{
+	char				szBackgroudImageDir[MAX_PATH];	// 屏幕底图目录
+	char				szWindowIconDir[MAX_PATH];		// 窗口图标目录
+	char				szEventVoiceDir[MAX_PATH];		// 报警语音提示音频文件存放目录
+} CFG_SPECIAL_DIR_INFO;
+
+
+// 关机后延时自动开机配置
+typedef struct tagCFG_AUTO_STARTUP_DELAY_INFO
+{
+	BOOL	bEnable;		//功能是否打开           
+	int		nDelay;			//关机后延时开机时间,单位：分钟(取值范围[30, 255])       
+}CFG_AUTO_STARTUP_DELAY_INFO;
+
+// 视频输入能力集(CFG_CAP_CMD_VIDEOINPUT_EX)扩展配置
+typedef struct tagCFG_CAP_VIDEOINPUT_INFO_EX
+{
+	BOOL            bSupportDefog;                          // 是否支持透雾功能
+	BOOL			bSupportABFFunction;					// 是否支持自动调后焦功能
+	BOOL			bSupportImageStabilization;				// 是否支持电子防抖功能
+
+	BOOL			bSupportKillShutLine;					// 是否支持消除快门线功能
+	int             nMinKillShutLine;						// 可配的最小值
+	int			    nMaxKillShutLine;						// 可配的最大值
+
+    BOOL            bSupportVideoInColor;	                //是否支持图像设置能力		 
+    BOOL            bSupportBrightness;                 	//是否支持亮度	
+    BOOL            bSupportContrast;                       //是否支持对比度       	
+    BOOL            bSupportSaturation;                     //是否支持饱和度	
+    BOOL            bSupportHue;                            //是否支持色度	
+    BYTE            bReserved[3];                           //字节对齐
+
+}CFG_CAP_VIDEOINPUT_INFO_EX;
+
+// CAN过滤配置
+#define MAX_CAN_COUNT	16			// 最大CAN个数
+
+// CAN 过滤策略
+typedef enum tagCFG_CAN_POLICY_METHOD
+{
+	CFG_CAN_POLICY_METHOD_UNKONW,		// 未知策略
+	CFG_CAN_POLICY_METHOD_NONE,			// 无过滤
+	CFG_CAN_POLICY_METHOD_WHITE,		// 白名单
+	CFG_CAN_POLICY_METHOD_BLACK,		// 黑名单
+}CFG_CAN_POLICY_METHOD;
+
+typedef struct tagCFG_CANFILTER_INFO
+{
+	int						nResponseTimeout;			// 等待应答超时(单位:毫秒)， 发送数据后，等待3000毫秒后，结束该路透传
+	int						nRequestTimeout;			// 接收请求应答超时(单位:毫秒)， 超过指定时间未收到数据，认为请求结束
+	int						nFilterPIDCount;			// 数据号个数
+	int						nRetFiterPIDCount;			// 返回数据号个数
+	int*					pnFilterPID;				// 过滤数据号
+	CFG_CAN_POLICY_METHOD	emPolicy;					// 过滤策略
+														// 如果是白名单，上报包含PID的数据
+														// 如果是黑名单，上报不含PID的数据
+														// 无过滤则所有数据都上报																
+}CFG_CANFILTER_INFO;
+
+typedef struct tagCFG_CANFILTER_LIST
+{
+	int						nCANCount;			// CAN个数
+	int						nRetCANCount;		// 设备返回CAN个数
+	CFG_CANFILTER_INFO		stuCANFilter[MAX_CAN_COUNT];			
+}CFG_CANFILTER_LIST;
+
+// 聚焦极限对应枚举
+typedef enum tagEM_FOCUS_LIMIT_SELECT_MODE
+{
+    EM_FOCUS_LIMIT_MODE_MANUAL,                // "Manual" 自动
+    EM_FOCUS_LIMIT_MODE_AUTO,                  // "Auto"手动
+    EM_FOCUS_LIMIT_MODE_INVALID
+}EM_FOCUS_LIMIT_SELECT_MODE;
+
+// 聚焦设置基本信息单元
+typedef struct tagCFG_VIDEO_IN_FOCUS_UNIT
+{
+	int                        nMode;                   // 聚焦模式, 0-关闭, 1-辅助聚焦, 2-自动聚焦, 3-半自动聚焦, 4-手动聚焦
+	int                        nSensitivity;            // 聚焦灵敏度, 0-高, 1-默认, 2-低
+	int                        nIRCorrection;           // 红外光聚焦修正, 0-不修正, 1-修正, 2-自动修正
+	EM_FOCUS_LIMIT_SELECT_MODE emFocusMode;             // 聚焦极限
+	int	                       nFocusLimit;				// 聚焦极限值, 单位毫米
+} CFG_VIDEO_IN_FOCUS_UNIT;
+
+// 单通道聚焦设置基本信息
+typedef struct tagCFG_VIDEO_IN_FOCUS	
+{
+	int						 nChannelIndex;				             // 通道号
+	int						 nVideoInFocusRealNum;		             // 配置使用个数
+	CFG_VIDEO_IN_FOCUS_UNIT  stVideoInFocusUnit[MAX_VIDEO_IN_FOCUS]; //通道聚焦配置单元信息
+	
+} CFG_VIDEO_IN_FOCUS;
+
+typedef enum tagEM_ANALYSE_MODE
+{
+	EM_ANALYSE_MODE_REAL_STREAM,                            // 实时流模式     
+	EM_ANALYSE_MODE_RECORDFILE_STREAM,                      // 录像文件流模式
+	EM_ANALYSE_MODE_PICFILE_STREAM,                         // 图片文件流模式
+}EM_ANALYSE_MODE;
+
+// 智能分析模式
+typedef struct tagCFG_ANALYSE_MODE
+{
+	EM_ANALYSE_MODE emMode;                                 // 分析模式，详见EM_ANALYSE_MODE 
+}CFG_ANALYSE_MODE;
+
+// 云台控制预置点结构
+typedef struct tagPTZ_PRESET
+{
+	BOOL                 bEnable;                             // 该预置点是否生效
+	char                 szName[MAX_PTZ_PRESET_NAME_LEN];     // 预置点名称
+	CFG_PTZ_SPACE_UNIT   stPosition;                          // 预置点的坐标和放大倍数
+}PTZ_PRESET;
+
+// 云台预置点配置对应结构
+typedef struct tagPTZ_PRESET_INFO
+{
+	DWORD              dwMaxPtzPresetNum;                     // 最大预置点个数
+	DWORD              dwRetPtzPresetNum;                     // 实际使用预置点个数
+	PTZ_PRESET         *pstPtzPreset;                         // 预置点信息(根据最大个数申请内存)
+}PTZ_PRESET_INFO;
+
+// 语音激励音频通道配置
+typedef struct tagCFG_AUDIO_SPIRIT_CHANNE
+{
+	int				nChannel;				// 语音激励联动视频通道号
+	int				nPriority;				// 语音激励优先级, 1~10
+	int				nPreset;				// 对应的视频摄像机的预置点, 与云台一致0~255
+} CFG_AUDIO_SPIRIT_CHANNEL;
+
+// 语音激励联动项
+typedef struct tagCFG_AUDIO_SPIRIT_LINKAGE 
+{
+	int				nOutputNum;				// 矩阵输出口数量
+	int				nOutputChanel[CFG_MAX_LOWER_MATRIX_OUTPUT];	// 同步大画面输出到(多个)矩阵输出口
+} CFG_AUDIO_SPIRIT_LINKAGE;
+
+// 语音激励
+typedef struct tagCFG_AUDIO_SPIRIT 
+{
+	BOOL				bEnable;			// 使能
+	int					nAudioLimit;		// 激励音量阈值, 0~100
+	int					nDelayTime;			// 激励延时时间, 单位: 秒
+	CFG_AUDIO_SPIRIT_CHANNEL* pstuChannels;	// 语音激励音频通道属性
+	int					nChannelCount;		// 音频通道数
+	CFG_AUDIO_SPIRIT_LINKAGE stuLinkage;	// 激励联动项
+} CFG_AUDIO_SPIRIT;
+
+// 合成通道配置
+typedef struct tagCFG_COMPOSE_CHANNEL 
+{
+	CFG_SPLITMODE	emSplitMode;			// 分割模式
+	int				nChannelCombination[MAX_VIDEO_CHANNEL_NUM]; // 割模式下的各子窗口显示内容
+	int				nChannelCount;			// 分割窗口数量
+} CFG_COMPOSE_CHANNEL;
+
+// 下位矩阵输出配置
+typedef struct tagCFG_LOWER_MATRIX_OUTPUT
+{
+	char					szName[CFG_COMMON_STRING_128]; // 输出通道名称
+	CFG_SPLITMODE			emSplitMode;		// 分割模式
+	int						nInputs[CFG_MAX_LOWER_MATRIX_INPUT]; // 输入通道组
+	int						nInputCount;		// 输入通道数
+} CFG_LOWER_MATRIX_OUTPUT;
+
+// 下位矩阵信息
+typedef struct tagCFG_LOWER_MATRIX_INFO 
+{
+	int						nOutputCount;			// 输出通道数
+	CFG_LOWER_MATRIX_OUTPUT	stuOutputs[CFG_MAX_LOWER_MATRIX_OUTPUT]; // 输出通道配置
+} CFG_LOWER_MATRIX_INFO;
+
+// 下位矩阵配置
+typedef struct tagCFG_LOWER_MATRIX_LIST
+{
+	int						nMatrixCount;		// 下位矩阵数量
+	CFG_LOWER_MATRIX_INFO	stuMatrix[CFG_MAX_LOWER_MATRIX_NUM]; // 下位矩阵数组
+} CFG_LOWER_MATRIX_LIST;
+
+// 开始与结束日期
+typedef struct tagCFG_DAYTIME_INFO
+{
+	int					nBeginMonth;		// 开始时间 月份
+	int					nBeginDay;			// 开始时间 日期
+	int					nEndMonth;			// 结束时间 月份
+	int					nEndDay;			// 结束时间	日期
+}CFG_DAYTIME_INFO;
+
+// 时间段限速值配置
+typedef struct tagCFG_TIMESPEEDLIMIT_INFO
+{
+	BOOL				bEnable;			// 速度限制开启
+	CFG_DAYTIME_INFO	stuDayTime;			// 时间段开始与结束日期
+	int					nDaySpeedLimit;		// 白天限速值，单位km/h
+	int					nNightSpeedLimit;	// 晚上限速值，单位km/h
+	CFG_TIME_SECTION	stuTimeSection;		// 白天时间段范围，掩码无效
+}CFG_TIMESPEEDLIMIT_INFO;
+
+typedef struct tagCFG_TIMESPEEDLIMIT_LIST
+{
+	int						nTimeSpeedLimitCount;		// 限速时间段个数
+	CFG_TIMESPEEDLIMIT_INFO stuTimeSpeedLimit[MAX_TIMESPEEDLIMIT_NUM];
+}CFG_TIMESPEEDLIMIT_LIST;
+
+// 语音提示时间
+typedef struct tagCFG_ALERTTIME_INFO
+{
+	int				nHour;				// 小时
+	int				nMinute;			// 分钟
+}CFG_ALERTTIME_INFO;
+
+// 语音提示配置
+typedef struct tagCFG_VOICEALERT_INFO
+{
+	CFG_ALERTTIME_INFO	stuAlertTime;							// 语音提醒时间点，定时提醒
+	int					nIntervalTime;							// 提醒间隔时，单位秒
+	char				szWarnText[CFG_COMMON_STRING_256];		// 语音提醒内容，用户自定义
+}CFG_VOICEALERT_INFO;
+
+typedef struct tagCFG_VOICEALERT_LIST
+{
+	int					nVoiceAlertCount;					// 语音提示个数
+	CFG_VOICEALERT_INFO stuVoiceAlert[MAX_VOICEALERT_NUM];
+}CFG_VOICEALERT_LIST;
+
+// 红外面板按键
+typedef struct tagCFG_INFRARED_KEY 
+{
+	char			szName[CFG_COMMON_STRING_32];	// 面板按键名称
+	char			szText[CFG_COMMON_STRING_64];	// 面板按键显示文字，按钮label
+} CFG_INFRARED_KEY;
+
+// 红外面板模板
+typedef struct tagCFG_INFRARED_BOARD_TEMPLATE 
+{
+	unsigned int	nID;							// 面板模板编号
+	char			szName[CFG_COMMON_STRING_64];	// 面板品牌型号定义
+	unsigned int	nCategory;						// 面板类型, 大类, 0-DVD, 1-TV
+	int				nKeyNum;						// 面板按键数量
+	CFG_INFRARED_KEY stuKeys[CFG_MAX_INFRARED_KEY_NUM];	// 面板按键
+} CFG_INFRARED_BOARD_TEMPLATE;
+
+// 红外面板模板组
+typedef struct tagCFG_INFRARED_BOARD_TEMPLATE_GROUP 
+{
+	int			nTemplateNum;		// 模板数量
+	CFG_INFRARED_BOARD_TEMPLATE stuTemplates[CFG_MAX_INFRARED_BOARD_TEMPLATE_NUM];	// 红外面板模板
+} CFG_INFRARED_BOARD_TEMPLATE_GROUP;
+
+// 红外面板
+typedef struct tagCFG_INFRARED_BOARD 
+{
+	unsigned int	nID;							// 面板编号, 唯一标示
+	char			szName[CFG_COMMON_STRING_64];	// 面板控制外设名称, 用户自定义
+	unsigned int	nCategory;						// 面板类型, 0-DVD, 1-TV
+	int				nCommPort;						// 红外通讯端口
+	unsigned int	nTemplateID;					// 关联的模板ID
+} CFG_INFRARED_BOARD;
+
+// 红外面板组
+typedef struct tagCFG_INFRARED_BOARD_GROUP
+{
+	int				nBoardNum;						// 红外面板数量
+	CFG_INFRARED_BOARD stuBoards[CFG_MAX_INFRARED_BOARD_NUM];	// 红外面板信息		
+} CFG_INFRARED_BOARD_GROUP;
+
+// 设备保活配置
+typedef struct tagCFG_DEVICEKEEPALIVE_INFO
+{
+	BOOL	bEnable;		// 开启保活使能
+	int		nInterval;		// 保活时间间隔，必须是>=10的值，单位：秒
+	int		nFailTimes;		// 保活失败次数，保活失败次数到达该值认为设备断线
+	int		nWaitBootTime;	// 等待外设加电后启动后检测保活心跳，单位：秒
+}CFG_DEVICEKEEPALIVE_INFO;
+
+// 设备曝光配置基本信息
+typedef struct tagCFG_VIDEOIN_EXPOSURE_BASE
+{
+    BOOL        bSlowShutter;           // 慢快门使能
+
+    BYTE        byExposureMode;         // 曝光模式调节
+    BYTE        byAntiFlicker;			// 防闪烁模式 0-Outdoor 1-50Hz防闪烁 2-60Hz防闪烁
+    BYTE        byCompensation;         // 曝光补偿, [0~14]
+    BYTE        byAutoGainMax;          // 自动增益上限, [0, 2]
+    BYTE        byGain;                 // 增益档位, [0, 15]
+    BYTE        bySlowAutoExposure;     // 慢曝光, [0, 15]
+    BYTE        bybyReserv[2];          // 字节对齐
+    int         byExposureSpeed;        // 曝光速度等级：0-自动曝光，1-曝光等级1，2-曝光等级2…n-1最大曝光等级数 n带时间上下限的自动曝光 n+1自定义时间手动曝光 (n为支持的曝光等级)
+    BYTE        bySlowSpeed;            // 慢曝光等级
+    BYTE        byIris;                 // 光圈设置, [0~17]
+    BYTE        byBacklight;            // 背光补偿: 取值范围取决于设备能力集: 0-关闭 1-启用 2-指定区域背光补偿
+    BYTE        byWideDynamicRange;     // 宽动态值 0-关闭，1~100-为真实范围值
+    BYTE        byWideDynamicRangeMode; // 宽动态模式, 0:关闭; 1:手动调节; 2:自动调节
+    BYTE        byGlareInhibition;      // 强光抑制, 0:关闭; 1:弱; 2:中; 3:强
+    BYTE        byDoubleExposure;       // 双快门支持, 0:不支持; 1:支持双快门全帧率; 2:支持双快门半帧率; 3:支持双快门全帧率和半帧率
+    BYTE        byReserved;             // 字节对齐
+    int         nRecoveryTime;          // 自动曝光恢复, 0-表示不恢复, 其他表示恢复的时间, 单位为秒
+
+    float       fValue1;                // 自动曝光时间下限或者手动曝光自定义时间, [0.1~80ms]
+    float       fValue2;                // 自动曝光时间上限, 需不小于下限, [0.1~80ms]
+
+    CFG_RECT    stuBacklightRegion;     // 背光补偿区域
+}CFG_VIDEOIN_EXPOSURE_BASE;
+
+// 设备曝光配置
+typedef struct tagCFG_VIDEOIN_EXPOSURE_INFO
+{
+    DWORD                       dwMaxExposureNum;       // 配置的最大个数
+    DWORD                       dwRetExposureNum;       // 实际使用的最大个数(查询时返回实际解析个数, 封装时按照此值个数封装)
+    CFG_VIDEOIN_EXPOSURE_BASE   *pstuVideoInExposure;   // 曝光配置信息
+}CFG_VIDEOIN_EXPOSURE_INFO;
+
+//////////////////////////////////////////////////////////////////////////
+// 门禁基本配置
+
+// 自定义开门方式
+typedef enum tagCFG_DOOR_OPEN_METHOD
+{
+	CFG_DOOR_OPEN_METHOD_UNKNOWN = 0,
+	CFG_DOOR_OPEN_METHOD_PWD_ONLY,                  // 只允许密码开锁
+	CFG_DOOR_OPEN_METHOD_CARD,                      // 只允许刷卡开锁
+	CFG_DOOR_OPEN_METHOD_PWD_OR_CARD,               // 密码或刷卡开锁
+	CFG_DOOR_OPEN_METHOD_CARD_FIRST,                // 先刷卡后密码开锁
+	CFG_DOOR_OPEN_METHOD_PWD_FIRST,                 // 先密码后刷卡开锁
+	CFG_DOOR_OPEN_METHOD_SECTION,                   // 分时段开门
+    CFG_DOOR_OPEN_METHOD_FINGERPRINTONLY = 7,       // 仅指纹开锁
+    CFG_DOOR_OPEN_METHOD_PWD_OR_CARD_OR_FINGERPRINT = 8,// 密码或刷卡或指纹开锁
+    CFG_DOOR_OPEN_METHOD_CARD_AND_FINGERPRINT = 11, // 刷卡+指纹开锁
+    CFG_DOOR_OPEN_METHOD_MULTI_PERSON = 12,         // 多人开锁
+}CFG_DOOR_OPEN_METHOD;
+
+
+// 门禁单双向配置类型
+typedef enum tagCFG_ACCESS_PROPERTY_TYPE
+{
+    CFG_ACCESS_PROPERTY_UNKNOWN = 0,
+    CFG_ACCESS_PROPERTY_BIDIRECT,       // 双向门禁
+    CFG_ACCESS_PROPERTY_UNIDIRECT,      // 单向门禁
+}CFG_ACCESS_PROPERTY_TYPE;
+
+#define CFG_MAX_ABLOCK_DOORS_NUM        4                       // 最大的门禁的互锁门通道数
+
+// 门禁的AB互锁的组
+typedef struct tagCFG_ABLOCK_DOOR_INFO 
+{
+    int                 nDoor;                                  // 有效互锁门的个数
+    int                 anDoor[CFG_MAX_ABLOCK_DOORS_NUM];       // 互锁的门的通道号
+}CFG_ABLOCK_DOOR_INFO;
+
+#define CFG_MAX_ABLOCK_GROUP_NUM        8                       // 最大的互锁组数
+
+// 门禁的AB互锁功能, 多个门通道，只有其他B通道都关闭，唯一的A通道才打开
+typedef struct tagCFG_ABLOCK_INFO 
+{
+    BOOL                bEnable;                                // 使能
+    int                 nDoors;                                 // 有效互锁组数
+    CFG_ABLOCK_DOOR_INFO stuDoors[CFG_MAX_ABLOCK_GROUP_NUM];    // 互锁组信息
+}CFG_ABLOCK_INFO;
+
+// 门禁基本配置
+typedef struct tagCFG_ACCESS_GENERAL_INFO
+{
+	char                szOpenDoorAudioPath[MAX_ADDRESS_LEN];   // 开门音频文件路径
+	char                szCloseDoorAudioPath[MAX_ADDRESS_LEN];  // 关门音频文件路径
+	char                szInUsedAuidoPath[MAX_ADDRESS_LEN];     // 有人音频文件路径
+	char                szPauseUsedAudioPath[MAX_ADDRESS_LEN];  // 暂停使用音频文件路径 
+	char                szNotClosedAudioPath[MAX_ADDRESS_LEN];  // 门未关音频文件路径
+	char                szWaitingAudioPath[MAX_ADDRESS_LEN];    // 等待提示音频文件路径
+	int                 nUnlockReloadTime;                      // 开锁命令响应间隔时间,单位秒，取值10、15(默认值)、20
+	int                 nUnlockHoldTime;                        // 开锁输出保持时间,单位秒，取值1、2(默认)、3、4、5、6、9、15。 
+
+	// 能力
+	bool                abProjectPassword;
+    bool                abAccessProperty;
+    bool                abABLockInfo;
+	BYTE				byReserved;
+
+	char				szProjectPassword[MAX_PASSWORD_LEN];	// 工程密码
+    CFG_ACCESS_PROPERTY_TYPE emAccessProperty;                  // 门禁通道单双向配置
+    CFG_ABLOCK_INFO     stuABLockInfo;                          // AB互锁信息
+}CFG_ACCESS_GENERAL_INFO;
+
+// 门禁状态
+typedef enum CFG_ACCESS_STATE
+{
+	ACCESS_STATE_NORMAL,                                        // 普通
+	ACCESS_STATE_CLOSEALWAYS,                                   // 常关
+	ACCESS_STATE_OPENALWAYS,                                    // 常开 
+}CFG_ACCESS_STATE; 
+
+// 门禁模式
+typedef enum CFG_ACCESS_MODE
+{
+	ACCESS_MODE_HANDPROTECTED,                                  // 防夹模式
+	ACCESS_MODE_SAFEROOM,                                       // 防护房间模式    
+	ACCESS_MODE_OTHER,                                          // 其它
+}CFG_ACCESS_MODE;
+
+
+// 分时段开门
+typedef struct tagCFG_DOOROPEN_TIMESECTION_INFO
+{
+	CFG_TIME_PERIOD			stuTime;				// 时间段
+	CFG_DOOR_OPEN_METHOD	emDoorOpenMethod;		// 开门模式
+}CFG_DOOROPEN_TIMESECTION_INFO;
+
+#define MAX_DOOR_TIME_SECTION		4				// 门禁每天分时时间段最大个数
+
+// 首卡权限验证通过后的门禁状态
+typedef enum CFG_ACCESS_FIRSTENTER_STATUS
+{
+	ACCESS_FIRSTENTER_STATUS_UNKNOWN,	// 未知状态
+	ACCESS_FIRSTENTER_STATUS_KEEPOPEN,	// KeepOpen-首卡权限验证通过后，门保持常开
+	ACCESS_FIRSTENTER_STATUS_NORMAL		// Normal-首卡权限验证通过后，其他用户才能刷卡(指纹等)验证通过
+}CFG_ACCESS_FIRSTENTER_STATUS;
+
+// 首卡开门信息
+typedef struct tagCFG_ACCESS_FIRSTENTER_INFO
+{
+	BOOL							bEnable;	// 在指定的时间,只有拥有首卡权限的用户验证通过后，其他的用户才能刷卡(指纹等)进入，TRUE 使能 FALSE 关闭
+	CFG_ACCESS_FIRSTENTER_STATUS	emStatus;	// 首卡权限验证通过后的门禁状态
+	int								nTimeIndex;	// 需要首卡验证的时间段, 值为通道号
+}CFG_ACCESS_FIRSTENTER_INFO;
+
+// 远程开门验证
+typedef struct tagCFG_REMOTE_DETAIL_INFO 
+{
+    int                 nTimeOut;                       // 超时时间, 0表示永久等待, 其他值表示超时时间(单位为秒)
+    BOOL                bTimeOutDoorStatus;             // 超时后的门状态, TRUE:打开, FALSE:关闭
+}CFG_REMOTE_DETAIL_INFO;
+
+// TimeOut info for handicap
+typedef struct tagCFG_HANDICAP_TIMEOUT_INFO
+{
+    int                 nUnlockHoldInterval;            // 门锁保持时间(自动关门时间),单位毫秒,[250, 60000]  
+    int                 nCloseTimeout;                  // 关门超时时间, 超过阈值未关会触发报警，单位秒,[0,9999];0表示不检测超时
+}CFG_HANDICAP_TIMEOUT_INFO;
+
+// 门禁事件配置
+typedef struct tagCFG_ACCESS_EVENT_INFO
+{
+	char                szChannelName[MAX_NAME_LEN];	// 门禁通道名称
+	CFG_ACCESS_STATE    emState;						// 门禁状态
+	CFG_ACCESS_MODE     emMode;							// 门禁模式
+	int					nEnableMode;					// 门禁使能电平值, 0:低电平有效(断电启动); 1:高电平有效(通电启动);
+	BOOL                bSnapshotEnable;				// 事件联动抓图使能
+	
+    // 能力
+	bool                abDoorOpenMethod;
+    bool                abUnlockHoldInterval;
+	bool                abCloseTimeout;
+	bool                abOpenAlwaysTimeIndex;
+	bool                abHolidayTimeIndex;
+	bool                abBreakInAlarmEnable;
+	bool				abRepeatEnterAlarmEnable;
+	bool                abDoorNotClosedAlarmEnable;
+	bool				abDuressAlarmEnable;
+	bool                abDoorTimeSection;
+	bool				abSensorEnable;
+	bool				abFirstEnterEnable;
+    bool                abRemoteCheck;
+    bool                abRemoteDetail;
+    bool                abHandicapTimeOut;
+    bool                abCheckCloseSensor;
+
+	CFG_DOOR_OPEN_METHOD	emDoorOpenMethod;			// 开门方式
+	int					nUnlockHoldInterval;			// 门锁保持时间(自动关门时间),单位毫秒,[250, 20000]
+	int					nCloseTimeout;					// 关门超时时间, 超过阈值未关会触发报警，单位秒,[0,9999];0表示不检测超时
+	int					nOpenAlwaysTimeIndex;			// 常开时间段, 值为CFG_ACCESS_TIMESCHEDULE_INFO配置的数组下标
+	int					nHolidayTimeRecoNo;				// 假期内时间段, 值为假日记录集的记录编号，对应NET_RECORDSET_HOLIDAY的nRecNo
+	BOOL				bBreakInAlarmEnable;			// 闯入报警使能
+	BOOL				bRepeatEnterAlarm;				// 反潜报警使能
+	BOOL				bDoorNotClosedAlarmEnable;		// 门未关报警使能
+	BOOL				bDuressAlarmEnable;				// 胁迫报警使能
+	CFG_DOOROPEN_TIMESECTION_INFO	stuDoorTimeSection[WEEK_DAY_NUM][MAX_DOOR_TIME_SECTION];// 分时段开门信息
+	BOOL				bSensorEnable;					// 门磁使能
+	CFG_ACCESS_FIRSTENTER_INFO stuFirstEnterInfo;		// 首卡开门信息
+    BOOL                bRemoteCheck;                   // 是否需要平台验证, TRUE表示权限通过后必须要平台验证后才能开门, FALSE表示权限验证通过后可立即开门
+    CFG_REMOTE_DETAIL_INFO  stuRemoteDetail;            // 与bRemoteCheck配合使用, 如果远端验证未应答, 设定的设备超时时间到后, 是正常开门还是不开门
+    CFG_HANDICAP_TIMEOUT_INFO   stuHandicapTimeOut;     // 针对残疾人的开门参数
+    BOOL                bCloseCheckSensor;              // 闭锁前是否检测门磁
+                                                        // true:则当开锁保持时间计时结束后，只有监测到有效门磁信号时，才可以恢复关闭锁的动作。
+                                                        // 反之，如果开锁保持时间已到，但未检测到有效门磁信号，则一直保持开锁状态；
+                                                        // false(默认):则直接按照设定的开锁保持时间进行开锁保持和恢复关闭的动作。
+}CFG_ACCESS_EVENT_INFO;
+
+
+
+// 门禁刷卡时间段
+typedef struct tagCFG_ACCESS_TIMESCHEDULE_INFO 
+{
+	CFG_TIME_SECTION		stuTime[WEEK_DAY_NUM][MAX_DOOR_TIME_SECTION];	// 刷卡时间段
+	BOOL					bEnable;										// 时间段使能开关
+}CFG_ACCESS_TIMESCHEDULE_INFO;
+
+//////////////////////////////////////////////////////////////////////////
+// 无线网络连接配置
+
+// 每日流量控制策略
+enum EM_CFG_DAY3GFLUXTACTIC
+{
+	EM_CFG_DAY3GFLUXTACTIC_BYFLUX = 0,	// 按流量
+	EM_CFG_DAY3GFLUXTACTIC_BYTIME,		// 按时间
+};
+
+// 接入的网络名称
+enum EM_CFG_APN
+{
+	EM_CFG_APN_CTNET = 0,				// CTNET
+};
+
+// 流量报警策略
+enum EM_CFG_DAY3GFLUXACTION
+{
+	EM_CFG_DAY3GFLUXACTION_NOTHING = 0,	// 无动作
+	EM_CFG_DAY3GFLUXACTION_3GNETDOWN,	// 3G下线
+};
+
+typedef struct tagCFG_WIRELESS_INFO
+{
+	BOOL			        bEnable;					                // 2G网络使能
+	int				        nKeepAlive;						            // 保活时间, 单位为秒，0表示一直连接，不自动断开
+	EM_CFG_APN		        emAPN;							            // 接入的2G网络名称
+	char			        szUseName[MAX_USERNAME_LEN];	            // 用户名
+	char			        szPassword[MAX_PASSWORD_LEN];	            // 密码
+	EM_CFG_DAY3GFLUXTACTIC	emDay3GFluxTactic;		                    // 每日流量控制策略
+	DWORD			        dwDay3GFluxUp;					            // 每日流量使用上限, MB或者分钟
+	DWORD			        dwDay3GFluxUse;					            // 当日的已用流量, MB或者分钟
+    EM_CFG_DAY3GFLUXACTION	emDay3GFluxAction;		                    // 流量报警策略
+	CFG_TIME_SECTION        stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT];// 拨号时间段
+}CFG_WIRELESS_INFO;
+
+#define MAX_CONNECTION_TYPE_LEN		32	// 连接方式的名字长度
+
+// 登报时间类型
+enum emCFG_REPORTWEEKDAY
+{
+	emReportWeekDay_DoNotReport = -1,	// 不登报
+	emReportWeekDay_Sunday,				// 每周日定时登报
+	emReportWeekDay_Monday,				// 每周一定时登报
+	emReportWeekDay_Tuesday,			// 每周二定时登报
+	emReportWeekDay_Wednesday,			// 每周三定时登报
+	emReportWeekDay_Thursday,			// 每周四定时登报
+	emReportWeekDay_Friday,				// 每周五定时登报
+	emReportWeekDay_Saturday,			// 每周六定时登报
+	emReportWeekDay_Everyday,			// 每天定时登报
+};
+
+// 报警服务器的配置
+typedef struct tagCFG_ALARMSERVER_INFO
+{
+	BOOL			bEnable;								// 使能
+	char			szProtocol[MAX_PROTOCOL_NAME_LEN];		// 协议类型, 目前支持"DAHUA"
+	char			szConnection[MAX_CONNECTION_TYPE_LEN];	// 连接方式
+	char			szAddress[MAX_ADDRESS_LEN];				// IP地址或网络名
+	int				nPort;									// 端口号
+	char			szUserName[MAX_USERNAME_LEN];			// 用户名
+	char			szPsw[MAX_PASSWORD_LEN];				// 密码
+	emCFG_REPORTWEEKDAY	emReportWeekDay;					// 登报日
+	int				nHour;									// 登报时间点的时
+	int				nMinute;								// 登报时间点的分
+	int				nSecond;								// 登报时间点的秒
+}CFG_ALARMSERVER_INFO;
+
+#define MAX_ALARMSERVER_NUM		8
+
+// 报警主机使用的报警中心及备用中心的配置
+typedef struct tagCFG_ALARMCENTER_INFO
+{
+	CFG_ALARMSERVER_INFO	stuMainServer;						// 报警主机使用的报警中心服务器
+	int						nBackupAlarmServerNum;				// 备用报警中心服务器的数目
+	CFG_ALARMSERVER_INFO	stuBackupAlarmServer[MAX_ALARMSERVER_NUM];	// 备用报警中心服务器的配置
+}CFG_ALARMCENTER_INFO;
+
+//////////////////////////////////////////////////////////////////////////
+// 布防、撤防配置
+#define	MAX_SCENE_COUNT	8		//	最大情景模式个数
+// 情景模式
+enum emCFG_SCENE_MODE
+{	
+	emCFG_SCENE_MODE_UNKNOWN,			// 未知模式
+	emCFG_SCENE_MODE_OUTDOOR,			// 外出模式
+	emCFG_SCENE_MODE_INDOOR,			// 在家模式
+};
+typedef struct tagCFG_SCENE_INFO
+{
+	emCFG_SCENE_MODE emName;							// 模式名
+	int				 nAlarmInChannelsCount;				// 报警通道个数
+	int				 nRetAlarmInChannelsCount;			// 实际返回的报警通道个数
+	int*			 pnAlarmInChannels;					// 启用的报警输入通道号列表，需用户分配内存
+}CFG_SCENE_INFO;
+typedef struct tagCFG_COMMGLOBAL_INFO	// =>CFG_CMD_COMMGLOBAL
+{
+	BOOL				bEnable;								// TRUE: 布防; FALSE: 撤防; 作用于整台设备，不区分通道
+	BOOL				bSceneEnable;							// 是否启用情景模式
+	emCFG_SCENE_MODE	emCurrentScene;							// 当前选择的情景模式
+	int					nSceneCount;							// 情景模式有效个数
+	CFG_SCENE_INFO		stuScense[MAX_SCENE_COUNT];			// 情景模式定义，每个模式对应一个配置
+}CFG_COMMGLOBAL_INFO;
+
+#define MAX_ALARM_LIMITS_NUM    8                                   // 报警限值最大个数
+
+// 模拟量报警输入通道配置
+typedef struct tagCFG_ANALOGALARM_INFO	// =>CFG_CMD_ANALOGALARM
+{
+	BOOL				bEnable;									// 使能开关(整台设备处于布防且该通道非使能时为旁路)
+	char				szChnName[MAX_CHANNELNAME_LEN];				// 报警通道名称
+	float				fUpperLimit;								// 量程上限
+	float				fLowerLimit;								// 量程下限
+	int					nSensitivity;								// 灵敏度, 单位：百分比
+	float				fCompensation;								// 补偿值, 根据传感器类型而定
+	float				fLimit1;									// 报警限1, 不建议使用, 建议使用fAlarmLimits字段
+	float				fLimit2;									// 报警限2, 不建议使用, 建议使用fAlarmLimits字段
+	float				fLimit3;									// 报警限3, 不建议使用, 建议使用fAlarmLimits字段
+	float				fLimit4;									// 报警限4, 不建议使用, 建议使用fAlarmLimits字段
+	BYTE				byMode;										// 报警模式, 掩码表示, 可能如下值1111、1110、1100、1000、0000
+																	// 1表示超过报警阈值，0表示低于报警阈值
+																	// 模式从左到右分别对应4个报警阈值, 依次递增
+																	// 例：1110表示超过第1、2、3个报警阈值, 并低于第4个报警阈值
+	BYTE				byReserve[3];								// 保留字节
+	CFG_ALARM_MSG_HANDLE	stuEventHandler;						// 报警联动
+	CFG_TIME_SECTION	stuTimeSection[WEEK_DAY_NUM][MAX_REC_TSECT];// 事件响应时间段
+	EM_SENSE_METHOD		emSense;									// 传感器方式
+	char				szSensorType[CFG_COMMON_STRING_64];			// 传感器类型
+    int                 nSlot;                                      // 根地址, 0表示本地通道, 1表示连接在第一个串口上的扩展通道, 2、3...以此类推, -1表示无效
+	int                 nLevel1;                                    // 第一级级联地址, 表示连接在第nSlot串口上的第nLevel1个探测器或仪表, 从0开始, -1表示无效
+    bool                abLevel2;                                   // 表示nLevel2字段是否存在
+    int                 nLevel2;                                    // 第二级级联地址, 表示连接在第nLevel1个的仪表上的探测器序号, 从0开始
+    int                 nAlamrLimits;                               // 有效的报警限值个数
+    float               fAlarmLimits[MAX_ALARM_LIMITS_NUM];         // 报警限值
+    int                 nNotifyInterval;                            // 模拟量上传周期, 单位: 秒
+    int                 nAlarmInterval;                             // 触发上下限后的上传周期, 单位: 秒
+}CFG_ANALOGALARM_INFO;
+
+// 报警输出通道的状态的配置
+typedef struct tagCFG_ALARMOUT_INFO		// =>CFG_CMD_ALARMOUT
+{
+	int					nChannelID;									// 报警通道号(0开始)
+	char				szChnName[MAX_CHANNELNAME_LEN];				// 报警通道名称
+	char				szOutputType[MAX_NAME_LEN];					// 输出类型, 用户自定义
+	int					nOutputMode;								// 输出模式, 0-自动报警, 1-强制报警, 2-关闭报警
+    int                 nPulseDelay;                                // 脉冲模式输出时间, 单位为秒(0-255秒)
+    int                 nSlot;                                      // 根地址, 0表示本地通道, 1表示连接在第一个串口上的扩展通道, 2、3...以此类推, -1表示无效
+    int                 nLevel1;                                    // 第一级级联地址, 表示连接在第nSlot串口上的第nLevel1个探测器或仪表, 从0开始, -1表示无效
+    bool                abLevel2;                                   // 表示nLevel2字段是否存在
+    int                 nLevel2;                                    // 第二级级联地址, 表示连接在第nLevel1个的仪表上的探测器序号, 从0开始
+}CFG_ALARMOUT_INFO;
+
+
+// 时区定义(NTP)
+typedef enum __EM_CFG_TIME_ZONE_TYPE
+{
+	EM_CFG_TIME_ZONE_0,								// {0, 0*3600,"GMT+00:00"}
+	EM_CFG_TIME_ZONE_1,								// {1, 1*3600,"GMT+01:00"}
+	EM_CFG_TIME_ZONE_2,								// {2, 2*3600,"GMT+02:00"}
+	EM_CFG_TIME_ZONE_3,								// {3, 3*3600,"GMT+03:00"}
+	EM_CFG_TIME_ZONE_4,								// {4, 3*3600+1800,"GMT+03:30"}
+	EM_CFG_TIME_ZONE_5,								// {5, 4*3600,"GMT+04:00"}
+	EM_CFG_TIME_ZONE_6,								// {6, 4*3600+1800,"GMT+04:30"}
+	EM_CFG_TIME_ZONE_7,								// {7, 5*3600,"GMT+05:00"}
+	EM_CFG_TIME_ZONE_8,								// {8, 5*3600+1800,"GMT+05:30"}
+	EM_CFG_TIME_ZONE_9,								// {9, 5*3600+1800+900,"GMT+05:45"}
+	EM_CFG_TIME_ZONE_10,							// {10, 6*3600,"GMT+06:00"}
+	EM_CFG_TIME_ZONE_11,							// {11, 6*3600+1800,"GMT+06:30"}
+	EM_CFG_TIME_ZONE_12,							// {12, 7*3600,"GMT+07:00"}
+	EM_CFG_TIME_ZONE_13,							// {13, 8*3600,"GMT+08:00"}
+	EM_CFG_TIME_ZONE_14,							// {14, 9*3600,"GMT+09:00"}
+	EM_CFG_TIME_ZONE_15,							// {15, 9*3600+1800,"GMT+09:30"}
+	EM_CFG_TIME_ZONE_16,							// {16, 10*3600,"GMT+10:00"}
+	EM_CFG_TIME_ZONE_17,							// {17, 11*3600,"GMT+11:00"}
+	EM_CFG_TIME_ZONE_18,							// {18, 12*3600,"GMT+12:00"}
+	EM_CFG_TIME_ZONE_19,							// {19, 13*3600,"GMT+13:00"}
+	EM_CFG_TIME_ZONE_20,							// {20, -1*3600,"GMT-01:00"}
+	EM_CFG_TIME_ZONE_21,							// {21, -2*3600,"GMT-02:00"}
+	EM_CFG_TIME_ZONE_22,							// {22, -3*3600,"GMT-03:00"}
+	EM_CFG_TIME_ZONE_23,							// {23, -3*3600-1800,"GMT-03:30"}
+	EM_CFG_TIME_ZONE_24,							// {24, -4*3600,"GMT-04:00"}
+	EM_CFG_TIME_ZONE_25,							// {25, -5*3600,"GMT-05:00"}
+	EM_CFG_TIME_ZONE_26,							// {26, -6*3600,"GMT-06:00"}
+	EM_CFG_TIME_ZONE_27,							// {27, -7*3600,"GMT-07:00"}
+	EM_CFG_TIME_ZONE_28,							// {28, -8*3600,"GMT-08:00"}
+	EM_CFG_TIME_ZONE_29,							// {29, -9*3600,"GMT-09:00"}
+	EM_CFG_TIME_ZONE_30,							// {30, -10*3600,"GMT-10:00"}
+	EM_CFG_TIME_ZONE_31,							// {31, -11*3600,"GMT-11:00"}
+	EM_CFG_TIME_ZONE_32,							// {32, -12*3600,"GMT-12:00"}
+}EM_CFG_TIME_ZONE_TYPE;
+
+// 时间同步服务器配置
+typedef struct tagCFG_NTP_INFO
+{
+	BOOL				bEnable;									// 使能开关
+	char				szAddress[MAX_ADDRESS_LEN];					// IP地址或网络名
+	int					nPort;										// 端口号
+	int					nUpdatePeriod;								// 更新周期，单位为分钟
+	EM_CFG_TIME_ZONE_TYPE emTimeZoneType;							// 时区
+	char				szTimeZoneDesc[MAX_NAME_LEN];				// 时区描述
+}CFG_NTP_INFO;
+
+// 警号配置
+typedef struct tagCFG_ALARMBELL_INFO
+{
+    int                 nPersistentTime;                            // 警号输出持续时间, 单位: 分钟(0-99), 0 表示响一下就停止
+}CFG_ALARMBELL_INFO;
+
+#define MAX_MSG_NUMBER_LEN	32				// 短信号码的最大长度
+#define MAX_RECEIVER_NUM	100				// 接收短信用户的最大数目
+
+// 短信类型
+typedef enum tagEM_MSG_TYPE
+{
+	EM_MSG_UNKNOWN = 0,												// 未知类型
+	EM_MSG_SMS,														// SMS短信
+	EM_MSG_MMS,														// MMS彩信
+}EM_MSG_TYPE;
+
+// 系统事件触发彩信/短信发送的配置
+typedef struct tagCFG_EVENT_MSG_SENDING_INFO
+{
+	BOOL				bEnable;									// 使能开关
+	EM_MSG_TYPE			emMsgType;									// 发送的信息的类型
+	char				szTitle[MAX_NAME_LEN];						// 标题, 也就是短信/彩信的第一行文字
+	DWORD				dwReceiverCount;							// 收信人号码的个数
+	char				szReceiverNumbersList[MAX_RECEIVER_NUM][MAX_MSG_NUMBER_LEN];// 收信人号码
+}CFG_EVENT_MSG_SENDING_INFO;
+
+// 移动相关业务配置
+typedef struct tagCFG_MOBILE_INFO
+{
+	CFG_EVENT_MSG_SENDING_INFO	stuEventMsgSending;					// 系统时间触发的发送短信/彩信的配置
+}CFG_MOBILE_INFO;
+
+#define MAX_CONTACT_NUM		100				// 联系人最大数目
+
+// 电话语音提醒配置
+typedef struct tagCFG_PHONEEVENTNOTIFY_INFO
+{
+	BOOL				bEnable;									// 使能开关
+	DWORD				dwContactCount;								// 呼叫号码的个数
+	char				szContactNumbersList[MAX_CONTACT_NUM][MAX_MSG_NUMBER_LEN];// 呼叫号码列表
+}CFG_PHONEEVENTNOTIFY_INFO;
+
+// 电话报警中心配置
+enum CFG_EM_SIGNALTRANSMIT_MODE
+{
+	CFG_EM_SIGNALTRANSMIT_ERROR = 0,								// 未知模式
+	CFG_EM_SIGNALTRANSMIT_DTMF_5S,									// "DTMF 5/S" - DTMF模式慢拨
+	CFG_EM_SIGNALTRANSMIT_DTMF_10S,									// "DTMF 10/S" - DTMF模式快拨
+};
+enum CFG_EM_PSTN_PROTOCOL_TYPE
+{
+	CFG_EM_PSTN_PROTOCOL_ERROR = 0,									// 未知类型
+	CFG_EM_PSTN_PROTOCOL_CID,										// "CID" - Contact ID Protocol
+};
+typedef struct tagCFG_PSTN_ALARM_SERVER_INFO
+{
+	char							szName[MAX_NAME_LEN];						// 电话报警中心名称
+	char							szNumber[MAX_PHONE_NUMBER_LEN];				// 电话报警中心接收机号码
+																				// "057188888888PPP888",格式为[号码][停顿时间][分机号码]，其中P表示停顿2秒。
+	CFG_EM_PSTN_PROTOCOL_TYPE		emProtocol;									// 协议类型，
+	CFG_EM_SIGNALTRANSMIT_MODE		emMode;										// 信号传输模式																															
+	int								nTryCount;									// 拨号尝试次数
+	int								nDelay;										// 拨号延时，单位：秒
+	char							szAccount[MAX_PHONE_NUMBER_LEN];			// 用户号码
+}CFG_PSTN_ALARM_SERVER_INFO;
+
+typedef struct tagCFG_PSTN_ALARM_CENTER_INFO
+{
+	BOOL						bEnable;								// 使能开关
+	int							nServerCount;							// 电话报警服务器个数
+	CFG_PSTN_ALARM_SERVER_INFO	stuPSTNAlarmServer[MAX_PSTN_SERVER_NUM];		// 电话报警服务器
+}CFG_PSTN_ALARM_CENTER_INFO;
+
+// 音量输出配置
+typedef struct tagCFG_AUDIO_OUTPUT_VOLUME
+{
+	int				nAudioOutputCount;									// 实际音频输出通道个数
+	char			szAudioOutputVolume[MAX_AUDIO_OUTPUT_NUM];			// 每个元素对应一个音频输出通道的音量值,范围[0, 100]
+}CFG_AUDIO_OUTPUT_VOLUME;
+
+
+// 报警键盘配置
+typedef struct tagCFG_ALARMKEYBOARD_INFO
+{
+	BOOL			bEnable;								// 使能开关
+	char			szProtocolName[MAX_PROTOCOL_NAME_LEN];	// 协议名称
+	int				nPort;									// 使用的串口端口号
+	int				nAddress;								// 设备地址，如果串口上挂了多个串口设备，通过这个地址区分
+	CFG_COMM_PROP	stuCommAttr;							// 串口属性
+}CFG_ALARMKEYBOARD_INFO;
+
+// 获取文件管理能力
+typedef struct tagCFG_CAP_FILEMANAGER
+{
+	int			nMaxUploadFileSize;		// 最大的上传文件的大小, 单位: 字节
+}CFG_CAP_FILEMANAGER;
+
+// 获取设备报警联动能力
+typedef struct tagCFG_CAP_EVENTMANAGER_INFO
+{
+	BOOL				bTimeSectionEnable;                               // 是否支持时间事件响应
+	BOOL				bRecordEnable;                                    // 是否支持录像
+	BOOL				bAlarmOutEnable;                                  // 是否支持报警输出
+	BOOL				bPtzLinkEnable;                                   // 是否支持云台联动
+	BOOL				bSnapshotEnable;                                  // 是否支持快照
+	BOOL				bMailEnable;                                      // 是否支持发送邮件
+	BOOL				bBeepEnable;                                      // 是否支持蜂鸣
+	BOOL				bDejitterEnable;                                  // 是否支持去抖动
+	BOOL				bTipEnable;										  // 是否支持本地消息框提示
+	BOOL				bMonitorTourEnable;								  // 是否支持轮询联动配置
+	BOOL				bMMSEnable;										  // 是否支持短消息
+	BOOL				bSupportAlarmBell;								  // 是否支持警号输出
+	BOOL				bSupportAccessControl;							  // 是否支持门禁控制
+	BOOL				bSupportAlarmServer;							  // 是否支持上传至报警服务器
+	BOOL				bSupportPtzLinkDelay;							  // 是否支持云台联动延迟
+	BOOL				bSupportPSTNAlarmServer;						  // 是否支持上传至电话报警中心
+}CFG_CAP_EVENTMANAGER_INFO;
+
+// 电源故障配置
+typedef struct tagCFG_POWERFAULT_ONE
+{
+	BOOL			bEnable;									// 使能开关
+	CFG_ALARM_MSG_HANDLE stuEventHandler;						// 报警联动
+}CFG_POWERFAULT_ONE;
+
+typedef struct tagCFG_POWERFAULT_INFO
+{
+	int				nPowerCount;								// 电源个数
+	CFG_POWERFAULT_ONE stuPowerFault[MAX_POWER_NUM];			// 报警联动
+}CFG_POWERFAULT_INFO;
+
+// 机箱入侵报警(防拆报警)配置
+typedef struct tagCFG_CHASSISINTRUSION_INFO
+{
+	BOOL			bEnable;									// 使能开关
+	CFG_ALARM_MSG_HANDLE stuEventHandler;						// 报警联动
+}CFG_CHASSISINTRUSION_INFO;
+
+// 紧急事件配置
+typedef struct tagCFG_URGENCY_INFO 
+{
+	BOOL			bEnable;									// 使能开关
+	CFG_ALARM_MSG_HANDLE stuEventHandler;						// 报警联动
+}CFG_URGENCY_INFO;
+
+/************************************************************************
+** 扩展报警模块
+***********************************************************************/
+// 扩展模块报警输入配置
+typedef struct tagCFG_EXALARMINPUT_INFO
+{
+	CFG_ALARMIN_INFO		stuAlarmIn;						// 报警输入参数，详见 CFG_ALARMIN_INFO
+	
+}CFG_EXALARMINPUT_INFO;
+
+// 扩展模块报警输出配置
+typedef struct tagCFG_EXALARMOUTPUT_INFO
+{
+	char		szChnName[MAX_CHANNELNAME_LEN];				// 报警通道名称
+	int			nOutputMode;								// 输出模式, 0-自动报警, 1-强制报警, 2-关闭报警
+}CFG_EXALARMOUTPUT_INFO;
+
+// 扩展模块报警盒配置
+typedef struct tagCFG_EXALARMBOX_INFO
+{
+	BOOL			bEnable;								// 使能开关
+	char			szProtocolName[MAX_PROTOCOL_NAME_LEN];	// 协议名称
+	int				nPort;									// 使用的串口端口号
+	int				nAddress;								// 设备地址
+	CFG_COMM_PROP	stuCommAttr;							// 串口属性
+}CFG_EXALARMBOX_INFO;
+
+// 扩展报警盒协议类型
+enum CFG_EM_EXALARM_PROTOCOL_TYPE
+{
+	CFG_EM_EXALARM_PROTOCOL_ERROR,								// 未知类型
+	CFG_EM_EXALARM_PROTOCOL_DH_ALARMBOX,						// DH_AlarmBox 大华报警盒协议
+};
+
+
+// 扩展模块报警能力集
+typedef struct tagCFG_CAP_EXALARM_INFO
+{	
+	int					 nAlarmInCount;											// 扩展报警模块输入个数
+	int					 nAlarmOutCount;										// 扩展报警模块速出个数
+	int				 	 nMaxDelay;												// 延时防区的最大延时时间,单位为秒，只有支持延时防区时此字段才有效。
+	int					 nDefenceAreaTypeNum;									// 防区类型种类数,为0表示无此字段时报警输入不作为防区使用。
+	EM_CFG_DEFENCEAREATYPE	emDefenceAreaType[MAX_ALARM_DEFENCE_TYPE_NUM];		// 支持防区类型 
+	int					 nExAlarmChannelNum;									// 扩展模块报警通道数,为了保持兼容性,此为0时表示每个通道支持所有类型的传感器
+	CFG_EXALARM_SENSE_METHOD stuExAlarmChannel[MAX_EXALARM_CHANNEL_NUM];		// 报警通道集合
+	int					 nProtocolNum;											// 支持的协议种类
+	CFG_EM_EXALARM_PROTOCOL_TYPE emProtocolType[MAX_EXALARMBOX_PROTOCOL_NUM];	// 扩展报警模块报警盒支持的协议类型	
+}CAP_EXALARM_INFO;
+
+// 扩展模块报警盒能力集
+typedef struct tagCFG_CAP_EXALARMBOX_INFO 
+{
+	int nAlarmInCount; // 扩展报警模块输入个数
+	int nAlarmOutCount; // 扩展报警模块输出个数 
+}CFG_CAP_EXALARMBOX_INFO; 
+
+// 查询记录能力集能力集
+typedef struct tagCFG_CAP_RECORDFINDER_INFO 
+{
+	int nMaxPageSize; // 最大分页条数 
+}CFG_CAP_RECORDFINDER_INFO;
+
+
+// 传感器采样 ==>CFG_CMD_SENSORSAMPLING
+typedef struct  tagCFG_SENSORSAMPLING_INFO 
+{
+	int			nDetectionPeriod;			// 检查周期, 单位：秒，按检测周期实时上传温度状态
+	int			nStorageItem;				// 存储信息量, 单位：条数，设备本地以写文件方式，可导出（0~5000）
+}CFG_SENSORSAMPLING_INFO;
+
+// 环网 ==>CFG_CMD_STP
+typedef struct tagCFG_STP_INFO 
+{
+	BOOL			bEnable;				// 使能
+}CFG_STP_INFO;
+
+#define DH_MAX_ZONE_NUM					(256)	// 最大防区数目
+#define DH_MAX_PUBLIC_SUBSYSTEM_NUM		(8)		// 最大公共子系统数目
+
+// 报警子系统配置 ==>CFG_CMD_ALARM_SUBSYSTEM
+typedef struct tagCFG_ALARM_SUBSYSTEM_INFO 
+{
+	char		szName[CFG_COMMON_STRING_128];	// 名称
+	int			nZoneNum;						// 本地防区数目
+	int			anZone[DH_MAX_ZONE_NUM];		// 本地防区号
+	int			nExZoneNum;						// 扩展防区数目
+	int			anExZone[DH_MAX_ZONE_NUM];		// 扩展防区号
+	int			nDisableDelay;					// 延时撤防时间（进入延时）, 单位为秒
+	int			nEnableDelay;					// 延时布防时间（退出延时）, 单位为秒
+	BOOL		bIsPublic;						// 是否为公共子系统
+	int			nPublicSubSystem;				// 公共所属的子系统数目
+	int			anPublicSubSystem[DH_MAX_PUBLIC_SUBSYSTEM_NUM];// 公共所属的关联子系统
+}CFG_ALARM_SUBSYSTEM_INFO;
+
+// 电池电压低配置 ==>CFG_CMD_BATTERY_LOW_POWER
+typedef struct tagCFG_BATTERY_LOW_POWER_INFO 
+{
+	BOOL		bEnable;						// 使能
+	CFG_ALARM_MSG_HANDLE stuEventHandler;		// 报警联动
+}CFG_BATTERY_LOW_POWER_INFO;
+
+
+// 抓图通道联动外设配置 ==>CFG_CMD_SNAPLINKAGE
+typedef struct tagCFG_SNAPLINKAGE_INFO 
+{
+    int         nChannelNum;                    // 视频通道关联的模拟量通道数目
+    int         anAnalogAlarm[DH_MAX_ZONE_NUM]; // 视频通道关联的模量通道号
+}CFG_SNAPLINKAGE_INFO;
+
+// 视频输入配置
+typedef struct tagCFG_AUDIO_INPUT 
+{
+    char        szAudioSource[CFG_COMMON_STRING_256];   // 输入音频源. 如果音频通道的输入是由多路合成，用|分割.
+                                                        // 例："Mic|LineIn|Remote" 表示此音频通道由Mic、LineIn和远程通道的音频输入构成.
+                                                        // "Coaxial" 同轴口音频
+                                                        // "BNC" 本地BNC口音频
+                                                        // "HDCVI_BNC" 远程HDCVI设备音频
+                                                        // "LineIn" 线性输入
+                                                        // "Mic" 麦克风输入
+                                                        // "MicOut" 麦克输出
+                                                        // "Remote" 远程通道(仅对画中画通道有意义，表示画中画主画面为远程通道时，将当前远程通道的音频作为音频输入)
+}CFG_AUDIO_INPUT;
+
+// 邮件上报设备状况
+typedef struct tagCFG_HEALTHREPORT_INFO 
+{
+    BOOL			bEnable;				// 使能
+    int             nInterval;              // 邮件发送间隔,单位为秒,范围：0~3600
+}CFG_HEALTHREPORT_INFO;
+
+// 邮件发送配置 ==>CFG_CMD_EMAIL
+typedef struct tagCFG_EMAIL_INFO 
+{
+    BOOL			bEnable;				                            // 使能
+    BOOL            bSslEnable;                                         // 是否需要SSL加密
+    BOOL            bTlsEnable;                                         // 是否需要TLS加密
+    char            szAddress[MAX_ADDRESS_LEN];                         // SMTP服务器IP地址或网络名
+    int             nPort;                                              // 端口号
+    char            szUserName[MAX_USERNAME_LEN];                       // 帐户名
+    char            szPassword[MAX_PASSWORD_LEN];                       // 密码
+    BOOL            bAnonymous;                                         // 匿名邮件，true匿名，false非匿名
+    char            szSendAddress[MAX_ADDRESS_LEN];                     // 发件人地址
+    int             nRetReciversNum;                                    // 有效收件人数
+    char            szReceivers[MAX_RECEIVER_NUM][MAX_ADDRESS_LEN];     // 收件人列表
+    char            szTitle[MAX_MAILTITLE_LEN];                         // 邮件标题关键字
+    BOOL            bOnlyAttachment;                                    // 事件联动邮件，只发送带附件的邮件
+    BOOL            bAttachEnable;                                      // 邮件附件使能
+    int             nSendInterv;                                        // 同一事件的最小邮件发送间隔，单位为秒
+    
+    bool            abHealthReport;                                     // 能力,为true时,stuHealthReport有效
+    BYTE            byReserved[3];
+    CFG_HEALTHREPORT_INFO   stuHealthReport;                            // 邮件上报设备状况
+}CFG_EMAIL_INFO;
+
+#define MAX_TRANSFER_SERVER_NUM          10                             // 最大传输服务器个数
+// 传输离线文件配置
+typedef struct tagTRAFFIC_TRANSFER_OFFLINE_INFO
+{
+    BOOL            bEnable;                                                // 使能
+    int             nType;                                                  // 0: 使用IP地址; 1:使用MAC地址
+    int             nIpAddrNum;                                             // 返回的IP地址个数
+    char            szIpAddr[MAX_TRANSFER_SERVER_NUM][MAX_ADDRESS_LEN];     // IP地址或网络名
+    int             nMacAddrNum;                                            // 返回的mac地址个数
+    char            szClientID[MAX_TRANSFER_SERVER_NUM][MAX_ADDRESS_LEN];   // mac地址
+
+}TRAFFIC_TRANSFER_OFFLINE_INFO;
+
+#define MAX_DEVCOMM_NUM          16                                     // 最大串口个数
+// 订阅串口数据配置-单个串口配置
+typedef struct tagCFG_DEVCOMM_SUBSCRIBE_INFO
+{
+    int             nReadCycle;                                         // 串口读取间隔,单位: 秒    
+}CFG_DEVCOMM_SUBSCRIBE_INFO;
+
+// 订阅串口数据配置
+typedef struct tagCFG_DEVCOMM_SUBSCRIBE
+{
+    int                             nSubscribeInfoNum;                  // 串口数据配置个数
+    CFG_DEVCOMM_SUBSCRIBE_INFO      stuSubscribeInfo[MAX_DEVCOMM_NUM];  // 订阅串口数据配置，是一个数组，每个元素对应一个串口    
+}CFG_DEVCOMM_SUBSCRIBE;
+
+// 车位状态对应的车位指示灯
+typedef enum tagEM_CFG_PARKINGSPACE_LIGHT_COLOR
+{
+    EM_CFG_PARKINGSPACE_LIGHT_RED,                                      // 红色
+    EM_CFG_PARKINGSPACE_LIGHT_YELLOW,                                   // 黄色
+    EM_CFG_PARKINGSPACE_LIGHT_BLUE,                                     // 蓝色 
+    EM_CFG_PARKINGSPACE_LIGHT_GREEN,                                    // 绿色
+    EM_CFG_PARKINGSPACE_LIGHT_PURPLE,                                   // 紫色
+    EM_CFG_PARKINGSPACE_LIGHT_WHITE,                                    // 白色
+    EM_CFG_PARKINGSPACE_LIGHT_PINK,                                     // 粉色
+}EM_CFG_PARKINGSPACE_LIGHT_COLOR;
+
+// 指示灯状态
+typedef enum tagEM_CFG_PARKINGSPACE_LIGHT_STATE
+{
+    EM_CFG_PARKINGSPACE_LIGHT_OFF,                                      // 灭
+    EM_CFG_PARKINGSPACE_LIGHT_ON,                                       // 亮
+    EM_CFG_PARKINGSPACE_LIGHT_GLINT,                                    // 闪烁
+}EM_CFG_PARKINGSPACE_LIGHT_STATE;
+
+#define CFG_MAX_PARKINGSPACE_LIGHT_NUM       8
+
+typedef struct tagCFG_PARKINGSPACE_LIGHT_STATE
+{
+    BYTE                            bySpaceFreeLinght[CFG_MAX_PARKINGSPACE_LIGHT_NUM]; // 车位空闲状态灯色,颜色枚举值作为数组下标，数组元素值表示指示灯状态，如bySpaceFreeLinght[0]=1,表示红色指示灯亮
+    BYTE                            bySpaceFullLinght[CFG_MAX_PARKINGSPACE_LIGHT_NUM]; // 车位满状态灯色，颜色枚举值作为数组下标，数组元素值表示指示灯状态，如bySpaceFullLinght[1]=1,表示黄色指示灯亮
+}CFG_PARKINGSPACE_LIGHT_STATE;
+
+// 空调工作模式
+typedef enum tagEM_CFG_AIRCONDITION_MODE
+{
+    EM_CFG_AIRCONDITION_MODE_UNKNOWN = 0,
+    EM_CFG_AIRCONDITION_MODE_AUTO,             // 自动
+    EM_CFG_AIRCONDITION_MODE_HOT,              // 制热
+    EM_CFG_AIRCONDITION_MODE_COLD,             // 制冷
+    EM_CFG_AIRCONDITION_MODE_WET,              // 除湿
+    EM_CFG_AIRCONDITION_MODE_WIND,             // 通风
+} EM_CFG_AIRCONDITION_MODE;
+
+// 空调送风模式
+typedef enum tagEM_CFG_AIRCONDITION_WINDMODE
+{
+    EM_CFG_AIRCONDITION_WINDMODE_UNKNOWN = 0,
+    EM_CFG_AIRCONDITION_WINDMODE_STOP,            // 停止
+    EM_CFG_AIRCONDITION_WINDMODE_AUTO,            // 自动
+    EM_CFG_AIRCONDITION_WINDMODE_HIGH,            // 高速
+    EM_CFG_AIRCONDITION_WINDMODE_MIDDLE,          // 中速
+    EM_CFG_AIRCONDITION_WINDMODE_LOW,             // 低速
+} EM_CFG_AIRCONDITION_WINDMODE;
+
+// 串口地址
+typedef struct tagCFG_COMMADDR_INFO
+{
+    int                 nAddressNum;                            // 串口地址个数
+    int 				nAddress[MAX_ADDRESS_NUM];			// 地址描述,不同厂商地址位不同，用数组表示
+}CFG_COMMADDR_INFO;
+
+// 空调设备配置详情
+typedef struct tagCFG_AIRCONDITION_DETAIL
+{
+    char				szDeviceID[MAX_DEVICE_ID_LEN];			// 设备编码,惟一标识符
+    char                szName[MAX_DEVICE_MARK_LEN];            // 设备描述
+    char                szBrand[MAX_BRAND_NAME_LEN];            // 设备品牌
+    CFG_COMMADDR_INFO   stuCommAddr;                            // 串口地址
+    int                 nState;                                 // 设备状态: 1-打开,0-关闭
+    int                 nRange;                                 // 幅度值(温度)单位：摄氏度
+    EM_CFG_AIRCONDITION_MODE        emAirconditionMode;         // 空调工作模式
+    EM_CFG_AIRCONDITION_WINDMODE    emAirconditionWindMode;     // 空调送风模式
+}CFG_AIRCONDITION_DETAIL;
+
+// 空调设备配置(对应CFG_CMD_AIRCONDITION命令)
+typedef struct tagCFG_AIRCONDITION_INFO
+{
+    int                         nAirConditionNum;                        // 空调设备个数
+    CFG_AIRCONDITION_DETAIL 	stuAirConditions[MAX_AIRCONDITION_NUM];	 // 空调设备配置详情, 数组表示
+}CFG_AIRCONDITION_INFO;
+
+//压缩回放配置信息
+typedef struct tagCFG_COMPRESS_PLAY_INFO
+{
+    BOOL                bEnable;                // 使能
+	CFG_CAPTURE_SIZE    emResolution;           // 视频分辨率
+	unsigned int        nBitRate;               // 视频固定码流值(kbps), 范围：192~1024
+}CFG_COMPRESS_PLAY_INFO;
+
+// 系统类型
+typedef enum tagEM_CFG_BUILDING_SYSTEM_TYPE
+{
+    EM_CFG_BUILDING_SYSTEM_TYPE_UNKNOWN = 0,        // 未知
+    EM_CFG_BUILDING_SYSTEM_TYPE_DIGITAL,            // 数字系统
+    EM_CFG_BUILDING_SYSTEM_TYPE_ANALOG,             // 模拟系统
+}EM_CFG_BUILDING_SYSTEM_TYPE;
+
+// VTO 楼层配置(对应 CFG_CMD_BUILDING 命令)
+typedef struct tagCFG_BUILDING_INFO
+{
+    char                            szIssueNumber[CFG_COMMON_STRING_16];                // 期号，范围：0 ~ 99
+    char                            szSectionNumber[CFG_COMMON_STRING_16];              // 区号，范围：0 ~ 99
+    char                            szBuildingNumber[CFG_COMMON_STRING_16];             // 楼号，范围：0 ~ 999
+    char                            szBuildingUnitNumber[CFG_COMMON_STRING_16];         // 楼内单元号，范围：0 ~ 9
+    char                            szSectionUnitNumber[CFG_COMMON_STRING_16];          // 小区单元编号，范围：0 ~ 999
+    int                             nUnitFloorNumber;                                   // 单元楼层数，范围：0 ~ 99
+    int                             nFloorPerRoomNumber;                                // 一层房间数，范围：0 ~ 99
+    BOOL                            bCreateRoomEnable;                                  // 创建房间号使能
+    EM_CFG_BUILDING_SYSTEM_TYPE     emSystemType;                                       // 系统类型
+}CFG_BUILDING_INFO;
+
+//VTO 楼层扩展配置(对应 CFG_CMD_BUILDING_EXTERNAL 命令)
+typedef struct tagCFG_BUILDING_EXTERNAL_INFO
+{
+    int                                     nFloorCount;                                            // 单元总层数
+    int                                     nRoomCount;                                             // 每层房间数
+    int                                     nBeginNumberCount;                                      // 获取/设置时，对应的开始房间号的有效个数
+    // 获取时，当获取的开始房间号个数超过MAX_FLOOR_NUM，前MAX_FLOOR_NUM个有效
+    // 设置时，当设置的开始房间号个数超过MAX_FLOOR_NUM，前MAX_FLOOR_NUM个有效
+    char                                    szBeginNumber[MAX_FLOOR_NUM][CFG_COMMON_STRING_16];     // 开始的房间号，nBeginNumber[0] 为第一层开始房间号，nBeginNumber[1] 为第二层开始房间号，
+    int                                     nTotalBuildingNumber;                                   // 小区总幢数，范围：0 ~ 99
+    int                                     nBuildingPerUintNumber;                                 // 每幢单元数，范围：0 ~ 9
+}CFG_BUILDING_EXTERNAL_INFO;
+
+//拨号规则(对应 CFG_CMD_DIALRULE 命令)
+typedef struct tagCFG_DIALRULE_INFO
+{
+    BOOL                            bBuildingModeEnable;            //幢模式使能
+    BOOL                            bUnitModeEnable;                //单元模式使能
+    BOOL                            bExtentionModeEnable;           //分机模式使能
+    char                            cSeperator;                     //拨号分隔符, 如 "#", "-"
+    BYTE				            byReserved[3];				    //字节对齐
+}CFG_DIALRULE_INFO;
+
+// 车辆油箱配置
+typedef struct tagCFG_OIL_MASS_INFO
+{
+    int                 nTankVolume;            // 油箱容积，单位：升
+    int                 nNotifyIntervalTime;    // 上报油箱信息间隔时间,单位：秒
+    int                 nLowOil;                // 油量液位低报警百分比(例：低于20%则报警),单位：百分比，0－100
+    int                 nAlarmIntervalTime;     // 上报油量液位低的报警时间间隔(即报警后，每隔一段时间就重复报警),单位：秒
+}CFG_OIL_MASS_INFO; 
+
+// MAC冲突事件报警配置
+typedef struct tagCFG_MACCONFLICT_INFO 
+{
+    BOOL                bEnable;                // 使能开关
+    CFG_ALARM_MSG_HANDLE stuEventHandler;       // 报警联动
+}CFG_MACCONFLICT_INFO;
+
+// 空闲动作功能枚举
+typedef enum tagEM_CFG_IDLEMOTION_FUNCTION
+{
+    EM_CFG_IDLEMOTION_FUNCTION_NONE = 0,         // 无
+    EM_CFG_IDLEMOTION_FUNCTION_PRESET,           // 预置点
+    EM_CFG_IDLEMOTION_FUNCTION_SCAN,             // 自动线扫
+    EM_CFG_IDLEMOTION_FUNCTION_TOUR,             // 巡航
+    EM_CFG_IDLEMOTION_FUNCTION_PATTERN,          // 自动巡迹
+} EM_CFG_IDLEMOTION_FUNCTION;
+
+// 空闲动作配置信息
+typedef struct tagCFG_IDLE_MOTION_INFO
+{
+    BOOL                        bEnable;         // 使能
+    int                         nTime;           // 启动空闲动作的时间1~60分钟
+    EM_CFG_IDLEMOTION_FUNCTION  emFunction;      // 空闲动作功能,见枚举 EM_CFG_IDLEMOTION_FUNCTION
+    int                         nPresetId;       // 预置点编号,   范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wPresetMin和wPresetMax
+    int                         nScanId;         // 自动线扫编号, 范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wAutoScanMin和wAutoScanMax
+    int                         nTourId;         // 巡航编号,     范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wTourMin和wTourMax
+    int                         nPatternId;      // 自动巡迹编号, 范围参照CFG_PTZ_PROTOCOL_CAPS_INFO的wPatternMin和wPatternMax
+}CFG_IDLE_MOTION_INFO;
+
+// 电视墙预案轮巡配置
+typedef struct tagCFG_MONITORWALL_COLLECTION_TOUR_INFO
+{
+    int                 nInterval;               // 轮巡间隔时间, 单位秒
+    int                 nCollectionNum;          // 预案轮巡组中包含的预案数量
+    char                szCollectionGroup[CFG_MAX_COLLECTION_NUM][CFG_COMMON_STRING_128]; // 预案轮巡组内容, 每一项是预案的名称
+}CFG_MONITORWALL_COLLECTION_TOUR_INFO;
+
+// PSTN掉线事件配置
+typedef struct tagCFG_PSTN_BREAK_LINE_INFO
+{
+    BOOL                bEnable;                // 使能开关
+    CFG_ALARM_MSG_HANDLE stuEventHandler;       // 报警联动
+}CFG_PSTN_BREAK_LINE_INFO;
+
+// 网络采集设备配置, 对应CFG_CMD_NET_COLLECTION命令
+typedef struct tagCFG_NET_COLLECTION_INFO
+{
+    char                szIp[MAX_ADDRESS_LEN];  // IP
+	int                 nPort;                  // 端口
+}CFG_NET_COLLECTION_INFO;
+
+// 物理接口类型
+typedef enum tagEM_CFG_INTERFACE_TYPE
+{
+    EM_CFG_INTERFACE_TYPE_UNKNOWN = 0,
+	EM_CFG_INTERFACE_TYPE_COMM,                 // Comm类型, 即串口, 对应CFG_COMMGROUP_INFO配置
+	EM_CFG_INTERFACE_TYPE_NETCOLLECTION,        // NetCollection类型, 即网络采集点, 对应CFG_NET_COLLECTION_INFO配置
+}EM_CFG_INTERFACE_TYPE;
+
+// 虚拟Slot节点与具体物理设备的对应关系, 对应CFG_CMD_ALARM_SLOT_BOND命令
+// 由于第一个通道(即通道0)已经于本地通道绑定，故无法设置;
+// 其他通道对应Slot节点序号, 元素内容为相应物理接口
+typedef struct tagCFG_ALARM_SLOT_BOND_INFO
+{
+    EM_CFG_INTERFACE_TYPE   emType;             // 物理接口类型
+	int                     nIndex;	            // 通道号, 从0开始
+	                                            // 类型为EM_CFG_INTERFACE_TYPE_COMM时, 表示CFG_COMMGROUP_INFO配置的数组下标;
+	                                            // 类型为EM_CFG_INTERFACE_TYPE_NETCOLLECTION时, 表示CFG_NET_COLLECTION_INFO配置的数组下标;
+}CFG_ALARM_SLOT_BOND_INFO;
+
+#define CFG_MAX_CTRLTYPE_NUM       16            // 最大道闸控制方式
+// 道闸控制方式枚举
+typedef enum tagEM_CFG_TRAFFICSTROBE_CTRTYPE
+{
+    EM_CFG_CTRTYPE_UNKNOWN = 0,                 // 未定义
+    EM_CFG_CTRTYPE_TRAFFICTRUSTLIST,            // 通过白名单控制是否开闸；只有白名单内车辆才开闸
+    EM_CFG_CTRTYPE_ALLSNAPCAR,                  // 针对所有抓拍车辆都开闸
+    EM_CFG_CTRTYPE_ORDER,                       // 通过上层下发的命令开闸
+} EM_CFG_TRAFFICSTROBE_CTRTYPE;
+
+// 道闸配置信息(对应 CFG_CMD_TRAFFICSTROBE 命令)
+typedef struct tagCFG_TRAFFICSTROBE_INFO
+{
+    BOOL                            bEnable;                            // 使能
+    int                             nCtrlTypeCount;                     // 道闸控制方式个数
+    EM_CFG_TRAFFICSTROBE_CTRTYPE    emCtrType[CFG_MAX_CTRLTYPE_NUM];    // 道闸控制方式,见枚举 EM_CFG_TRAFFICSTROBE_CTRTYPE
+    CFG_ALARM_MSG_HANDLE            stuEventHandler;					// 开启道闸联动参数
+    CFG_ALARM_MSG_HANDLE            stuEventHandlerClose;               // 关闭道闸联动参数
+}CFG_TRAFFICSTROBE_INFO;
+
+#define CFG_MAX_PLATEENABLE_NUM       16        // 最大使能过车车牌播报个数
+#define CFG_MAX_TRAFFICVOICE_NUM      8         // 最大语音播报配置个数
+// 使能过车车牌播报功能枚举
+typedef enum tagEM_CFG_PLATEENABLE_TYPE
+{
+    EM_CFG_PLATEENABLE_UNKNOWN = 0,             // 未定义
+    EM_CFG_PLATEENABLE_TIPS,                    // 播放欢迎词
+    EM_CFG_PLATEENABLE_PLATE,                   // 播放车牌
+} EM_CFG_PLATEENABLE_TYPE;
+
+// 智能交通语音播报信息
+typedef struct tagCFG_TRAFFICVOICE_BROADCAST_INFO
+{
+    int                             nEnableCount;                       // 使能播报个数
+    EM_CFG_PLATEENABLE_TYPE         emEnable[CFG_MAX_PLATEENABLE_NUM];  // 使能过车车牌播报,见枚举 EM_CFG_PLATEENABLE_TYPE
+    char                            szNormalCar[MAX_PATH];              // 普通车辆过车播报内容,例如:播报语音文件"欢迎光临.wav"
+    char                            szTrustCar[MAX_PATH];               // 信任车辆过车播报内容,例如:播报语音文件"欢迎光临.wav"
+    char                            szSuspiciousCar[MAX_PATH];          // 嫌疑车辆过车播报内容,例如:播报语音文件"非注册车辆.wav"
+}CFG_TRAFFICVOICE_BROADCAST_INFO;
+
+// 智能交通语音播报配置(对应 CFG_CMD_TRAFFICVOICE 命令)
+typedef struct tagCFG_TRAFFICVOICE_BROADCAST
+{
+    int                             nTrafficVoiceNum;                           // 语音播报配置个数
+    CFG_TRAFFICVOICE_BROADCAST_INFO stuTrafficVoices[CFG_MAX_TRAFFICVOICE_NUM];	// 语音播报配置详情, 数组表示
+}CFG_TRAFFICVOICE_BROADCAST;
+
+// 停车时间配置
+typedef struct tagCFG_STANDING_TIME_INFO
+{
+    BOOL                        bEnable;         // 是否启用停车超时报警功能
+    int                         nUpperlimit;     // 停留时间上限, 单位：分钟
+    int                         nInterval;       // DH_ALARM_VEHICLE_STANDING_OVER_TIME事件上报间隔, 单位：秒
+} CFG_STANDING_TIME_INFO;
+
+// 电子围栏报警时间段信息
+typedef struct tagENCLOSURE_TIME_SCHEDULE_INFO
+{
+    int                         nEnclosureID;                                          // 围栏的ID号
+    CFG_TIME_SECTION            stuTimeSection[MAX_TIME_SCHEDULE_NUM][MAX_REC_TSECT];  // 事件响应时间段
+} ENCLOSURE_TIME_SCHEDULE_INFO;
+
+// 电子围栏最大数量
+#define MAX_ENCLOSURE_NUM 128
+
+// 电子围栏报警时间段配置
+typedef struct tagCFG_ENCLOSURE_TIME_SCHEDULE_INFO
+{
+    int                                nEnclosureInfoCount;                     // 围栏数量
+    ENCLOSURE_TIME_SCHEDULE_INFO       stuEnclosureInfo[MAX_ENCLOSURE_NUM];     // 围栏信息
+    char                               szVersion[CFG_COMMON_STRING_64];         // 围栏时间段配置版本号
+} CFG_ENCLOSURE_TIME_SCHEDULE_INFO;
+
+// 停车场出入口控制器工作模式
+typedef enum tagEM_ECK_WORK_MODE_TYPE
+{
+    EM_ECK_WORK_MODE_UNKNOWN = 0,
+    EM_ECK_WORK_MODE_IMPORT,                                    // 入口控制机
+    EM_ECK_WORK_MODE_EXPORT,                                    // 出口控制机
+}EM_ECK_WORK_MODE_TYPE;
+
+// 停车场出入口控制器开闸模式
+typedef enum tagEM_ECK_STROBE_MODE_TYPE
+{
+    EM_ECK_STROBE_MODE_UNKNOWN = 0,
+    EM_ECK_STROBE_MODE_ON,                                      // 始终开闸
+    EM_ECK_STROBE_MODE_OFF,                                     // 始终关闸
+    EM_ECK_STROBE_MODE_AUTO,                                    // 自动开关闸
+}EM_ECK_STROBE_MODE_TYPE;
+
+// 停车场出入口控制器滚动屏初始滚动速度
+typedef enum tagEM_ECK_LED_SPEED_TYPE
+{
+    EM_ECK_LED_SPEED_UNKNOWN = 0,
+    EM_ECK_LED_SPEED_LOW,                                       // 慢
+    EM_ECK_LED_SPEED_NORMAL,                                    // 正常
+    EM_ECK_LED_SPEED_HIGH,                                      // 快
+}EM_ECK_LED_SPEED_TYPE;
+
+// 停车场出入口控制器LED滚动屏配置
+typedef struct tagCFG_ECK_LED_INFO 
+{
+    EM_ECK_LED_SPEED_TYPE   emLEDSpeed;                         // LED滚动屏初始滚动速度
+    char                    szCustomData[CFG_COMMON_STRING_512];// LED滚动屏初始自定义字符, 有效长度0-256字节
+}CFG_ECK_LED_INFO;
+
+// 停车场出入口控制器配置
+typedef struct tagCFG_ECKCONFIG_INFO 
+{
+    EM_ECK_WORK_MODE_TYPE   emWorkMode;                         // 工作模式
+    EM_ECK_STROBE_MODE_TYPE emStrobeMode;                       // 开闸模式
+    BOOL                    bForceOffline;                      // 强制脱机开关, TRUE:强制脱机工作, FALSE:接受平台控制工作
+    BOOL                    bLoopSence;                         // 地感功能开关, TRUE:开启地感功能, FALSE:关闭地感功能
+    CFG_ECK_LED_INFO        stuLED;                             // 滚动屏幕配置
+}CFG_ECKCONFIG_INFO;
+
+// 箭头指向
+typedef enum tagEM_DIRECTION
+{
+    EM_DIRECTION_UNKNOWN,
+    EM_DIRECTION_LEFT,                                          // 左
+    EM_DIRECTION_UPLEFT,                                        // 左上
+    EM_DIRECTION_UP,                                            // 上
+    EM_DIRECTION_UPRIGHT,                                       // 右上
+    EM_DIRECTION_RIGHT,                                         // 右
+    EM_DIRECTION_DOWNRIGHT,                                     // 右下
+    EM_DIRECTION_DOWN,                                          // 下
+    EM_DIRECTION_DOWNLEFT,                                      // 左下
+}EM_DIRECTION;
+
+// 箭头相对于数字的位置
+typedef enum tagEM_GUIDESCREEN_POS
+{
+    EM_GUIDESCREEN_POS_UNKNOWN,
+    EM_GUIDESCREEN_POS_LEFT,                                    // 左侧
+    EM_GUIDESCREEN_POS_RIGHT,                                   // 右侧
+}EM_GUIDESCREEN_POS;
+
+// 诱导屏内容是否滚动
+typedef enum tagEM_GUIDESCREEN_ROLL
+{
+    EM_GUIDESCREEN_ROLL_UNKNOWN,
+    EM_GUIDESCREEN_ROLL_DISABLE,                                // 不滚动
+    EM_GUIDESCREEN_ROLL_ENABLE,                                 // 滚动
+}EM_GUIDESCREEN_ROLL;
+
+// 诱导屏箭头设置
+typedef struct tagCFG_GUISCREEN_ARROW
+{
+    EM_DIRECTION            emDirect;                           // 箭头指向
+    EM_GUIDESCREEN_POS      emPos;                              // 箭头相对于数字的位置
+    EM_GUIDESCREEN_ROLL     emRoll;                             // 是否滚动
+}CFG_GUISCREEN_ARROW;
+
+#define CFG_GUIDE_SCREEN_NUM_MAX (8)                            // 诱导屏最大数量
+
+// 诱导屏系统配置(对应 CFG_CMD_GUIDESCREEN 命令)
+typedef struct tagCFG_GUIDESCREEN_INFO
+{
+    char                    szText[CFG_COMMON_STRING_128];      // 上下屏时,上屏显示内容
+                                                                // 英文或常用中文汉字，中文需要GB2312编码，长度不超过64字节
+    int                     nArrowNum;                          // 箭头标志数量
+    CFG_GUISCREEN_ARROW     stuArrow[CFG_GUIDE_SCREEN_NUM_MAX]; // 箭头标志设置, 对应的屏从左至右依次排列
+}CFG_GUIDESCREEN_INFO;
+
+// 停车场出入口刷卡报警事件配置(对应CFG_CMD_PARKING_CARD命令)
+typedef struct tagCFG_PARKING_CARD_INFO
+{
+    BOOL                            bEnable;                // 是否启用
+    CFG_ALARM_MSG_HANDLE            stuEventHandler;        // 报警联动
+} CFG_PARKING_CARD_INFO;
+
+// 报警方式, 即通过什么方式发出的报警
+typedef enum tagEM_CFG_RCEMERGENCY_MODE_TYPE
+{
+    EM_CFG_RCEMERGENCY_MODE_UNKNOWN = 0,
+    EM_CFG_RCEMERGENCY_MODE_KEYBOARD,                       // 键盘
+    EM_CFG_RCEMERGENCY_MODE_WIRELESS_CONTROL,               // 遥控器
+}EM_CFG_RCEMERGENCY_MODE_TYPE;
+
+// 紧急救助报警类型
+typedef enum tagEM_CFG_RCEMERGENCY_CALL_TYPE
+{
+    EM_CFG_RCEMERGENCY_CALL_UNKNOWN = 0,
+    EM_CFG_RCEMERGENCY_CALL_FIRE,                           // 火警
+    EM_CFG_RCEMERGENCY_CALL_DURESS,                         // 胁迫
+    EM_CFG_RCEMERGENCY_CALL_ROBBER,                         // 匪警
+    EM_CFG_RCEMERGENCY_CALL_MEDICAL,                        // 医疗
+}EM_CFG_RCEMERGENCY_CALL_TYPE;
+
+// 紧急呼叫报警事件配置(对应 CFG_CMD_RCEMERGENCYCALL 命令)
+typedef struct tagCFG_RCEMERGENCY_CALL_INFO 
+{
+    BOOL                            bEnable;                // 是否启用
+    EM_CFG_RCEMERGENCY_MODE_TYPE    emMode;                 // 报警方式
+    EM_CFG_RCEMERGENCY_CALL_TYPE    emAlarmType;            // 报警类型
+    CFG_ALARM_MSG_HANDLE            stuEventHandler;        // 报警联动
+}CFG_RCEMERGENCY_CALL_INFO;
+
+// 车道信息上报配置(对应 CFG_CMD_LANES_STATE_REPORT 命令)
+typedef struct tagCFG_LANES_STATE_REPORT
+{
+    BOOL                bEnable;        //上报使能	true:上报使能 ,false:上报不使能
+    int                 nPeriod;        //上报周期	单位：秒
+}CFG_LANES_STATE_REPORT;
+
+#define CFG_MAX_USER_ID_LEN                     32              // 门禁卡用户ID最大长度
+
+// 多人组合开门的开门方式
+typedef enum tagEM_CFG_OPEN_DOOR_GROUP_METHOD
+{
+    EM_CFG_OPEN_DOOR_GROUP_METHOD_UNKNOWN = 0,
+    EM_CFG_OPEN_DOOR_GROUP_METHOD_CARD,                         // 刷卡
+    EM_CFG_OPEN_DOOR_GROUP_METHOD_PWD,                          // 密码
+    EM_CFG_OPEN_DOOR_GROUP_METHOD_FINGERPRINT,                  // 指纹
+}EM_CFG_OPEN_DOOR_GROUP_METHOD;
+
+// 多人组合开门组详细信息
+typedef struct tagCFG_OPEN_DOOR_GROUP_DETAIL 
+{
+    char                            szUserID[CFG_MAX_USER_ID_LEN];  // 用户ID
+    EM_CFG_OPEN_DOOR_GROUP_METHOD   emMethod;                       // 开门方式
+}CFG_OPEN_DOOR_GROUP_DETAIL;
+
+#define CFG_MAX_OPEN_DOOR_GROUP_DETAIL_NUM      64               // 每一组多人开门组合的最大人数
+
+// 多人组合开门组信息
+typedef struct tagCFG_OPEN_DOOR_GROUP 
+{
+    int                         nUserCount;                     // 用户数目，表示需要组合才能开门的人数
+    int                         nGroupNum;                      // 有效组数目
+    CFG_OPEN_DOOR_GROUP_DETAIL  stuGroupDetail[CFG_MAX_OPEN_DOOR_GROUP_DETAIL_NUM];// 多人组合开门组的详细信息
+}CFG_OPEN_DOOR_GROUP;
+
+#define CFG_MAX_OPEN_DOOR_GROUP_NUM             4               // 多人开门组合的最大组合数
+
+// 多人多开门方式组合(对应 CFG_CMD_OPEN_DOOR_GROUP 命令),表示每个通道的组合信息，
+// 第一个通道的组合的开门优先级最高，后面依次递减
+typedef struct tagCFG_OPEN_DOOR_GROUP_INFO 
+{
+    int                         nGroup;                         // 有效组合数
+    CFG_OPEN_DOOR_GROUP         stuGroupInfo[CFG_MAX_OPEN_DOOR_GROUP_NUM];// 多人开门组合信息
+}CFG_OPEN_DOOR_GROUP_INFO;
+
+#define MAX_READER_ID_LEN                       32              // 读卡器ID最大长度
+
+// 开门路线的每个节点的信息
+typedef struct tagCFG_DOOR_ROUTE_NODE_INFO
+{
+    char                        szReaderID[MAX_READER_ID_LEN];  // 读卡器ID，即门禁控制器相连的读卡器的ID
+}CFG_DOOR_ROUTE_NODE_INFO;
+
+// 每条开门路线最大节点(读卡器数目)
+#define MAX_DOOR_ROUTE_NODE_NUM     4
+
+// 门数组集合信息，按照数组下标从小到大顺序，表示开门路线
+typedef struct tagCFG_DOOR_ROUTE_INFO
+{
+    int                         nDoors;                             // 开门路线有效节点数
+    CFG_DOOR_ROUTE_NODE_INFO    stuDoors[MAX_DOOR_ROUTE_NODE_NUM];  // 开门路线节点信息
+}CFG_DOOR_ROUTE_INFO;
+
+#define MAX_OPEN_DOOR_ROUTE_NUM                 16                  // 最大开门路线数目
+
+// 开门路线集合，或称防反潜路线配置(对应 CFG_CMD_OPEN_DOOR_ROUTE 命令)
+typedef struct tagCFG_OPEN_DOOR_ROUTE_INFO
+{
+    int                         nDoorList;
+    CFG_DOOR_ROUTE_INFO         stuDoorList[MAX_OPEN_DOOR_ROUTE_NUM];
+}CFG_OPEN_DOOR_ROUTE_INFO;
+
+#define MAX_BURNPLAN_DEVICES_NUM                     32
+#define MAX_BURNPLAN_CHANNELS_NUM                     32
+
+// 刻录流格式
+typedef enum tagEM_CFG_BURNPLAN_RECORDPACK_TYPE
+{
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE_UNKNOWN,        // 未知
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE_DHAV,           // "DHAV"
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE_PS,             // "PS"
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE_ASF,            // "ASF"
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE_MP4,            // "MP4"
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE_TS,             // "TS"
+}EM_CFG_BURNPLAN_RECORDPACK_TYPE;
+
+// 刻录模式
+typedef enum tagEM_CFG_BURNPLAN_MODE
+{
+    EM_CFG_BURNPLAN_MODE_UNKNOWN,           // 未知
+    EM_CFG_BURNPLAN_MODE_SYNC,              // 同步： "Sync"
+    EM_CFG_BURNPLAN_MODE_TURN,              // 轮流:  "Turn"
+    EM_CFG_BURNPLAN_MODE_CYCLE,             // 循环:  "Cycle"
+}EM_CFG_BURNPLAN_MODE;
+
+// 刻录计划信息
+typedef struct tagCFG_BURNPLAN_DETAIL
+{
+    int                                 nSessionId;                             // 审讯室
+    int                                 nDevicesNum;                            // 参与该会话的设备列表有效个数
+    int                                 nDevices[MAX_BURNPLAN_DEVICES_NUM];     // 参与该会话的设备列表
+    int                                 nChannelsNum;                           // 刻录的视频通道有效个数
+    int                                 nChannels[MAX_BURNPLAN_CHANNELS_NUM];   // 刻录的视频通道
+    EM_CFG_BURNPLAN_RECORDPACK_TYPE     emRecordpack;                           // 刻录流格式
+    EM_CFG_BURNPLAN_MODE                emMode;                                 // 刻录模式
+    CFG_NET_TIME                        stuStarttime;                           // 刻录开始时间
+}CFG_BURNPLAN_DETAIL;
+
+#define MAX_BURNPLAN_DETAIL_NUM          32
+
+// 刻录计划配置(对应CFG_BURNPLAN_INFO)
+typedef struct tagCFG_BURNPLAN_INFO
+{
+    int                         nBurnPlanDetailNum;                                 // 刻录计划信息列表有效个数
+    CFG_BURNPLAN_DETAIL         stuBurnPlanDetail[MAX_BURNPLAN_DETAIL_NUM];         // 刻录计划信息列表
+}CFG_BURNPLAN_INFO;
+
+typedef struct tagCFG_SCADA_DEV_INFO 
+{
+    BOOL                            bEnable;                // 是否启用
+    char                            szDevType[CFG_COMMON_STRING_64];// 设备类型
+    char                            szDevName[CFG_COMMON_STRING_64];// 设备名称, 唯一标示设备用
+    int                             nSlot;                  // 虚拟槽位号, 详见AlarmSlotBond配置
+    int                             nLevel;                 // 如果Slot绑定的是NetCollection类型的话，该字段为-1
+    CFG_ALARM_MSG_HANDLE            stuEventHandler;        // 报警联动
+}CFG_SCADA_DEV_INFO;
+
+// 通道相关信息
+typedef struct tagCFG_VSP_GAYS_CHANNEL_INFO
+{
+    char                            szId[CFG_COMMON_STRING_64];             // 通道编号	字符串（24位）
+    int                             nAlarmLevel;                            // 报警级别[1,6]	整型
+}CFG_VSP_GAYS_CHANNEL_INFO;
+
+// 报警相关信息
+typedef struct tagCFG_VSP_GAYS_ALARM_INFO
+{
+    char                            szId[CFG_COMMON_STRING_64];             // 通道编号	字符串（24位）
+    int                             nAlarmLevel;                            // 报警级别[1,6]	整型
+}CFG_VSP_GAYS_ALARM_INFO;
+
+// 公安一所平台接入配置(CFG_CMD_VSP_GAYS)
+typedef struct tagCFG_VSP_GAYS_INFO
+{
+    BOOL                            bEnable;                                // 是否使能，TRUE使能，FALSE不使能
+    char                            szSipSvrId[CFG_COMMON_STRING_64];       // SIP服务器编号	字符串（24位）
+    char                            szDomain[CFG_COMMON_STRING_256];        // SIP域	字符串（128位）
+    char                            szSipSvrIp[CFG_COMMON_STRING_32];       // SIP服务器IP	字符串（16位）
+    char                            szDeviceId[CFG_COMMON_STRING_64];       // 设备编号，也是注册用户名	字符串（24位）
+    char                            szPassword[CFG_COMMON_STRING_64];       // 注册密码,密文	字符串（24位）
+    unsigned short                  nLocalSipPort;                          // 本地SIP服务端口	无符号短整型
+    unsigned short                  nSipSvrPort;                            // SIP服务器端口	无符号短整型
+    int                             nSipRegExpires;                         // 注册有效期	整型
+    int                             nKeepAliveCircle;                       // 心跳周期	整型
+    int                             nMaxTimeoutTimes;                       // 最大心跳超时次数	整型
+    char                            szCivilCode[CFG_COMMON_STRING_64];      // 行政区划代码	字符串（24位）
+    char                            szIntervideoID[CFG_COMMON_STRING_64];   // 接入模块识别码	字符串（24位）
+    unsigned short                  nChannelSum;                            // 通道数	无符号短整型
+    unsigned short                  nAlarmInSum;                            // 外部报警输入数	无符号短整型
+    CFG_VSP_GAYS_CHANNEL_INFO       stuChannelInfo[MAX_VIDEO_CHANNEL_NUM];  // 通道相关信息	数组，有效个数同channelSum
+    CFG_VSP_GAYS_ALARM_INFO         stuAlarmInfo[MAX_ALARM_CHANNEL_NUM];    // 报警相关信息	数组，有效个数同alarmInSum
+}CFG_VSP_GAYS_INFO;
+
+// 音频检测报警配置(CFG_CMD_AUDIODETECT)
+typedef struct tagCFG_AUDIO_DETECT_INFO
+{
+    BOOL                            bEnable;                                // 是否使能，TRUE使能，FALSE不使能
+    int                             nMinVolume;                             // 音量下限
+    int                             nMaxVolume;                             // 音量上限
+    BOOL                            bAnomalyDetect;                         // 声音异常检测使能
+    int                             nAnomalySensitive;                      // 声音异常检测灵敏度值	取值范围1~100
+    BOOL                            bMutationDetect;                        // 声强突变检测使能
+    int                             nMutationThreold;                       // 声强突变检测阈值	取值范围1~100
+    CFG_ALARM_MSG_HANDLE            stuEventHandler;						// 联动配置
+}CFG_AUDIO_DETECT_INFO;
+
+// VTS呼叫配置(对应命令 CFG_CMD_VTS_CALL_INFO)
+typedef struct tagCFG_VTS_CALL_INFO 
+{
+    CFG_TIME_SECTION                stuCallEnableTime;                      // 允许呼叫VTS的时间段
+}CFG_VTS_CALL_INFO;
+
+// 设备列表配置中每个设备的信息
+typedef struct tagCFG_DEV_LIST
+{
+    char                            szDevType[CFG_COMMON_STRING_128];       // 设备类型, 支持: "VTT", "VTS"
+    char                            szDevName[CFG_COMMON_STRING_128];       // 设备名称
+    char                            szIP[MAX_ADDRESS_LEN];                  // ip地址
+    int                             nPort;                                  // 端口号
+    char                            szUser[CFG_COMMON_STRING_64];           // 用户名
+    char                            szPassword[CFG_COMMON_STRING_64];       // 密码
+    char                            szDevID[CFG_COMMON_STRING_128];         // 设备ID号, 必须唯一
+    char                            szParentID[CFG_COMMON_STRING_128];      // 父节点ID, 必须唯一
+}CFG_DEV_LIST;
+
+// 设备列表配置(对应命令 CFG_CMD_DEV_LIST_INFO)
+typedef struct tagCFG_DEV_LIST_INFO 
+{
+    CFG_DEV_LIST*                   pstuDevList;                            // 配置信息, 用户分配内存
+    DWORD                           dwDevListMaxCount;                      // pstuDevList分配内存的有效结构体个数
+    DWORD                           dwDevListRetCount;                      // 实际返回的结构体个数, 解析成结构体时有效
+}CFG_DEV_LIST_INFO;
+
+#define MAX_CALIBRATE_MATRIX_LEN    8       // 标定矩阵最大长度
+
+// 主从式跟踪器标定矩阵配置(对应 CFG_CMD_CALIBRATE_MATRIX 命令)
+typedef struct tagCFG_CALIBRATE_MATRIX_INFO 
+{
+    char                szSlaveSN[CFG_COMMON_STRING_128];                   // 从设备序列号
+    DWORD               dwMatrixLen;                                        // 标定矩阵中有效dword个数
+    DWORD               dwMatrix[MAX_CALIBRATE_MATRIX_LEN];                 // 标定矩阵, 是一个128字节的二进制串, 为提高解析效率, 保存为32个uint32_t值
+}CFG_CALIBRATE_MATRIX_INFO;
+
+// 防区延时配置(对应 CFG_CMD_DEFENCE_AREA_DELAY 命令)
+typedef struct tagCFG_DEFENCE_AREA_DELAY_INFO 
+{
+    int                 nEnterDelay1;           // 有进入延时的防区类型，除防区类型EM_CFG_DefenceAreaType_Entrance2外, 都使用此进入延时
+    int                 nEnterDelay2;           // 只有防区类型为EM_CFG_DefenceAreaType_Entrance2, 才会使用此进入延时
+    int                 nExitDelay;             // 所有有退出延时的防区, 都使用此退出延时
+}CFG_DEFENCE_AREA_DELAY_INFO;
+
+// 近光灯信息
+typedef struct tagCFG_NEARLIGHT_INFO
+{
+    BOOL                bEnable;                // 是否使能，TRUE使能，FALSE不使能
+    DWORD               dwLightPercent;         // 灯光亮度百分比值(0~100)
+    DWORD               dwAnglePercent;         // 灯光角度百分比值(0~100)
+}CFG_NEARLIGHT_INFO;
+
+// 远光灯信息
+typedef struct tagCFG_FARLIGHT_INFO 
+{
+    BOOL                bEnable;                // 是否使能，TRUE使能，FALSE不使能
+    DWORD               dwLightPercent;         // 灯光亮度百分比值(0~100)
+    DWORD               dwAnglePercent;         // 灯光角度百分比值(0~100)
+}CFG_FARLIGHT_INFO;
+
+// 灯光模式
+typedef enum tagEM_CFG_LIGHTING_MODE
+{
+    EM_CFG_LIGHTING_MODE_UNKNOWN,               // 未知
+    EM_CFG_LIGHTING_MODE_MANUAL,                // 手动: "Manual"
+    EM_CFG_LIGHTING_MODE_ZOOMPRIO,              // 倍率优先: "ZoomPrio"
+}EM_CFG_LIGHTING_MODE;
+
+#define MAX_LIGHTING_NUM         16
+
+// 灯光设置详情
+typedef struct tagCFG_LIGHTING_DETAIL
+{
+    int                                 nCorrection;                     // 灯光补偿 (0~4) 倍率优先时有效
+    int                                 nSensitive;                      // 灯光灵敏度(0~5)倍率优先时有效，默认为3
+    EM_CFG_LIGHTING_MODE                emMode;                          // 灯光模式
+    int                                 nNearLight;                      // 近光灯有效个数
+    CFG_NEARLIGHT_INFO                  stuNearLights[MAX_LIGHTING_NUM]; // 近光灯列表
+    int                                 nFarLight;                       // 远光灯有效个数
+    CFG_FARLIGHT_INFO                   stuFarLights[MAX_LIGHTING_NUM];  // 远光灯列表
+}CFG_LIGHTING_DETAIL;
+
+#define MAX_LIGHTING_DETAIL_NUM  16
+
+// 灯光设置(对应 CFG_CMD_LIGHTING 命令)
+typedef struct tagCFG_LIGHTING_INFO
+{
+    int                         nLightingDetailNum;                         // 灯光设置有效个数
+    CFG_LIGHTING_DETAIL         stuLightingDetail[MAX_LIGHTING_DETAIL_NUM]; // 灯光设置信息列表
+}CFG_LIGHTING_INFO;
+
+// 雨刷工作模式
+typedef enum tagEM_CFG_RAINBRUSHMODE_MODE
+{
+    EM_CFG_RAINBRUSHMODE_MODE_UNKNOWN,           // 未知
+    EM_CFG_RAINBRUSHMODE_MODE_MANUAL,            // 手动模式
+    EM_CFG_RAINBRUSHMODE_MODE_TIMING,            // 定时模式
+}EM_CFG_RAINBRUSHMODE_MODE;
+
+// 雨刷使能电平模式
+typedef enum tagEM_CFG_RAINBRUSHMODE_ENABLEMODE
+{
+    EM_CFG_RAINBRUSHMODE_ENABLEMODE_UNKNOWN,     // 未知
+    EM_CFG_RAINBRUSHMODE_ENABLEMODE_LOW,         // 低电平有效（常闭）
+    EM_CFG_RAINBRUSHMODE_ENABLEMODE_HIGH,        // 高电平有效（常开）
+}EM_CFG_RAINBRUSHMODE_ENABLEMODE;
+
+// 雨刷模式相关配置(对应 CFG_RAINBRUSHMODE_INFO 命令)
+typedef struct tagCFG_RAINBRUSHMODE_INFO
+{
+    EM_CFG_RAINBRUSHMODE_MODE        emMode;         // 雨刷工作模式
+    EM_CFG_RAINBRUSHMODE_ENABLEMODE  emEnableMode;   // 雨刷使能电平模式
+    int                              nPort;          // 雨刷使用的IO端口,-1表示未接入设备,-2表示该字段无效（设备未传送该字段）
+}CFG_RAINBRUSHMODE_INFO;
+
+#define MAX_EMERGENCY_REOCRD_CLIENT_NUM         8       // 可以紧急录像存储的最大客户端数
+
+// 客户端的紧急录像配置信息
+typedef struct tagCFG_EMERGENCY_RECORD_CLIENT 
+{
+    char        szDevID[CFG_COMMON_STRING_128];         // 客户端字符串标识作为对象名称，可以是客户端mac地址，若客户端是设备，则使用设备序列号
+    BOOL        bEnable;                                // 使能
+    int         nMaxTime;                               // 拉流异常断开之后进行紧急存储的最大时间, 
+}CFG_EMERGENCY_RECORD_CLIENT;
+
+// 紧急录像存储配置(对应 CFG_CMD_EMERGENCY_RECORD_FOR_PULL)
+typedef struct tagCFG_EMERGENCY_RECORD_FOR_PULL_INFO 
+{
+    int         nClientNum;                             // 有效客户端紧急录像配置个数
+    CFG_EMERGENCY_RECORD_CLIENT stuEmRecordInfo[MAX_EMERGENCY_REOCRD_CLIENT_NUM];// 客户端紧急录像配置信息 
+}CFG_EMERGENCY_RECORD_FOR_PULL_INFO;
+
+// 高频次报警
+typedef struct tagCFG_HIGH_FREQUENCY 
+{
+    int         nPeriod;                            // 统计周期, 以秒为单位, 默认30分钟(1800s)
+    int         nMaxCount;                          // 在对应统计周期内最大允许上报报警数
+}CFG_HIGH_FREQUENCY;
+
+// 告警屏蔽规则配置(对应 CFG_CMD_ALARM_SHIELD_RULE)
+typedef struct tagCFG_ALARM_SHIELD_RULE_INFO 
+{
+    CFG_HIGH_FREQUENCY  stuHighFreq;                // 高频次报警, 在一定周期内允许上报的报警次数，以此过滤对于报警的频繁上报导致信息干扰
+}CFG_ALARM_SHIELD_RULE_INFO;
+
+#define CFG_MAX_VIDEOIN_ANALYSER_NUM        3       // 每个视频通道内的最大视频分析器数量
+#define CFG_MAX_ANALYSE_RULE_GROUP_NUM      8       // 视频分析规则组最大数量
+
+// 智能分析规则组, 一个组中包含同类型的多条规则
+typedef struct tagCFG_ANALYSERULE_GROUP
+{
+    DWORD				dwRuleType;					// 规则类型，详见dhnetsdk.h中"智能分析事件类型"
+    int                 nRuleStructSize;            // 规则类型对应的规则结构的大小, parse时的输出参数, packet时是输入参数
+    BOOL                bEnable;                    // 使能
+    BOOL                bEventHandlerEnable;        // 报警联动使能, TRUE规则组报警联动使能, 组内所有规则使用共同的联动项; FALSE使用规则中各自的联动项
+    CFG_ALARM_MSG_HANDLE stuEventHandler;			// 规则组报警联动
+    CFG_TIME_SCHEDULE   stuEventTimeSection;        // 规则组报警联动时间表
+    int                 nRuleNum;                   // 规则数量, parse时的输出参数, packet时是输入参数
+    char*               pRuleBuf;                   // 规则缓冲, 需要用户分配内存, 用于存放规则信息
+                                                    // 如规则类型为警戒线, pRuleBuf的内容就是多个CFG_CROSSLINE_INFO
+    int                 nRuleBufSize;               // 规则缓冲大小, 用户填写
+}CFG_ANALYSERULE_GROUP;
+
+// 视频分析器信息
+typedef struct tagCFG_VIDEO_IN_ANALYSER_INFO
+{
+    CFG_ANALYSEGLOBAL_INFO  stuGlobal;              // 全局配置
+    CFG_ANALYSEMODULES_INFO stuModules;             // 模块配置
+    CFG_ANALYSERULE_GROUP	stuRuleGroup[CFG_MAX_ANALYSE_RULE_GROUP_NUM]; // 规则配置, 数组内元素的规则缓冲需要用户分配内存
+    int                     nRuleGroupNum;          // 规则组数量
+}CFG_VIDEOIN_ANALYSER_INFO;
+
+// 视频通道内的智能规则, 该结构体很大, 使用时在堆中分配内存
+typedef struct tagCFG_VIDEO_IN_ANALYSE_RULE_INFO
+{
+    int                     nAnalyserNum;                               // 分析器数量
+    CFG_VIDEOIN_ANALYSER_INFO stuAnalysers[CFG_MAX_VIDEOIN_ANALYSER_NUM]; // 分析器信息
+}CFG_VIDEOIN_ANALYSE_RULE_INFO;
+
+typedef enum tagEM_CFG_ACCESS_WORD_MODE
+{
+    EM_CFG_ACCESS_WORD_MODE_UNKNOWN,                // 未知
+        EM_CFG_ACCESS_WORD_MODE_NORMAL,                 // "Normal" 正常模式
+        EM_CFG_ACCESS_WORD_MODE_CLEAN,                  // "Clean"  打扫模式
+        EM_CFG_ACCESS_WORD_MODE_DECORATION,             // "Decoration"  装修模式
+}EM_CFG_ACCESS_WORD_MODE;
+
+// 门锁工作模式(对应 CFG_CMD_ACCESS_WORK_MODE)
+typedef struct tagCFG_ACCESS_WORK_MODE_INFO 
+{
+    EM_CFG_ACCESS_WORD_MODE  emMode;                // 工作模式
+}CFG_ACCESS_WORK_MODE_INFO;
 
 /************************************************************************
 ** 接口定义
