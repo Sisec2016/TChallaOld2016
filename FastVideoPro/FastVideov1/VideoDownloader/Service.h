@@ -10,6 +10,7 @@
 #include <SF/map.hpp>
 #include "LoginInfo.pb.h"
 #include "RecordInfo.pb.h"
+#include "DeviceInfo.pb.h"
 
 #define PORT_NONE				0
 #define PORT_FACTORY			50001
@@ -30,6 +31,7 @@ RCF_METHOD_R1(int, defaultPort, int);
 RCF_METHOD_R1(std::string, defaultUser, int);
 RCF_METHOD_R1(std::string, defaultPasswords, int);
 RCF_METHOD_R2(int, KeepServerRunning, int, int);
+RCF_METHOD_R2(bool, searchDevice, int, VideoServer::DeviceInfoList&);
 RCF_END(VideoserverFactorySvr);
 
 RCF_BEGIN(VideoserverSvr, "VideoserverSvr")

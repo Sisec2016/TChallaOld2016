@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #define ONEDAY   24 * 60 * 60
-
+#pragma comment(lib,"ws2_32.lib")
 #ifndef NEW_SERVER
 extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory()
 {
@@ -140,6 +140,34 @@ IVideoServer* CFactory::create()
     return new gzll_videoserver();
 }
 
+bool CFactory::searchDevice(std::vector<DeviceInfo>& devices){
+    Log::instance().AddLog(std::string("gzll_videoserver::searchDevice"));
+    SDK_CONFIG_NET_COMMON_V2 m_Device[100] = { 0 };
+    memset(&m_Device, 0, sizeof(SDK_CONFIG_NET_COMMON_V2)* 100);
+    int nRetLength = 0;
+    devices.clear();
+    bool bRet = H264_DVR_SearchDevice((char*)m_Device, sizeof(SDK_CONFIG_NET_COMMON_V2)* 100, &nRetLength, 1000);
+    if (bRet)
+    {
+        Log::instance().AddLog(std::string("gzll_videoserver::bRet"));
+        DeviceInfo d;
+
+        int ncount = nRetLength / sizeof(SDK_CONFIG_NET_COMMON_V2);
+        Log::instance().AddLog(QString("%1 %2").arg(nRetLength).arg(ncount));
+        for (int i = 0; i < ncount; i++)
+        {
+            char sTmp[20] = { 0 };
+            struct in_addr in;
+            in.s_addr = m_Device[i].HostIP.l;
+            d.szIP = inet_ntoa(in);
+            d.nPort = m_Device[i].TCPPort;
+            d.Factory = this->factory();
+            devices.push_back(d);
+        }
+    }
+
+    return devices.size() > 0;
+}
 
 void CFactory::clean()
 {

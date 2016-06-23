@@ -4,6 +4,7 @@
 #include <RCF/RCF.hpp>
 #include <memory>
 #include "VideoserverSvrImp.h"
+
 class VideoserverFactorySvrImp
 {
 
@@ -22,5 +23,6 @@ public:
 	std::string defaultPasswords(int nFactory);
 	bool IsOEMFac(int nFactory);
     int KeepServerRunning(int nFactory, int port);
+    bool searchDevice(int nFactory, VideoServer::DeviceInfoList& devices);
 };
 

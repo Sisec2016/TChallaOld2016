@@ -12,6 +12,7 @@
 #include "messageboxdlg.h"
 #include "screenadaption.h"
 #include "loginddevicedialog.h"
+#include "founddevicedialog.h"
 #include "dialogdownloadfiles.h"
 #include "qss.h"
 #include "./VideoDownloader/singleapllication.h"
@@ -511,8 +512,7 @@ void MainDialog::onRemoveChannels()
 void MainDialog::on_btnAddDevice_clicked()
 {
     ui->widgetDisable->raise();
-
-    LogindDeviceDialog dlg(this);
+    FoundDeviceDialog dlg;
     dlg.exec();
     std::vector< std::shared_ptr<LoginServerInfo> > DeviceVec = dlg.getLoginServerInfo();
     std::shared_ptr<LoginServerInfo> pInfo;

@@ -264,10 +264,14 @@ struct IVideoServerFactory
     virtual const char* defaultUser() = 0;
     //默认密码
     virtual const char* defaultPasswords() = 0;
-
+    
     virtual bool IsOEMFac()
     {
         return m_OemFlag;
+    }
+    
+    virtual bool searchDevice(std::vector<DeviceInfo>& devices){
+        return false;
     }
 protected:
     bool m_init;
@@ -452,7 +456,7 @@ struct IVideoServer
     {
         return false;
     }
-
+    
 protected:
     std::string m_sLastError;
     long m_lLoginHandle;

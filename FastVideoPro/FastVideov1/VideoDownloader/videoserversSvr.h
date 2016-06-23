@@ -34,7 +34,7 @@ public:
 	virtual DeviceFactory factory();
 
 	virtual void videoFileExterns(std::vector<std::string>& externs);
-
+    bool searchDevice(std::vector<DeviceInfo>& dvcInfos);
 	virtual IVideoServer* create();
 
 };
