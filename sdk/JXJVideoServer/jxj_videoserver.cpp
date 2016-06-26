@@ -9,11 +9,11 @@
 #include <qdebug.h>
 #include "j_sdk.h"
 #include "Jtype.h"
+#include "mb_api.h"
 Log jxj_log("jxj_videoserver");
 
 extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory()
 {
-
     return new CFactory();
 }
 
@@ -109,6 +109,66 @@ IVideoServer* CFactory::create()
     return new jxj_videoserver();
 }
 
+int __stdcall OnMBNotify(long lHandle, DWORD dwProtocol, int iErr, int iMsgID, LPCTSTR lpszDstID, void* pData, int iDataLen, void* pUserParam)
+{
+    jxj_log.AddLog(std::string("OnMBNotify :"));
+    if (NULL == lpszDstID || NULL == pData || NULL == pUserParam)
+    {
+        return -1;
+    }
+    std::vector<DeviceInfo>*		pDeves = (std::vector<DeviceInfo>*)(pUserParam);
+    try
+    {
+        DeviceInfo d;
+        j_Device_T *pDev = (j_Device_T *)(pData);
+        d.szIP = (char*)(pDev->NetworkInfo.network[0].ip);
+        d.nPort = pDev->NetworkInfo.cmd_port;
+        jxj_log.AddLog(QString("%1,%2,%3,%4").arg(pDev->NetworkInfo.data_port).arg(pDev->NetworkInfo.cmd_port)
+            .arg(pDev->NetworkInfo.talk_port).arg(pDev->NetworkInfo.talk_port));
+        d.Factory = SISC_IPC_JXJ;
+        pDeves->push_back(d);
+    }
+    catch (...)
+    {
+        return 0;
+    }
+    return 0;
+
+}
+BOOL  m_bSerachDevice = FALSE;
+bool CFactory::searchDevice(std::vector<DeviceInfo>& devices){
+    jxj_log.AddLog(std::string("JNetMBSearch :") + m_sLastError);
+    if (m_bSerachDevice)
+    {
+        return true;
+    }
+    m_bSerachDevice = TRUE;
+    long m_hBhandle = 0;
+    JNetMBOpen(GROUP_IP, GROUP_PORT, OnMBNotify, &devices, JNET_PRO_T_JPF, m_hBhandle);
+    if (m_hBhandle)
+    {
+        if (JNetMBSearch(m_hBhandle, 5) != 0){
+            jxj_log.AddLog(std::string("JNetMBSearch failed:") + m_sLastError);
+        }
+            
+    }
+    else{
+        jxj_log.AddLog(std::string("JNetMBOpen failed:") + m_sLastError);
+    }
+
+    int waitMilliSeconds = 200;
+    while (waitMilliSeconds--){
+        Sleep(1);
+    }
+
+    if (0 != JNetMBClose(m_hBhandle))
+    {
+        jxj_log.AddLog(std::string("JNetMBClose failed:") + m_sLastError);
+    }
+
+    m_bSerachDevice = FALSE;
+    return true;
+}
 
 std::vector<jxj_videoserver*> jxj_videoserver::sServers;
 std::recursive_mutex jxj_videoserver::sMtServers;

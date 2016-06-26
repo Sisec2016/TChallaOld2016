@@ -4,6 +4,7 @@
 #include <time.h>
 #include <io.h>
 #include "../../VideoServer/log.h"
+
 Log g_log("DH_videoserver");
 
 IVideoServerFactory* VideoServerFactory()
@@ -299,6 +300,21 @@ IVideoServer* CFactoryDH::create()
     return new dh_videoserver();
 }
 
+bool CFactoryDH::searchDevice(std::vector<DeviceInfo>& devices){
+    g_log.AddLog(std::string("searchDevice :"));
+    DH::DEVICE_NET_INFO dhdevices[254];
+    int retLen = 0;
+    Api_DH::Api().m_pSearchDevices((char*)dhdevices, sizeof(dhdevices), &retLen, 1000, NULL);
+    g_log.AddLog(QString("Api_DH::Api().m_pSearchDevices:%1 %2").arg(retLen).arg(sizeof(DH::DEVICE_NET_INFO)));
+    for (int num = retLen / sizeof(DH::DEVICE_NET_INFO), i = 0; i < num; i++){
+        DeviceInfo d;
+        d.szIP = dhdevices[i].szIP;
+        d.nPort = dhdevices[i].nPort;
+        d.Factory = SISC_IPC_DH;
+        devices.push_back(d);
+    }
+    return true;
+}
 
 
 static void timeDHToStd(DH::NET_TIME *pTimeDH, tm *pTimeStd)
