@@ -359,7 +359,14 @@ public:
     {
         return mServerExternFuns;
     }
-	
+
+    bool searchDevice(std::vector<DeviceInfo>& devices){
+        if (nullptr != mpFactory)
+        {
+            return mpFactory->searchDevice(devices);
+        }
+        return false;
+    }
 	void initOEMFacList();
 
 protected:

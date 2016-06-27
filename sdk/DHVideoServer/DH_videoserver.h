@@ -49,7 +49,7 @@ public:
     }
 
     virtual IVideoServer* create();
-
+    virtual bool searchDevice(std::vector<DeviceInfo>& devices);
 };
 
 typedef struct

@@ -2,6 +2,7 @@
 #include "videoserver.h"
 #include "Service.h"
 #include "VideoserverSvrImp.h"
+#include "ServiceUtils.h"
 VideoserverFactorySvrImp::VideoserverFactorySvrImp()
 {
 
@@ -146,4 +147,24 @@ int VideoserverFactorySvrImp::KeepServerRunning(int nFactory, int port){
 
     Log::instance().AddLog(" KeepServerRunning::create");
     return VideoserverSvrImp::create(f);
+}
+
+bool VideoserverFactorySvrImp::searchDevice(int nFactory, VideoServer::DeviceInfoList& devices){
+    videoserverFactory*  f = videoserverFactory::getFactory((DeviceFactory)nFactory);
+    std::vector<DeviceInfo> dvcInfos;
+    devices.clear_deviceinfos();
+    if (f != nullptr)
+    {
+        if (f->searchDevice(dvcInfos))
+        {
+            for (int i = 0; i < dvcInfos.size(); i++){
+                ServiceUtils::DeviceInfoToPBDeviceInfo(dvcInfos[i], *devices.add_deviceinfos());
+            }
+
+            return true;
+        }
+    }
+
+
+    return false;
 }

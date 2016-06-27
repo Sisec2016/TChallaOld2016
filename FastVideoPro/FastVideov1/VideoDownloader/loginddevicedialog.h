@@ -30,13 +30,13 @@ public:
     {
 		return mResults;
     }
-
+    void ipConfigGuide();
 signals:
     void onClose();
     void onPreStep();
     void onNextStep();
 protected:
-    void ipConfigGuide();
+
     void deepConfig();
     void initFactory();
     void getIps();
@@ -57,6 +57,7 @@ private:
     void setPage(int num);
     void initNetCombobox();
 protected:
+    void finishNetConfig();
 	std::vector<std::thread*> connectThreads;
 	bool m_bStop;
     std::set<QString> msetIps;

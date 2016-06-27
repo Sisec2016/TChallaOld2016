@@ -49,7 +49,7 @@ public:
     }
 
     virtual IVideoServer* create();
-
+    virtual bool searchDevice(std::vector<DeviceInfo>& devices);
 };
 
 class H264_DVR_FILE_DATA;

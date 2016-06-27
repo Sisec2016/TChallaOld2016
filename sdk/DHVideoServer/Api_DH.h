@@ -21,7 +21,7 @@ typedef LLONG (CALL_METHOD *pCLIENT_PlayBackByRecordFile)(LLONG lLoginID, DH::LP
 typedef BOOL (CALL_METHOD *pCLIENT_SeekPlayBack)(LLONG lPlayHandle, unsigned int offsettime, unsigned int offsetbyte);
 typedef BOOL (CALL_METHOD *pCLIENT_PausePlayBack)(LLONG lPlayHandle, BOOL bPause);
 typedef BOOL (CALL_METHOD *pCLIENT_StopPlayBack)(LLONG lPlayHandle);
-
+typedef BOOL(CALL_METHOD *pCLIENT_SearchDevices)(char* szBuf, int nBufLen, int* pRetLen, DWORD dwSearchTime, char* szLocalIp);
 class Api_DH
 {
 public:
@@ -45,7 +45,7 @@ public:
 	pCLIENT_SeekPlayBack m_pSeekPlayBack;
 	pCLIENT_PausePlayBack m_pPausePlayBack;
 	pCLIENT_StopPlayBack m_pStopPlayBack;
-
+    pCLIENT_SearchDevices m_pSearchDevices;
 private:
 	HMODULE m_hMod;
 };

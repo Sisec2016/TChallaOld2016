@@ -122,6 +122,9 @@ bool  SvrFactory::getRefreshPort(int& newProt, int32_t factory, int32_t oldPort)
     
     return true;
 }
+
+
+
 SvrFactory::SvrFactory(int f) : mFactory(f){
     mPort = PORT_NONE;
 }
@@ -221,6 +224,26 @@ IVideoServer* SvrFactory::create(){
     return nullptr;
 }
 
+bool  SvrFactory::searchDevice(std::vector<DeviceInfo>& dvcInfos){
+    VF_BEGIN()
+        VideoServer::DeviceInfoList dviList;
+
+    if (spService->searchDevice(mFactory, dviList))
+    {
+        dvcInfos.resize(dviList.deviceinfos_size());
+        for (int i = 0; i < dviList.deviceinfos_size(); i++)
+        {
+            ServiceUtils::PBDeviceInfoToDeviceInfo(dviList.deviceinfos(i), dvcInfos[i]);
+        }
+
+        return true;
+    }
+
+    VF_END()
+
+
+        return false;
+}
 
 std::vector<SvrVideoserver*> SvrVideoserver::sServers;
 std::recursive_mutex SvrVideoserver::sMtServers;

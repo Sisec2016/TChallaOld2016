@@ -47,7 +47,7 @@ public:
     }
 
     virtual IVideoServer* create();
-
+    virtual bool searchDevice(std::vector<DeviceInfo>& devices);
 };
 struct DownloadInfo
 {

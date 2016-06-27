@@ -10,6 +10,7 @@
 #include <SF/map.hpp>
 #include "LoginInfo.pb.h"
 #include "RecordInfo.pb.h"
+#include "DeviceInfo.pb.h"
 
 #define PORT_NONE				0
 #define PORT_FACTORY			50001

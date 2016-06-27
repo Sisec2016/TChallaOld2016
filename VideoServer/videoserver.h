@@ -303,9 +303,16 @@ public:
     {
         return mServerExternFuns;
     }
-	
-	void initOEMFacList();
+    virtual bool searchDevice(std::vector<DeviceInfo>& devices){
+        if (nullptr != mpFactory)
+        {
+            return mpFactory->searchDevice(devices);
+        }
 
+        return false;
+    }
+	void initOEMFacList();
+    
 protected:
     IVideoServerFactory* mpFactory;
     ServerExternFuns mServerExternFuns;
@@ -341,7 +348,7 @@ protected:
                       .arg(nLine).arg("null factory").arg(sLog).arg(this->getLastError()));
         }
     }
-
+    
 public:
 	static OEMFacMap m_OEMXMFacMap;   //雄迈OEM系列
 	static OEMFacMap m_OEMHIKFacMap;  //海康OEM系列

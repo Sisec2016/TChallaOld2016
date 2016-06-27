@@ -71,6 +71,9 @@ Api_DH::Api_DH()
 	assert(m_pPausePlayBack);
 	m_pStopPlayBack = (pCLIENT_StopPlayBack)GetProcAddress(m_hMod, "CLIENT_StopPlayBack");
 	assert(m_pStopPlayBack);
+    m_pSearchDevices = (pCLIENT_SearchDevices)GetProcAddress(m_hMod, "CLIENT_SearchDevices");
+    assert(m_pSearchDevices);
+
 } 
 
 Api_DH::~Api_DH()
