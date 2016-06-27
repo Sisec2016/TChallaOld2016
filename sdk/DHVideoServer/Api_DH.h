@@ -22,6 +22,9 @@ typedef BOOL (CALL_METHOD *pCLIENT_SeekPlayBack)(LLONG lPlayHandle, unsigned int
 typedef BOOL (CALL_METHOD *pCLIENT_PausePlayBack)(LLONG lPlayHandle, BOOL bPause);
 typedef BOOL (CALL_METHOD *pCLIENT_StopPlayBack)(LLONG lPlayHandle);
 typedef BOOL(CALL_METHOD *pCLIENT_SearchDevices)(char* szBuf, int nBufLen, int* pRetLen, DWORD dwSearchTime, char* szLocalIp);
+//<<<<<<<<<add by zhangyaofa 2016/06/15
+typedef BOOL (CALL_METHOD *pCLIENT_QueryDevState)(LLONG lLoginID, int nType, char *pBuf, int nBufLen, int *pRetLen, int waittime);
+//>>>>>>>>>add end
 class Api_DH
 {
 public:
@@ -46,6 +49,9 @@ public:
 	pCLIENT_PausePlayBack m_pPausePlayBack;
 	pCLIENT_StopPlayBack m_pStopPlayBack;
     pCLIENT_SearchDevices m_pSearchDevices;
+	//<<<<<<<<<<<<<<<add by zhangyaofa 2016/6/15
+	pCLIENT_QueryDevState m_pQueryDevState;
+	//>>>>>>>>>>>>>>add end
 private:
 	HMODULE m_hMod;
 };

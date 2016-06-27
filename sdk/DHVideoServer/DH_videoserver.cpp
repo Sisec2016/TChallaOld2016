@@ -406,7 +406,7 @@ bool dh_videoserver::login(const char* IP, __int32 port, const char* user, const
         return false;
     }
 
-	char szChannelNames[16*32];
+	/*char szChannelNames[16*32];
 	ZeroMemory(szChannelNames, sizeof(szChannelNames));
 	int iChannelCount = 0;
     bool bRet = Api_DH::Api().m_pGetChannel(m_lLoginHandle, szChannelNames, 16*32, &iChannelCount, 500);
@@ -416,7 +416,22 @@ bool dh_videoserver::login(const char* IP, __int32 port, const char* user, const
 		g_log.AddLog(string("login 获取通道失败，错误原因：") + m_sLastError);
 		return false;
 	}
-	g_log.AddLog(string(szChannelNames, 16 * 32));
+	g_log.AddLog(string(szChannelNames, 16 * 32));*/
+
+	int nRetLen = 0;
+	int iChannelCount = 0;
+	DH::NET_DEV_CHN_COUNT_INFO stuChn = { sizeof(DH::NET_DEV_CHN_COUNT_INFO) };
+	stuChn.stuVideoIn.dwSize = sizeof(stuChn.stuVideoIn);
+	stuChn.stuVideoOut.dwSize = sizeof(stuChn.stuVideoOut);
+	if (Api_DH::Api().m_pQueryDevState(m_lLoginHandle, DH_DEVSTATE_DEV_CHN_COUNT, (char*)&stuChn, stuChn.dwSize, &nRetLen, 1000))
+	{
+		iChannelCount = stuChn.stuVideoIn.nMaxTotal;
+	}
+	else
+	{
+		iChannelCount = m_deviceInfo.byChanNum;
+	}
+
 	channels.clear();
 	char szName[32+2];
 	for (int i=1; i<=iChannelCount; i++)
