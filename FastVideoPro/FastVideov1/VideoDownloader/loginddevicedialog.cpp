@@ -20,6 +20,7 @@
 #include "netdlg.h"
 #include "IPConfigSucessDialog.h"
 #include "Iphlpapi.h"
+#include "founddevicedialog.h"
 
 #pragma comment(lib,"Iphlpapi")
 
@@ -62,15 +63,20 @@ LogindDeviceDialog::~LogindDeviceDialog()
     delete ui;
 }
 
+void LogindDeviceDialog::finishNetConfig(){
+    this->show();
+}
 void LogindDeviceDialog::ipConfigGuide(){
     QNetworkConfigurationManager mgr;
+    this->hide();
     if (!WindowUtils::isOnLine())
     {
         UIUtils::showTip(*this,
             QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
+        finishNetConfig();
         return;
     }
-    this->hide();
+
     if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("是否进行下载器IP智能匹配？")))
     {   
 
@@ -106,18 +112,22 @@ void LogindDeviceDialog::ipConfigGuide(){
         }, [=, this](bool bCancel){
             if (bCancel)
             {
+                this->finishNetConfig();
                 return;
             }
             if (*bResult)
             {
                 IPConfigSucessDialog dlg(*pIP, "255.255.255.0", *pNetGate);
                 dlg.exec();
-                this->show();
+                this->finishNetConfig();
             }
             else{
                 if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, QStringLiteral("智能识别网段失败！是否进行深度匹配？")))
                 {
                     deepConfig();
+                }
+                else{
+                    this->finishNetConfig();
                 }
                 
             }
@@ -128,7 +138,7 @@ void LogindDeviceDialog::ipConfigGuide(){
         netDlg netDlg_(nullptr);
         netDlg_.setTitleName(QStringLiteral("网络配置"));
         netDlg_.exec();
-        this->show();
+        this->finishNetConfig();
     }
 }
 
@@ -161,13 +171,14 @@ void LogindDeviceDialog::deepConfig(){
     }, [=, this](bool bCancel){
         if (*bpCancel)
         {
+            this->finishNetConfig();
             return;
         }
         if (*bResult)
         {
             IPConfigSucessDialog dlg(*pIP, "255.255.255.0", *pNetGate);
             dlg.exec();
-            this->show();
+            this->finishNetConfig();
         }
         else{
             UIUtils::showTip(*this,
@@ -175,7 +186,7 @@ void LogindDeviceDialog::deepConfig(){
             netDlg netDlg_(nullptr);
             netDlg_.setTitleName(QStringLiteral("网络配置"));
             netDlg_.exec();
-            this->show();
+            this->finishNetConfig();
         }
 
     }, bpCancel);

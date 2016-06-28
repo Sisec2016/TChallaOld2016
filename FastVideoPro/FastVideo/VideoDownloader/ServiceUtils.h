@@ -45,6 +45,18 @@ public:
 		to.set_port(from.port);
 		to.set_user(from.user.toLocal8Bit().data());
 	}
+
+    static void PBDeviceInfoToDeviceInfo(const VideoServer::DeviceInfo& from, DeviceInfo& to){
+        to.Factory = from.factory();
+        to.nPort = from.nport();
+        to.szIP = from.szip();
+    }
+
+    static void DeviceInfoToPBDeviceInfo(const DeviceInfo& from, VideoServer::DeviceInfo&to){
+        to.set_factory(from.Factory);
+        to.set_nport(from.nPort);
+        to.set_szip(from.szIP.c_str(), from.szIP.size());
+    }
 private:
 
 };
