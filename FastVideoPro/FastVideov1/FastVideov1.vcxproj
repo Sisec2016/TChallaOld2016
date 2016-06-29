@@ -159,6 +159,9 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_formlogineddevices.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_founddevicedialog.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ftpdlg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -330,6 +333,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_formlogineddevices.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_founddevicedialog.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ftpdlg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -466,6 +472,7 @@
     <ClCompile Include="VideoDownloader\channellistwidget.cpp" />
     <ClCompile Include="VideoDownloader\channelwidget.cpp" />
     <ClCompile Include="VideoDownloader\cwaitdlg.cpp" />
+    <ClCompile Include="VideoDownloader\DeviceInfo.pb.cc" />
     <ClCompile Include="VideoDownloader\devicelistwidget.cpp" />
     <ClCompile Include="VideoDownloader\devicewidget.cpp" />
     <ClCompile Include="VideoDownloader\dialogdownloadfiles.cpp" />
@@ -477,6 +484,7 @@
     <ClCompile Include="VideoDownloader\formdownloadfile.cpp" />
     <ClCompile Include="VideoDownloader\formfactoryitem.cpp" />
     <ClCompile Include="VideoDownloader\formlogineddevices.cpp" />
+    <ClCompile Include="VideoDownloader\founddevicedialog.cpp" />
     <ClCompile Include="VideoDownloader\globalvariables.cpp" />
     <ClCompile Include="VideoDownloader\listview.cpp" />
     <ClCompile Include="VideoDownloader\log.cpp" />
@@ -570,6 +578,7 @@
     <ClInclude Include="GeneratedFiles\ui_formdeviceinfo.h" />
     <ClInclude Include="GeneratedFiles\ui_formfactoryitem.h" />
     <ClInclude Include="GeneratedFiles\ui_formlogineddevices.h" />
+    <ClInclude Include="GeneratedFiles\ui_founddevicedialog.h" />
     <ClInclude Include="GeneratedFiles\ui_ftppathadddlg.h" />
     <ClInclude Include="GeneratedFiles\ui_HelpDialog.h" />
     <ClInclude Include="GeneratedFiles\ui_ipadddlg.h" />
@@ -701,7 +710,18 @@
     <ClInclude Include="TaskLog.h" />
     <ClInclude Include="Verify.h" />
     <ClInclude Include="VideoDownloader\customEvent.h" />
+    <ClInclude Include="VideoDownloader\DeviceInfo.pb.h" />
     <ClInclude Include="VideoDownloader\downloadtask.h" />
+    <CustomBuild Include="VideoDownloader\founddevicedialog.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing founddevicedialog.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DRCF_USE_PROTOBUF -DWIN32_LEAN_AND_MEAN -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -D_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -D_UNICODE "-I.\GeneratedFiles" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(SolutionDir)..\common" "-I." "-I.\.." "-I$(SolutionDir)..\common\head" "-I.\..\include" "-I.\..\include\wpcap" "-I.\..\include\fastCopy" "-I.\VideoDownloader" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtNetwork" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtSql"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing founddevicedialog.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DRCF_USE_PROTOBUF -DWIN32_LEAN_AND_MEAN -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -D_UNICODE "-I.\GeneratedFiles" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(SolutionDir)..\common" "-I." "-I.\.." "-I$(SolutionDir)..\common\head" "-I.\..\include" "-I.\..\include\wpcap" "-I.\..\include\fastCopy" "-I.\VideoDownloader" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtNetwork" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtSql"</Command>
+    </CustomBuild>
     <ClInclude Include="VideoDownloader\log.h" />
     <ClInclude Include="VideoDownloader\LoginInfo.pb.h" />
     <CustomBuild Include="VideoDownloader\messageboxdlg.h">
@@ -1591,6 +1611,16 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
     <CustomBuild Include="VideoDownloader\messageboxdlg.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+    </CustomBuild>
+    <CustomBuild Include="VideoDownloader\founddevicedialog.ui">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
