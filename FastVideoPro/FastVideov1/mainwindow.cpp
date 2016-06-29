@@ -156,8 +156,9 @@ bool MySystemShutDown()
     TOKEN_PRIVILEGES tkp;
 
     //获取进程标志
-    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)){
         return false;
+    }
 
     //获取关机特权的LUID
     LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid);
@@ -182,7 +183,8 @@ void MainWindow::onCloseClicked()
         return;
     }
     if (nullptr != mpVideoDownloadDlg){
-        delete mpVideoDownloadDlg;
+        mpVideoDownloadDlg->accept();
+        mpVideoDownloadDlg->deleteLater();
         mpVideoDownloadDlg = nullptr;
     }
     MySystemShutDown();
