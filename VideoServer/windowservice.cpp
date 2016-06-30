@@ -60,6 +60,7 @@ void DisableSetUnhandledExceptionFilter()
     }
 }
 #define PORT_VIDEO_SERVER		99999
+#define PORT_VIDEO_MAIN         100000
 void WindowService::StartVideoServer(DWORD argc, LPTSTR *argv){
     DisableSetUnhandledExceptionFilter();
 	int arg = argc;
@@ -105,7 +106,15 @@ void WINAPI WindowService::ServiceMain(DWORD argc, LPTSTR *argv)
 		QUdpSocket udp;
         if (!udp.bind(PORT_VIDEO_SERVER, QAbstractSocket::DontShareAddress))
 		{
-			::Sleep(5000);
+            if (!udp.bind(PORT_VIDEO_MAIN, QAbstractSocket::DontShareAddress))
+            {
+                ::Sleep(5000);
+            }
+            else{
+                udp.close();
+                QProcess::startDetached(QApplication::applicationDirPath() + "/FastVideo.exe  -s");
+                ::Sleep(2000);
+            }
 		}
 		else{   
 			udp.close();

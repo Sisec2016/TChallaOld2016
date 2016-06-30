@@ -421,7 +421,7 @@ public:
 
     static bool exec(QSqlQuery& q, const std::string& sql = "")
     {
-        qDebug()<<"exec"<<QString::fromLocal8Bit(sql.c_str());
+        //qDebug()<<"exec"<<QString::fromLocal8Bit(sql.c_str());
         bool ok = false;
         if (sql.empty())
         {

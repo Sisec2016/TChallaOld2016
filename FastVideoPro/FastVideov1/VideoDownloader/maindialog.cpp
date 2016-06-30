@@ -19,6 +19,7 @@
 #include <QScrollBar>
 #include "Verify.h"
 #include "TaskLogRecordDialog.h"
+#include "settings.h"
 
 #define REFRESH_SECONDS   10
 MainDialog::MainDialog(QWidget *parent) :
@@ -135,6 +136,8 @@ mLoaded(false)
         UIUtils::showTip(*this,
             QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
     }
+
+    Settings::setItem(KEY_APP_STATE, APP_STATE_DOWNLOADING);
 }
 
 
@@ -142,6 +145,7 @@ mLoaded(false)
 MainDialog::~MainDialog()
 {
     this->saveForExit();
+    Settings::setItem(KEY_APP_STATE, APP_STATE_NOT_DOWNLOAD);
     exit(1);
     mStop = true;
     CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("正在退出中..."), [this]()
@@ -293,9 +297,9 @@ void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
         pDownloadTask->save();
         pDevice->save(false);
         pDevice->addTask(pDownloadTask);
-        pDevice->save(false);
+        
         qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
-    }, [=](bool bCancel){ui->widgetDisable->lower(); });
+    }, [=](bool bCancel){pDevice->save(true); ui->widgetDisable->lower();  });
 
     ui->widgetDisable->lower();
 }
@@ -414,26 +418,10 @@ void MainDialog::on_downloadButton_clicked()
                 pFileAllRows->push_back(*it);
             }
         }
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
-        //         for (int i = 0; i < channels.size(); i++)
-        //         {
-        //             fileRows.clear();
-        //             qDebug()<<getGPSBeginDateTime().toString()<<" GetRecordFileList "<<getGPSEndDateTime().toString();
-        //             if ( pDevice->getService().GetRecordFileList(fileRows, channels[i],
-        //                 getGPSBeginDateTime(), getGPSEndDateTime()))
-        //             {
-        //                 for (std::vector<RecordFile>::iterator it = fileRows.begin();
-        //                      it != fileRows.end(); it++)
-        //                 {
-        //                     pFileAllRows->push_back(*it);
-        //                 }
-        //             }
-        //         }
 
     }, [pFileAllRows, this](bool bCancel){
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
         onDownloadFindEnd(pFileAllRows);
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
+
     });
 }
 
@@ -516,18 +504,6 @@ void MainDialog::on_btnAddDevice_clicked()
     dlg.exec();
     std::vector< std::shared_ptr<LoginServerInfo> > DeviceVec = dlg.getLoginServerInfo();
     std::shared_ptr<LoginServerInfo> pInfo;
-
-    // 	std::shared_ptr<LoginServerInfo> pInfo = dlg.getLoginInfo();
-    // 	if (pInfo)
-    // 	{
-    // 		videoserver *pServer = videoserverFactory::getFactory(pInfo->factory)->create();
-    // 		if (pServer != nullptr)
-    // 		{
-    // 			ui->listWidgetDevices->addDevice(*pServer, pInfo, false);
-    // 		}
-    // 
-    // 	}
-
     for (int i = 0; i < DeviceVec.size(); i++)
     {
         pInfo = DeviceVec[i];
@@ -537,6 +513,7 @@ void MainDialog::on_btnAddDevice_clicked()
             if (pServer)
             {
                 ui->listWidgetDevices->addDevice(pServer, pInfo, false);
+                pInfo->save();
                 //Log::instance().AddLog(pInfo->name + " " + pInfo->ip + ", id:" + pInfo->id);
                 QThread::msleep(10);
             }
