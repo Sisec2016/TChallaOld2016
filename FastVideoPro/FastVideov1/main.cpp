@@ -24,7 +24,7 @@
 #include "settings.h"
 
 #include "Verify.h"
-
+#include <QUdpSocket>
 #include <iostream>
 #include <string>
 #include "logdata.h"
@@ -188,6 +188,8 @@ void checkDirectory(){
     }
 }
 
+#define PORT_VIDEO_MAIN         100000
+
 int main(int argc, char *argv[])
 {
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
@@ -241,6 +243,11 @@ int main(int argc, char *argv[])
     {
         checkDirectory();
         qDebug() << "showMainDlgNoExcept";
+        QUdpSocket udp;
+        if (!udp.bind(PORT_VIDEO_MAIN, QAbstractSocket::DontShareAddress))
+        {
+            return 0;
+        }
         showMainDlgNoExcept(a);
         Verify::uninit();
     }
