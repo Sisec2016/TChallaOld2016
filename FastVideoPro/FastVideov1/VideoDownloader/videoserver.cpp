@@ -83,11 +83,11 @@ std::vector<std::string> videoserverFactory::s_vcExternFunStrings;
 OEMFacMap videoserverFactory::m_OEMXMFacMap;   //雄迈OEM系列
 OEMFacMap videoserverFactory::m_OEMHIKFacMap;  //海康OEM系列
 OEMFacMap videoserverFactory::m_OEMDHFacMap;   //大华OEM系列
-OEMFacMap videoserverFactory::m_OEMWSDFacMap;  //沃仕达OEM系列
+OEMFacMap videoserverFactory::m_OEMBXSFacMap;  //宝欣盛OEM系列
 OEMFacMap videoserverFactory::m_OEMJiuAnFacMap;  //九安OEM系列
 OEMFacMap videoserverFactory::m_OEMDongYangFacMap; //东阳OEM系统
 OEMFacMap videoserverFactory::m_OEMZhongWeiFacMap; //中维OEM系列
-
+OEMFacMap videoserverFactory::m_OEMJXJMap; //佳信捷OEM系列
 
 downloadEvent::downloadEvent(videoserver* pSvr, qint64 totalSize, qint64 size, bool failed) :
    QEvent(SERVICE_CALLBACK_EVENT), m_pSvr(pSvr), m_totalSize(totalSize), m_size(size), m_failed(failed)
@@ -127,7 +127,7 @@ void videoserverFactory::initOEMFacList()
 		m_OEMXMFacMap["施耐安"] = SISC_IPC_SNA;
 		m_OEMXMFacMap["雄迈"] = SISC_IPC_XM;
 		m_OEMXMFacMap["海视泰"] = SISC_IPC_HAISHITAI;
-		m_OEMXMFacMap["新达共创"] = SISC_IPC_XINDAGONGCHUANG;
+		m_OEMXMFacMap["新大共创"] = SISC_IPC_XINDAGONGCHUANG;
 		m_OEMXMFacMap["天视达"] = SISC_IPC_TIANSHIDA;
 		m_OEMXMFacMap["守卫者"] = SISC_IPC_SHOUWEIZHE;
 		m_OEMXMFacMap["深圳思浪"] = SISC_IPC_SILANG;
@@ -233,7 +233,6 @@ void videoserverFactory::initOEMFacList()
         m_OEMHIKFacMap["旷视安"] = SISC_IPC_KUANGSHIAN;
 		m_OEMHIKFacMap["广州宏翔"] = SISC_IPC_GZHX;
 
-		m_OEMHIKFacMap["宝欣盛"] = SISC_IPC_BAOXINGSHENG;
 		m_OEMHIKFacMap["立安达OEM"] = SISC_IPC_LANDAOEMHK;
 		m_OEMHIKFacMap["西安海方"] = SISC_IPC_XIANHAIFANG;
 		m_OEMHIKFacMap["北京正方时代"] = SISC_IPC_BEIJINGZHENGFANG;
@@ -256,9 +255,10 @@ void videoserverFactory::initOEMFacList()
 		m_OEMHIKFacMap["天天佑"] = SISC_IPC_TIANTIANYOU;
 	}
 	
-	// 沃仕达OEM
+	// 宝欣盛OEM
 	{
-		m_OEMWSDFacMap["鑫鹏安防"] = SISC_IPC_XP;
+        m_OEMBXSFacMap["鑫鹏安防"] = SISC_IPC_XP;
+        m_OEMBXSFacMap["沃仕达"] = SISC_IPC_WSD;
 	}
 	
 	// 九安光电OEM
@@ -279,6 +279,9 @@ void videoserverFactory::initOEMFacList()
 		m_OEMZhongWeiFacMap["吉锐"] = SISC_IPC_JIRUI;
 		m_OEMZhongWeiFacMap["华邦海视"] = SISC_IPC_HUABANGHAISHI;
 	}
+
+    //佳信捷
+    m_OEMJXJMap["吉田"] = SISC_IPC_JITIAN;
 }
 
 void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
@@ -315,18 +318,18 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 			
 			break;
 		}
-		case SISC_IPC_WSD:
+        case SISC_IPC_BAOXINGSHENG:
 		{
-			OEMFacMap::iterator itr = m_OEMWSDFacMap.begin();
-			for(itr; itr !=m_OEMWSDFacMap.end(); itr++)
-			{
-				IVideoServerFactory* pOEMFactory = new OEMFactory((DeviceFactory)itr->second, true, (char *)itr->first.c_str(), pFactory);
-				if (nullptr != pFactory)
-				{
-					videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
-					s_Factorys.push_back(pvsf);
-				}
-			}
+            OEMFacMap::iterator itr = m_OEMBXSFacMap.begin();
+            for (itr; itr != m_OEMBXSFacMap.end(); itr++)
+            {
+                IVideoServerFactory* pOEMFactory = new OEMFactory((DeviceFactory)itr->second, true, (char *)itr->first.c_str(), pFactory);
+                if (nullptr != pFactory)
+                {
+                    videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
+                    s_Factorys.push_back(pvsf);
+                }
+            }
 			
 			break;
 		}
@@ -374,7 +377,23 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 			}
 			
 			break;
-		}	
+		}
+
+        case SISC_IPC_JXJ:
+        {
+            OEMFacMap::iterator itr = m_OEMJXJMap.begin();
+            for (itr; itr != m_OEMJXJMap.end(); itr++)
+            {
+                IVideoServerFactory* pOEMFactory = new OEMFactory((DeviceFactory)itr->second, true, (char *)itr->first.c_str(), pFactory);
+                if (nullptr != pFactory)
+                {
+                    videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
+                    s_Factorys.push_back(pvsf);
+                }
+            }
+
+            break;
+        }
 		default:
 			break;
 	}
@@ -772,7 +791,7 @@ void plusCommonFactorySort(const std::vector<DeviceFactory>& factories, int inde
 
 bool videoserver::login(std::shared_ptr<LoginServerInfo> p, bool *pbStop)
 {
-	if (!p || *pbStop)
+    if (!p || (pbStop && *pbStop))
     {
         Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
             .arg(__FUNCTION__).arg(__LINE__).arg(*pbStop));
@@ -792,6 +811,8 @@ bool videoserver::login(std::shared_ptr<LoginServerInfo> p, bool *pbStop)
         QString sUser;
         QString sPasswords;
 		std::shared_ptr<LoginServerInfo> tmpLoginfo = std::make_shared<LoginServerInfo>();
+        std::vector< std::shared_ptr<std::thread> > connectThreads;
+        std::shared_ptr<bool> bpR = std::make_shared<bool>(false);
         for(int i = 0; i < factorys.size(); i++)
         {
 			if (*pbStop)
@@ -1017,7 +1038,11 @@ bool videoserver::GetRecordFileList(std::vector<RecordFile>& files, /*int nChann
             bool r = mpServer->GetRecordFileList(daysFiles, channelVec, QDateTime(start, tmS).toTime_t(), QDateTime(dtE, tmE).toTime_t());
             if (!r)
             {
-                return false;
+				///////////<<<<<<<<<<<<<<<<<<modify DALI search fail by zhangyaofa 2016/5/25
+				continue;
+				///////////////////////////////////////////////
+                //return false;
+				///////////>>>>>>>>>>>>>>>>>>modify end
             }
 
             for (int i = 0; i < daysFiles.size(); i++)
@@ -1098,10 +1123,10 @@ bool videoserver::downLoad(const QString& saveFileName, const RecordFile& file, 
                     while (!mStop)
                     {
                         mTimes = mTimes + 2;
-                        QThread::msleep(2000);
+                        
                         if (mTimes >= totalTime)
                         {
-                            isconnect = WindowUtils::isConnecteTo(pThis->ip());
+                            isconnect = WindowUtils::isConnecteTo(pThis->ip(), 3000);
                             if (!isconnect)
                             {
                                 //Log::instance().AddLog(QString("################### 05"));
@@ -1220,13 +1245,14 @@ QString videoserver::getChannelName(int channel)
 {
     if (m_channels.find(channel) != m_channels.end())
     {
-         QString s = QString::fromLocal8Bit(m_channels.at(channel).c_str());
-         if (s.isEmpty())
-         {
-             s = QString::fromLocal8Bit("通道%1").arg(channel);
-         }
-         s.replace(" ", "");
-         return s;
+        QString s = QString::fromLocal8Bit(m_channels.at(channel).c_str());
+        if (s.isEmpty())
+        {
+            s = QString::fromLocal8Bit("通道%1").arg(channel);
+        }
+
+
+        return s;
     }
 
     return "";
@@ -1294,6 +1320,15 @@ bool videoserver::shestopDownload(download_handle_t h)
     SHE_END_RETURN_FALSE
 }
 
+void earseSpecialChar(std::map<qint32, std::string>& mpChannels){
+    for (auto it = mpChannels.begin(); it != mpChannels.end(); it++)
+    {
+        QString s = QString::fromLocal8Bit(it->second.c_str());
+        s.replace(QRegExp("[\\s\\[\\`\\~\\!\\]@#$%\\^&\\*\\(\\)\\+\\=\\|\\{\\}\\:;'\\,\\\\\\.<>\\/\\?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"), "");
+        it->second = s.toLocal8Bit().data();
+    }
+}
+
 bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int port, const std::string& user, const std::string& password)
 {
     if (nullptr == pServer)
@@ -1307,11 +1342,13 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
 
     if (!r)
     {
+		//addLog(IP.c_str(), __LINE__);	
         this->mLastError = pServer->getLastError();
         addLog("videoserver::sheLogin failed", __LINE__);
     }
-    else{
+    else{		
         addLog("videoserver::sheLogin true", __LINE__);
+        earseSpecialChar(m_channels);
     }
     return r;
 
@@ -1320,7 +1357,6 @@ bool videoserver::sheLogin(IVideoServer* pServer, const std::string& IP, int por
 
 OEMFactory::OEMFactory()
 {
-	m_name[32] = {0};
 	m_FacID = SISC_IPC_UNDEFINE;
 	m_OemFlag = false;
 	m_pFactory = NULL;
@@ -1330,26 +1366,26 @@ OEMFactory::OEMFactory(DeviceFactory FacID, bool bOEMFlag, char *FacName, IVideo
 {
 	m_FacID = FacID;
 	m_OemFlag = bOEMFlag;
-	strcpy_s(m_name, FacName);
+    m_name = FacName;
 	m_pFactory = pFactory;
 
- 	m_port = 0;
-	memset(m_usr, 0, strlen(m_usr));
-	memset(m_pass, 0, strlen(m_pass));
+    m_port = pFactory->defaultPort();
+    m_usr = pFactory->defaultUser();
+    m_pass = pFactory->defaultPasswords();
 
 	switch (m_FacID)
 	{
 	case SISC_IPC_GZLL:
 	case SISC_IPC_JIRUI:
 	case SISC_IPC_HUABANGHAISHI:
-		strcpy_s(m_usr, "admin");
-		strcpy_s(m_pass, "");
+        m_usr = "admin";
+        m_pass = "";
         m_OemFlag = (m_FacID != SISC_IPC_GZLL);
 		m_port = 9101;
 		break;
 	case SISC_IPC_SALX:
-		strcpy_s(m_usr, "admin");
-		strcpy_s(m_pass, "123456");
+        m_usr = "admin";
+        m_pass = "123456";
 		m_port = 34567;
         m_OemFlag = false;
 		break;
@@ -1360,7 +1396,7 @@ OEMFactory::OEMFactory(DeviceFactory FacID, bool bOEMFlag, char *FacName, IVideo
 
 const char* OEMFactory::name()
 {
-	return m_name;
+	return m_name.c_str();
 }
 
 DeviceFactory OEMFactory::factory()

@@ -349,8 +349,7 @@ DLL_EXPORT int WP_PDVR_SynchronizeTime(int serverId, struct tm sm);
 
 //for PTZ
 DLL_EXPORT int WP_PDVR_GetPTZInfo(int serverId, int cameraId, EXTPTZINFO *PTZInfo);
-DLL_EXPORT int WP_PDVR_OperatePTZ(int serverId, int cameraId, int operate, int value = 0);
-DLL_EXPORT int WP_PDVR_OperatePTZEx(int serverId, int cameraId, int operate, char *param);						//Control the PTZ.
+DLL_EXPORT int WP_PDVR_OperatePTZ(int serverId, int cameraId, int operate, int value = 0);						//Control the PTZ.
 DLL_EXPORT int WP_PDVR_SetPTZInfo(int serverId, int cameraId, int operate, int GroupId, int PresetId, int StayTime, char *PresetName = 0);
 																													//Set the PTZ info.GroupId:The id of cruise group.The cruise group id range 0~3.
 																													//PresetId:The id of the preset point,a cruise group has the max num of preset is 128.

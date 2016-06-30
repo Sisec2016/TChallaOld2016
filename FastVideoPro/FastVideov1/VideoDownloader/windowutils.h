@@ -23,10 +23,12 @@ public:
     static bool setNetConfig(const QString& sName, const QString& sIP, const QString& sMask = "255.255.255.0", const QString& sGate = "", bool bWait = false);
     static bool setNetDhcp(const QString& sName);
 
-    static bool isConnecteTo(const QString& IP);
+    static bool isConnecteTo(const QString& IP, int millSeconds = 500);
     static bool getDirectDevice(QString& ip, QString& netGate);
     static bool getDirectDevice(QString& ip, QString& netGate, std::set<QString>& otherIPS, int secondsWait = 60);
     static bool setIPByDHCP(QString& ip, QString& mask, QString& netGate);
+    static const QString& getLoacalNetName();
+    static bool isOnLine();
 private:
     WindowUtils();
 };

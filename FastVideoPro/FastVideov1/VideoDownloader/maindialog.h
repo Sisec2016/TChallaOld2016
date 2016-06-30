@@ -68,6 +68,7 @@ private slots:
 private:
     Ui::MainDialog *ui;
     bool mStop;
+    bool mLoaded;
     std::shared_ptr<std::thread> mDownloadTimerThread;
 	QPushButton *m_backBtn2;
 	QPushButton *m_closeBtn2;

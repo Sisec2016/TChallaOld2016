@@ -124,7 +124,7 @@ bool  SvrFactory::getRefreshPort(int& newProt, int32_t factory, int32_t oldPort)
     return true;
 }
 SvrFactory::SvrFactory(int f) : mFactory(f){
-
+    mPort = PORT_NONE;
 }
 
 SvrFactory::~SvrFactory(){
@@ -144,8 +144,17 @@ const char* SvrFactory::name()
 
 int SvrFactory::defaultPort()
 {
+    if (mPort != PORT_NONE)
+    {
+        return mPort;
+    }
     VF_BEGIN()
-        return spService->defaultPort(mFactory);
+        if (spService)
+        {
+            mPort = spService->defaultPort(mFactory);
+            return mPort;
+        }
+        
     VF_END()
     
     return PORT_NONE;
@@ -244,8 +253,19 @@ bool SvrVideoserver::init_service(){
         try{
              mpService = std::make_shared< RcfClient<VideoserverSvr> >(RCF::TcpEndpoint("127.0.0.1", mPort));
              mpService->getClientStub().setConnectTimeoutMs(5 * 1000);
-             mpService->getClientStub().setRemoteCallTimeoutMs(120 * 1000);
-             mpService->getClientStub().setMaxBatchMessageLength(100000000);
+			 switch (mFactory)
+			 {
+			 case SISC_IPC_HANGJINGKEJI:
+				 mpService->getClientStub().setConnectTimeoutMs(3 * 1000);
+				 mpService->getClientStub().setRemoteCallTimeoutMs(120 * 3 * 1000);
+				 mpService->getClientStub().setMaxBatchMessageLength(100000000);
+				 break;
+			 default:
+				 mpService->getClientStub().setConnectTimeoutMs(5 * 1000);
+				 mpService->getClientStub().setRemoteCallTimeoutMs(120 * 1000);
+				 mpService->getClientStub().setMaxBatchMessageLength(100000000);
+				 break;
+			 }            
         }
         catch (const RCF::Exception & e)
         {

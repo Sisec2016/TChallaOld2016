@@ -71,6 +71,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Start", "..\Start\Start.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "videoReg", "..\videoReg\videoReg.vcxproj", "{F1DFB1B6-C17B-34C0-B17F-3E50D35A3975}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaoXinShengVideoServer", "..\sdk\BaoXinShengVideoServer\BaoXinShengVideoServer.vcxproj", "{02086719-A686-4AB9-B2CE-5E19F843217B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -510,8 +512,31 @@ Global
 		{F1DFB1B6-C17B-34C0-B17F-3E50D35A3975}.Template|Mixed Platforms.Build.0 = Release|Win32
 		{F1DFB1B6-C17B-34C0-B17F-3E50D35A3975}.Template|Win32.ActiveCfg = Release|Win32
 		{F1DFB1B6-C17B-34C0-B17F-3E50D35A3975}.Template|Win32.Build.0 = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Debug|Win32.Build.0 = Debug|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Release|Win32.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Release|Win32.Build.0 = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.ReleaseSSD|Any CPU.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.ReleaseSSD|Mixed Platforms.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.ReleaseSSD|Mixed Platforms.Build.0 = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.ReleaseSSD|Win32.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.ReleaseSSD|Win32.Build.0 = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Template|Any CPU.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Template|Mixed Platforms.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Template|Mixed Platforms.Build.0 = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Template|Win32.ActiveCfg = Release|Win32
+		{02086719-A686-4AB9-B2CE-5E19F843217B}.Template|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		Qt5Version = QTDIR
 	EndGlobalSection
 EndGlobal

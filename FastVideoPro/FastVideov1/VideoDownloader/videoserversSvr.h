@@ -9,6 +9,7 @@ class SvrFactory : public IVideoServerFactory
     std::string mName;
     std::string mDefaultUser;
     std::string mDefaultPasswords;
+    int mPort;
     int mFactory;
     static std::recursive_mutex sMutexService;
 	static std::shared_ptr< RcfClient<VideoserverFactorySvr> > spService;

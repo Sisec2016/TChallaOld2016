@@ -13,7 +13,7 @@ const char* Verify::version()
 #ifdef VERIFY_VERSION
     return "2.0.3";
 #else
-    return "1.3.4.9.6(widescreen)";
+	return "1.3.4.10.1";
 #endif
 }
 

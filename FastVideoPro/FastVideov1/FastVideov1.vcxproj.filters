@@ -186,6 +186,13 @@
     <ClCompile Include="VideoDownloader\messageboxdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_playflamedlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_playflamedlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoDownloader\playflamedlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_channelwidget.h" />
@@ -363,6 +370,7 @@
     <CustomBuild Include="VideoDownloader\messageboxdlg.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="VideoDownloader\playflamedlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FastVideo.rc" />
@@ -388,6 +396,21 @@
       <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
       <Extensions>ui</Extensions>
       <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{c0777c97-52a9-4f78-aa31-ab39857a1b28}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{d2be12d8-eb9d-480c-8268-5af5d1097365}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
     </Filter>
   </ItemGroup>
 </Project>

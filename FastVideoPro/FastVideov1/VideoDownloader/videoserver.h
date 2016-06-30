@@ -316,10 +316,17 @@ public:
 
     int port()
     {
-        if (nullptr != mpFactory)
-        {
-            return mpFactory->defaultPort();
+        __try{
+            if (nullptr != mpFactory)
+            {
+                return mpFactory->defaultPort();
+            }
         }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+
+        }
+        
 
         return 0;
     }
@@ -395,10 +402,11 @@ public:
 	static OEMFacMap m_OEMXMFacMap;   //雄迈OEM系列
 	static OEMFacMap m_OEMHIKFacMap;  //海康OEM系列
 	static OEMFacMap m_OEMDHFacMap;   //大华OEM系列
-	static OEMFacMap m_OEMWSDFacMap;  //沃仕达OEM系列
+    static OEMFacMap m_OEMBXSFacMap;  //宝欣盛OEM系列
 	static OEMFacMap m_OEMJiuAnFacMap;  //九安OEM系列
 	static OEMFacMap m_OEMDongYangFacMap; //东阳OEM系统
 	static OEMFacMap m_OEMZhongWeiFacMap; //中维OEM系列
+    static OEMFacMap m_OEMJXJMap; //佳信捷OEM系列
 };
 
 #define TIME_FORMAT "yyyy-MM-dd hh:mm:ss"
@@ -622,7 +630,6 @@ enum Enum_OEM_XM
 	OEM_FAC_JF = 0,
 	OEM_XM_END,
 };
-
 class OEMFactory : public IVideoServerFactory
 {
 public:
@@ -638,7 +645,7 @@ public:
 
 	virtual int defaultPort()
 	{
-		if (m_port == 0)
+        if (m_port == 0 && !m_pFactory)
 		{
 			return m_pFactory->defaultPort();
 		}
@@ -649,25 +656,25 @@ public:
 	}
 	virtual const char* defaultUser()
 	{
-		if (strlen(m_usr) == 0)
+        if (m_usr.length() == 0 && !m_pFactory)
 		{
 			return m_pFactory->defaultUser();
 		}
 		else
 		{
-			return m_usr;
+			return m_usr.c_str();
 		}
 	}
 
 	virtual const char* defaultPasswords()
 	{
-		if (strlen(m_usr) == 0)
+        if (m_pass.length() == 0 && !m_pFactory)
 		{
 			return m_pFactory->defaultPasswords();
 		}
 		else
 		{
-			return m_pass;
+            return m_pass.c_str();
 		}
 	}
 
@@ -676,7 +683,11 @@ public:
 	virtual void videoFileExterns(std::vector<std::string >& externs)
 	{
 		//externs.push_back("h264");
-		m_pFactory->videoFileExterns(externs);
+        if (!m_pFactory)
+        {
+            m_pFactory->videoFileExterns(externs);
+        }
+
 	}
 
 	virtual IVideoServer* create(){return m_pFactory->create(); }
@@ -688,13 +699,13 @@ public:
 
 private:
 
-	char m_name[32];
+	std::string m_name;
 	DeviceFactory m_FacID;
 	bool m_OemFlag;
 
-	char m_usr[32];
+    std::string m_usr;
 	int m_port;
-	char m_pass[32];
+    std::string m_pass;
 
 	IVideoServerFactory *m_pFactory;
 };
