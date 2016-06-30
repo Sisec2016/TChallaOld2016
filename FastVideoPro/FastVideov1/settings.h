@@ -39,6 +39,10 @@
 #define  NET_IP_SEARCH_SPLIT        "|"
 
 #define  KEY_DOWNLOAD_DIR           "download_dir"
+
+#define  KEY_APP_STATE                  "app_state"
+#define  APP_STATE_NOT_DOWNLOAD         "0"
+#define  APP_STATE_DOWNLOADING          "1"
 class Settings
 {
 private:
