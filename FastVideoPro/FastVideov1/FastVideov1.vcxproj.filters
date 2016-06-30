@@ -193,6 +193,16 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="VideoDownloader\playflamedlg.cpp" />
+    <ClCompile Include="VideoDownloader\DeviceInfo.pb.cc" />
+    <ClCompile Include="VideoDownloader\founddevicedialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_founddevicedialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_founddevicedialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_channelwidget.h" />
@@ -266,6 +276,12 @@
     <ClInclude Include="GeneratedFiles\ui_filemanagerdlg.h" />
     <ClInclude Include="GeneratedFiles\ui_diskdlg.h" />
     <ClInclude Include="GeneratedFiles\ui_fastvideo.h" />
+    <ClInclude Include="VideoDownloader\DeviceInfo.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_founddevicedialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="fastvideo.h" />
@@ -371,6 +387,12 @@
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="VideoDownloader\playflamedlg.h" />
+    <CustomBuild Include="VideoDownloader\founddevicedialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="VideoDownloader\founddevicedialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FastVideo.rc" />

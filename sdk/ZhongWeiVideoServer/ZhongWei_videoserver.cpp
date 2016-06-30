@@ -473,6 +473,10 @@ bool ZhongWei_videoserver::GetRecordFileList(std::vector<RecordFile>& files, con
             }
         }
 	}
+
+    std::sort(files.begin(), files.end(), [](const RecordFile& a, const RecordFile& b){
+        return a.beginTime < b.beginTime;
+    });
 	return true;
 }
 

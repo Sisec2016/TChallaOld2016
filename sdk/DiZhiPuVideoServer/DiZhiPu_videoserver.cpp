@@ -383,6 +383,9 @@ bool gzll_videoserver::GetRecordFileList(std::vector<RecordFile>& files, __int32
 
 		}
 	}
+    std::sort(files.begin(), files.end(), [](const RecordFile& a, const RecordFile& b){
+        return a.beginTime < b.beginTime;
+    });
     return true;
 }
 
