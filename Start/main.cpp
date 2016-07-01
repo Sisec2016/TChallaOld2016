@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
     qDebug()<<"loadSetting";
     ProtobufClient::instance().loadSetting(getMd5());
 
-    if (Settings::getItem(KEY_SERVER_VERSION) != Settings::getItem(KEY_CURVERSION)){
+   /* if (Settings::getItem(KEY_SERVER_VERSION) != Settings::getItem(KEY_CURVERSION)){
         QFile f(upgradeFile);
         if (f.exists()){
             f.remove();
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
         QProcess::execute(downloadCmd);
         qDebug()<< "downloadCmd finish";
         Settings::setItem(KEY_UPGRADE_STATE, KEY_UPGRADE_STATE_DOWNLOADED);
-    }
+    }*/
 
     return 0;
 }
