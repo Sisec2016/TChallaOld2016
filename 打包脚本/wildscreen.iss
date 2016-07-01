@@ -2,7 +2,7 @@
 ; 有关创建 Inno Setup 脚本文件的详细资料请查阅帮助文档！
 
 #define MyAppName "VideoDownLoad"
-#define MyAppVersion "v1.3.4.10.0(widescreen)"
+#define MyAppVersion "v1.3.4.10.1(widescreen)"
 #define MyAppPublisher "珠海经济特区远宏科技有限公司"
 #define MyAppURL "http://www.rmax.com/"
 #define MyAppExeName "FastVideo.exe"
@@ -54,10 +54,11 @@ Source: "C:\VideoDownLoad\*.sys"; 					    DestDir: "{app}"; Flags: ignoreversio
 								                            Source: "C:\VideoDownLoad\*.exe"; 		          DestDir: "{app}"; Flags: ignoreversion;    Excludes:"unins000.*"
 Source: "C:\VideoDownLoad\DaHuaTool\*"; 			  DestDir: "{app}\DaHuaTool"; 	Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\VideoDownLoad\factorys\*"; 		      DestDir: "{app}\factorys"; 		Flags: ignoreversion recursesubdirs createallsubdirs;   Excludes:"*.lib;*.pdb"	
-Source: "C:\VideoDownLoad\hikPlay\*"; 			    DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirsSource: "C:\VideoDownLoad\images\*"; 				    DestDir: "{app}\images"; 		Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\hikPlay\*"; 			    DestDir: "{app}\hikPlay"; 		Flags: ignoreversion recursesubdirs createallsubdirs;Source: "C:\VideoDownLoad\images\*"; 				    DestDir: "{app}\images"; 		Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\VideoDownLoad\platforms\*"; 			  DestDir: "{app}\platforms"; 	Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\VideoDownLoad\sqldrivers\*"; 			  DestDir: "{app}\sqldrivers"; 	Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\VideoDownLoad\tool\*"; 					    DestDir: "{app}\tool"; 			Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\VideoDownLoad\screenRecord\*"; 			DestDir: "{app}\screenRecord"; 			Flags: ignoreversion recursesubdirs createallsubdirs
 ; 注意: 不要在任何共享系统文件上使用“Flags: ignoreversion”
 
 [Dirs]
