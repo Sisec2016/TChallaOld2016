@@ -28,6 +28,8 @@
 #include "windowutils.h"
 #include "videoserver.h"
 #include "cwaitdlg.h"
+#include "settings.h"
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
@@ -91,7 +93,11 @@ ui(new Ui::MainWindow)
     {
         videoserverFactory::getFactorys();
 
-    }, [this](bool bCancel){});
+    }, [this](bool bCancel){
+        if (Settings::getItem(KEY_APP_STATE) == APP_STATE_DOWNLOADING){
+            QTimer::singleShot(200, this, SLOT(onVideoBtnclicked()));
+        }
+    });
 }
 
 MainWindow::~MainWindow()
