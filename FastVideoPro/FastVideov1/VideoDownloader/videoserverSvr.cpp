@@ -36,13 +36,13 @@ if (init_service()) \
     try	\
 {	\
     std::lock_guard<std::recursive_mutex> lock(mMutexService); \
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)	\
-    .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("beg"));    \
+    /*Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)	\*/
+   /* .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("beg"));    \*/
 
 
 #define VDS_END()	\
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)	\
-    .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("end"));    \
+    /*Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)*/	\
+    /*.arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("end"));*/    \
 }	\
     catch (const RCF::Exception & e)	\
 {	\

@@ -351,12 +351,12 @@ bool VideoserverSvrImp::getPlayBackPos(__int64 playbackHandle, int32_t& pos){
 }
 
 bool VideoserverSvrImp::getDownloadPos(int64_t h, int64_t& totalSize, int64_t& currentSize, int32_t& failed){
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, msg:%4 beg ").arg(__FILE__)
-        .arg(__FUNCTION__).arg(__LINE__).arg(h));
+    /*Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, msg:%4 beg ").arg(__FILE__)
+        .arg(__FUNCTION__).arg(__LINE__).arg(h));*/
     bool bFailed = true;
     bool b = m_pServer->getDownloadPos(h, &totalSize, &currentSize, &bFailed);
     failed = bFailed;
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, msg:%4 end ").arg(__FILE__)
-        .arg(__FUNCTION__).arg(__LINE__).arg(h));
+    /*Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, msg:%4 end ").arg(__FILE__)
+        .arg(__FUNCTION__).arg(__LINE__).arg(h));*/
     return b;
 };
