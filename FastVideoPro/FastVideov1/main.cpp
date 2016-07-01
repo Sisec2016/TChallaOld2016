@@ -84,7 +84,7 @@ _In_ struct _EXCEPTION_POINTERS * ExceptionInfo
 	int iIndex = strFileName.rfind('\\');
 	if (iIndex == string::npos)
 	{
-		return FALSE;
+		return EXCEPTION_EXECUTE_HANDLER;
 	}
 	strFileName = strFileName.substr(0, iIndex + 1);
 	strFileName += "crashReport.dmp";
@@ -102,9 +102,9 @@ _In_ struct _EXCEPTION_POINTERS * ExceptionInfo
 		::MiniDumpWriteDump(::GetCurrentProcess(), ::GetCurrentProcessId(), hFile, MiniDumpNormal, &einfo, NULL, NULL);
 		::CloseHandle(hFile);
 
-		return TRUE;
+		return EXCEPTION_EXECUTE_HANDLER;
 	}
-	return FALSE;
+	return EXCEPTION_EXECUTE_HANDLER;
 }
 void initDb()
 {
