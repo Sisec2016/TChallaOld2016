@@ -76,7 +76,7 @@ MyUnhandledExceptionFilter(
 _In_ struct _EXCEPTION_POINTERS * ExceptionInfo
 )
 {
-    Verify::uninit();
+//    Verify::uninit();
 	char szFileName[MAX_PATH];
 	ZeroMemory(szFileName, sizeof(szFileName));
 	GetModuleFileNameA(NULL, szFileName, MAX_PATH);

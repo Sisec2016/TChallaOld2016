@@ -146,6 +146,7 @@ MainDialog::~MainDialog()
 {
     this->saveForExit();
     Settings::setItem(KEY_APP_STATE, APP_STATE_NOT_DOWNLOAD);
+    Verify::uninit();
     exit(1);
     mStop = true;
     CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("正在退出中..."), [this]()
@@ -169,7 +170,7 @@ MainDialog::~MainDialog()
 //    delete m_backBtn2;
 //    m_closeBtn2->deleteLater();
     delete ui;
-    Verify::uninit();
+
     CWaitDlg::setMainDlg(this->parentWidget());
     // exit(1);
 }
