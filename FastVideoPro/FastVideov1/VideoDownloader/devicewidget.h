@@ -7,7 +7,8 @@
 #include <QTreeWidget>
 #include <algorithm>
 
-
+typedef std::unique_lock<std::recursive_timed_mutex> device_lock_t;
+#define  DEFALUT_WAIT_TIME  200
 namespace Ui {
 class DeviceWidget;
 }
@@ -15,13 +16,13 @@ class DeviceWidget;
 class DownloadRowForWidget : public QEvent
 {
 public:
-    DownloadRowForWidget(DownloadRow* pRow, std::shared_ptr<videoserver> pServer) :
+    DownloadRowForWidget(DownloadRow_t pRow, std::shared_ptr<videoserver> pServer) :
        QEvent(CUSTOM_DOWNLOAD_FOR_WIDGET_EVENT), m_pRow(pRow), m_pServer(pServer)
     {
 
     }
 
-    DownloadRow* m_pRow;
+    DownloadRow_t m_pRow;
     std::shared_ptr<videoserver> m_pServer;
 };
 class DeviceUnconnected : public QEvent
@@ -96,23 +97,16 @@ public:
         return mpService;
     }
 
-    void lock()
-    {
-        mMutexDownloadTask.lock();
-    }
-    void unlock()
-    {
-        mMutexDownloadTask.unlock();
-    }
+
     std::shared_ptr<DownloadTask> currentTask()
     {
-        std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
+        device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
         return mpDownloadTask;
     }
 
     std::shared_ptr<DownloadTask> nextTask()
     {
-        std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
+        device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
         if (mpDownloadTask.get() != nullptr)
         {
             mpDownloadTask->mState = DTK_STATE_FINISHED;
@@ -142,7 +136,7 @@ public:
             return;
         }
         qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
-        std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
+        device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
         task->mState = DTK_STATE_WAITING;
 		mpWaitingTasks.push_back(task);
 
@@ -167,7 +161,7 @@ public:
    
     bool haveInitTasks()
     {
-        std::lock_guard<std::recursive_mutex> lock(mmtInitTask);
+        device_lock_t lock(mmtInitTask);
         return mpInitTasks.size() != 0;
     }
     bool haveFinshedTasks()
@@ -194,11 +188,11 @@ protected:
     bool mNeedSave;
     bool mQuiting;
     std::shared_ptr<LoginServerInfo> mpLoginInfo;
-    std::recursive_mutex mMutexDownloadTask;
+    std::recursive_timed_mutex  mMutexDownloadTask;
     std::shared_ptr<DownloadTask> mpDownloadTask;
     std::deque< std::shared_ptr<DownloadTask> > mpFinishTasks;
 	std::deque< std::shared_ptr<DownloadTask> > mpWaitingTasks;
-    std::recursive_mutex mmtInitTask;
+    std::recursive_timed_mutex mmtInitTask;
     std::deque< std::shared_ptr<DownloadTask> > mpInitTasks;
 public slots:
     void dealDowloadfinished(DownloadWidget *souce, int channel, bool complete, bool close);

@@ -36,13 +36,9 @@ if (init_service()) \
     try	\
 {	\
     std::lock_guard<std::recursive_mutex> lock(mMutexService); \
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)	\
-    .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("beg"));    \
 
 
 #define VDS_END()	\
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)	\
-    .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("end"));    \
 }	\
     catch (const RCF::Exception & e)	\
 {	\
@@ -168,9 +164,6 @@ const char* SvrFactory::defaultUser()
     {
         VF_BEGIN()
             mDefaultUser = spService->defaultUser(mFactory);
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(QString::fromLocal8Bit(mDefaultUser.c_str())));
-
         VF_END()
     }
 
@@ -185,9 +178,6 @@ const char* SvrFactory::defaultPasswords()
     {
         VF_BEGIN()
             mDefaultPasswords = spService->defaultPasswords(mFactory);
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(QString::fromLocal8Bit(mDefaultPasswords.c_str())));
-
         VF_END()
     }
 
@@ -267,8 +257,6 @@ bool SvrVideoserver::init_service(){
     {
         if (!SvrFactory::getRefreshPort(mPort, mFactory, mPort))
         {
-            Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
-                .arg(__FUNCTION__).arg(__LINE__).arg("getRefreshPort failed"));
             return false;
         }
         
@@ -333,8 +321,6 @@ IVideoServer* SvrVideoserver::clone()
         int port = mpService->clone();
         if (port != PORT_NONE)
         {
-            Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)	\
-                .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("clone true end"));    \
             return new SvrVideoserver(port, mFactory);
         }
     VDS_END()
@@ -357,13 +343,9 @@ bool SvrVideoserver::login(const char* IP, __int32 port, const char* user,
             {
                 channels[vcchannels[i]] = vcchannelNames[i];
             }
-            Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-                .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end")); 
-            qDebug() << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "true";
             return true;
         }
         else{
-            qDebug() << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "false";
         }
     VDS_END()
 
@@ -376,8 +358,6 @@ bool SvrVideoserver::logout()
         bool r = mpService->logout();
         if (r)
         {
-            Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-                .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
             return true;
         }
     VDS_END()
@@ -407,8 +387,6 @@ bool SvrVideoserver::GetRecordFileList(std::vector<RecordFile>& files, const std
         {
             ServiceUtils::PBRecordInfoToRecordFile(vsriList.recordinfos(i), files[i]);
          }
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
 
@@ -425,8 +403,6 @@ bool SvrVideoserver::downLoadByRecordFile(const char* saveFileName, const Record
     ServiceUtils::RecordFileToPBRecordInfo(file, vsri);
     if (mpService->downLoadByRecordFile(saveFileName, vsri, hdl))
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
 
@@ -446,8 +422,6 @@ bool SvrVideoserver::stopDownload(download_handle_t h)
 
     if (mpService->stopDownload(h))
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
     VDS_END()
@@ -456,15 +430,12 @@ bool SvrVideoserver::stopDownload(download_handle_t h)
 
 bool SvrVideoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwnd, play_handle_t& playbackHandle)
 {
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, hwnd:%4").arg(__FILE__)
-        .arg(__FUNCTION__).arg(__LINE__).arg((int64_t)hwnd));
+
     VDS_BEGIN()
     VideoServer::RecordInfo vsri;
     ServiceUtils::RecordFileToPBRecordInfo(file, vsri);
     if (mpService->PlayBackByRecordFile(vsri, (int64_t)hwnd, playbackHandle))
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
     VDS_END()
@@ -477,8 +448,6 @@ bool SvrVideoserver::SetPlayBack(__int64 playbackHandle, __int32 pos)
     VDS_BEGIN()
     if (mpService->SetPlayBack(playbackHandle, pos))
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
     VDS_END()
@@ -490,8 +459,6 @@ bool SvrVideoserver::getPlayBackPos(__int64 playbackHandle, __int32* pos)
     VDS_BEGIN()
     if (mpService->getPlayBackPos(playbackHandle, *pos))
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
     VDS_END()
@@ -504,8 +471,6 @@ bool SvrVideoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
     VDS_BEGIN()
     if (mpService->StopPlayBack(playbackHandle, mPause))
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
     VDS_END()
@@ -516,9 +481,6 @@ bool SvrVideoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 const char* SvrVideoserver::getLastError(){
     VDS_BEGIN()
     m_sLastError = mpService->getLastError();
-
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, msg:%4").arg(__FILE__)
-        .arg(__FUNCTION__).arg(__LINE__).arg(QString::fromLocal8Bit(m_sLastError.c_str())));
     VDS_END()
         return m_sLastError.c_str();
 }
@@ -530,8 +492,6 @@ bool SvrVideoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __i
     if (mpService->getDownloadPos(h, *totalSize, *currentSize, nFailed))
     {
         *failed = (bool)nFailed;
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, msg:%5").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg("true end"));
         return true;
     }
     VDS_END()

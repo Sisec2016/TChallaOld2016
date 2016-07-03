@@ -60,14 +60,14 @@ void showMainDlg(SingleApplication& a)
 
 void showMainDlgNoExcept(SingleApplication& a)
 {
-// 	__try{
+    __try{
 		showMainDlg(a);
-// 	}
-// 	__except (EXCEPTION_EXECUTE_HANDLER)
-// 	{
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
 // 		std::cout << "showMainDlgNoExcept unkonw error!" << std::endl;
-// 		exit(-1);
-// 	}
+        exit(-1);
+    }
 }
 
 LONG
@@ -76,6 +76,7 @@ MyUnhandledExceptionFilter(
 _In_ struct _EXCEPTION_POINTERS * ExceptionInfo
 )
 {
+    return TRUE;
 //    Verify::uninit();
 	char szFileName[MAX_PATH];
 	ZeroMemory(szFileName, sizeof(szFileName));
@@ -92,7 +93,6 @@ _In_ struct _EXCEPTION_POINTERS * ExceptionInfo
 	HANDLE hFile = ::CreateFileA(strFileName.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
-		Log::instance().AddLog(QString("MyUnhandledExceptionFilter"));
 
 		MINIDUMP_EXCEPTION_INFORMATION einfo;
 		einfo.ThreadId = ::GetCurrentThreadId();
@@ -106,6 +106,12 @@ _In_ struct _EXCEPTION_POINTERS * ExceptionInfo
 	}
 	return FALSE;
 }
+
+void my_terminate_handler()
+{
+    exit(1);
+}
+
 void initDb()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -192,9 +198,9 @@ void checkDirectory(){
 
 int main(int argc, char *argv[])
 {
-	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT | SEM_NOOPENFILEERRORBOX);
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
-
+    set_terminate(my_terminate_handler);
 	SingleApplication a(argc, argv);
     qInstallMessageHandler(outputMessage);
 	if (a.isRunning())

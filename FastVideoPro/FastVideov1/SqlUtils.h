@@ -421,7 +421,6 @@ public:
 
     static bool exec(QSqlQuery& q, const std::string& sql = "")
     {
-        qDebug()<<"exec"<<QString::fromLocal8Bit(sql.c_str());
         bool ok = false;
         if (sql.empty())
         {
@@ -434,7 +433,7 @@ public:
         }
         if (!ok)
         {
-            Log::instance().AddLog(QString("exec sql failed:%1;%2").arg(q.lastQuery()).arg(q.lastError().text()));
+//            Log::instance().AddLog(QString("exec sql failed:%1;%2").arg(q.lastQuery()).arg(q.lastError().text()));
             qDebug() << "exec sql failed:" << q.lastQuery() << ":" << q.lastError().text();
             q.clear();
         }
@@ -462,17 +461,17 @@ public:
         printPrepearWhereSql(strstream, primaryColumns);
         sPreparedUpdate = strstream.str().c_str();
         sPreparedUpdate += ";";
-        qDebug()<<sPreparedUpdate;
+ //       qDebug()<<sPreparedUpdate;
         strstream.str("");
         printPrepearInsertSql(strstream, sTableName, vcColumnName);
         sPreparedInsert = strstream.str().c_str();
         sPreparedInsert += ";";
-        qDebug()<<sPreparedInsert;
+//        qDebug()<<sPreparedInsert;
         strstream.str("");
         printPrepearDeleteSql(strstream, sTableName, primaryColumns);
         sPreparedDelete = strstream.str().c_str();
         sPreparedDelete += ";";
-        qDebug()<<sPreparedDelete;
+//        qDebug()<<sPreparedDelete;
     }
 
     static bool createTable(std::stringstream& sqlStream)
@@ -480,7 +479,7 @@ public:
         QString createSql(sqlStream.str().c_str());
         createSql.replace("(", "("ID_COLUMN" INTEGER primary key AutoIncrement,");
         QSqlQuery query;
-        qDebug()<<"createTable "<<" "<< sTableName<<" "<<createSql;
+//        qDebug()<<"createTable "<<" "<< sTableName<<" "<<createSql;
         return exec(query, createSql.toStdString());
     }
 
