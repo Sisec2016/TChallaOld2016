@@ -29,6 +29,7 @@ public:
     static bool setIPByDHCP(QString& ip, QString& mask, QString& netGate);
     static const QString& getLoacalNetName();
     static bool isOnLine();
+    static void disableWindowMsg();
 private:
     WindowUtils();
 };
