@@ -54,15 +54,17 @@ void DownloadWidget::heartBeat()
     {
         mBeatTime = GetTickCount();
     }
-    if ((GetTickCount() - mBeatTime >= MAX_HEARTBEAT_TIME) && this->mDownloading)
+    if (!this->mDownloading)
     {
-        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, download_timeout:%4").arg(__FILE__)
-            .arg(__FUNCTION__).arg(__LINE__).arg(QString("progress:") + QString::number(ui->progressBar->value()) + " letf_time: " + ui->timeLabel->text()));
-
+        qDebug() << __FUNCTION__ << __LINE__ << "!this->mDownloading";
+        return;
+    }
+    if (GetTickCount() - mBeatTime >= MAX_HEARTBEAT_TIME)
+    {
+        qDebug() << __FUNCTION__ << __LINE__ << "progress:" << ui->progressBar->value() << ui->timeLabel->text();
         if (nullptr != mpSvr)
         {
             this->mpSvr->stopDownload(this);
-
         }
 
        
@@ -88,7 +90,7 @@ void DownloadWidget::heartBeat()
             this->mpSvr->reLogin();
             this->mDownloading = true;
             QCoreApplication::postEvent(this, new downloadEvent(mpSvr.get(), 0, 0, true));
-            
+            qDebug() << __FUNCTION__ << __LINE__ << "progress:" << ui->progressBar->value() << ui->timeLabel->text();
         }
         
         mBeatTime = GetTickCount();
@@ -107,7 +109,7 @@ bool DownloadWidget::dealHeartbeat(QEvent* event)
             mBeatTime = GetTickCount();
         }
     }
-
+    
 
     return false;
 }
@@ -117,6 +119,7 @@ void DownloadWidget::customEvent(QEvent* event)
 {
     if (!this->mDownloading || dealHeartbeat(event))
     {
+        qDebug() << __FUNCTION__ << __LINE__ << "!this->mDownloading";
         return;
     }
 

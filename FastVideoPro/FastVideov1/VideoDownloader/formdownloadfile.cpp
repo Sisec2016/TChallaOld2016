@@ -4,9 +4,7 @@
 
 FormDownloadFile::FormDownloadFile(QWidget *parent) :
     ListViewItem(parent),
-    ui(new Ui::FormDownloadFile),
-    mpFile(nullptr),
-    mpServer(nullptr)
+    ui(new Ui::FormDownloadFile)
 {
     ui->setupUi(this);
 }
@@ -16,7 +14,7 @@ FormDownloadFile::~FormDownloadFile()
     delete ui;
 }
 
-void FormDownloadFile::init(RecordFile* pFile, std::shared_ptr<videoserver> pServer)
+void FormDownloadFile::init(pRecordFile_t pFile, std::shared_ptr<videoserver> pServer)
 {
     if (nullptr != pFile && pServer)
     {
@@ -42,7 +40,7 @@ bool FormDownloadFile::isChecked()
 
 void FormDownloadFile::on_pushButtonPlay_clicked()
 {
-    if (nullptr != mpFile && nullptr != mpServer)
+    if (mpFile && mpServer)
     {
         PlayRecordFilewidget playrecrodfile(*mpFile, mpServer);
         playrecrodfile.exec();

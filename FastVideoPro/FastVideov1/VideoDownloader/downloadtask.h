@@ -80,7 +80,7 @@ struct DownloadRow : public SqlTable<DownloadRow>
         return f.size;
     }
 
-    bool download(DeviceWidget* pWidget, const QString& strFilePath, std::shared_ptr<videoserver> pServer);
+    bool download(DeviceWidget* pWidget, const QString& strFilePath, std::shared_ptr<DownloadRow> selfP, std::shared_ptr<videoserver> pServer);
 public:
     int taskID;
 
@@ -92,6 +92,9 @@ public:
     std::shared_ptr<std::thread> mThread;
     
     void setCancel();
+    bool isCancel(){
+        return mCancel;
+    }
 private:
     bool mCancel;
 };
@@ -102,6 +105,7 @@ QDataStream & operator << (QDataStream &dataStream, DownloadRow &d);
 QDataStream & operator >> (QDataStream &dataStream, DownloadRow &d);
 
 typedef std::map<channelid_t, std::deque<std::shared_ptr<DownloadRow> > > DownloadRows_t;
+typedef std::shared_ptr<DownloadRow> DownloadRow_t;
 
 #define  DTK_STATE_NULL         0
 #define  DTK_STATE_INIT         1

@@ -21,9 +21,7 @@ void CWaitDlg::on_cancelBtn_clicked()
         *mbCancel = true;
     }
     
-	//ui->cancelBtn->hide();
 	ui->info->setText(QString::fromLocal8Bit("正在取消中..."));
-	//mFinishCall(true);
 }
 
 CWaitDlg &CWaitDlg::instanceCwaitdlg(QWidget *parent)
@@ -108,12 +106,7 @@ CWaitDlg::~CWaitDlg()
 void CWaitDlg::ShowWaitDlg(const QString& text)
 {
     ui->info->setText(text);
-    if (SingleApplication::instance() != nullptr &&
-            SingleApplication::instance()->mainWidget() != nullptr && 
-			this->mbHideCancel)
-    {
-        SingleApplication::instance()->mainWidget()->setEnabled(false);
-    }
+
 	//this->setWindowModality(Qt::ApplicationModal);
     this->exec();
 }
@@ -121,28 +114,17 @@ void CWaitDlg::ShowWaitDlg(const QString& text)
 
 void  CWaitDlg::HideWaitDlg()
 {
-	this->hide();
-	if (SingleApplication::instance() != nullptr &&
-		SingleApplication::instance()->mainWidget() != nullptr && 
-		this->mbHideCancel)
-	{
-		SingleApplication::instance()->mainWidget()->setEnabled(true);
-	}
     QCoreApplication::postEvent(this, new FinishEvent());
+    this->hide();
 }
 
 bool CWaitDlg::eventFilter(QObject *b, QEvent *e)
 {
     if (this == b && dynamic_cast<FinishEvent *> (e) != nullptr)
     {
-        this->accept();
         dealFinished();
+        this->accept();
         this->deleteLater();
-//         if (SingleApplication::instance() != nullptr &&
-//                 SingleApplication::instance()->mainWidget() != nullptr)
-//         {
-//             SingleApplication::instance()->mainWidget()->setEnabled(true);
-//         }
     }
     else if (this == b && dynamic_cast<TextEvent *> (e) != nullptr)
     {
@@ -154,6 +136,7 @@ bool CWaitDlg::eventFilter(QObject *b, QEvent *e)
 
 void CWaitDlg::dealFinished()
 {
+
     if (mbCancel)
     {
         mFinishCall(*mbCancel);
@@ -161,5 +144,13 @@ void CWaitDlg::dealFinished()
     else{
         mFinishCall(false);
     }
-    
+    enableMainWidget(true);
+}
+
+void CWaitDlg::enableMainWidget(bool enable){
+    if (SingleApplication::instance() != nullptr &&
+            SingleApplication::instance()->mainWidget() != nullptr)
+    {
+        SingleApplication::instance()->mainWidget()->setEnabled(enable);
+    }
 }
