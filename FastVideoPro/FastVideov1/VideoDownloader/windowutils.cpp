@@ -6,10 +6,12 @@
 #include <iphlpapi.h>
 #include <tlhelp32.h>
 #include <QNetworkInterface>
+#include <QSettings>
 #include "PING.h"
 #include <IPTypes.h>
 #include "pcap.h"
 #include "utils.h"
+
 
 QString GetNICUuidByHumanReadableName(const QString& HumanReadableName)
 {
@@ -931,4 +933,10 @@ bool WindowUtils::isOnLine(){
     }
     delete pIfTable;
     return r;
+}
+
+void WindowUtils::disableWindowMsg(){
+    QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\Windows Error Reporting", QSettings::NativeFormat);
+    reg.setValue("Disabled", 1);
+    reg.setValue("DontShowUI", 1);
 }

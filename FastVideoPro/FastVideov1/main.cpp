@@ -247,6 +247,7 @@ int main(int argc, char *argv[])
 	
     if (Verify::init())
     {
+        WindowUtils::disableWindowMsg();
         checkDirectory();
         qDebug() << "showMainDlgNoExcept";
         QUdpSocket udp;
