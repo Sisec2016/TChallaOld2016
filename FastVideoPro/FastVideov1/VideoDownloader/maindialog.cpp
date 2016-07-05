@@ -102,7 +102,7 @@ mLoaded(false)
     }, [this](bool bCancel){load(); mLoaded = true; });
 
 
-    mDownloadTimerThread = std::shared_ptr<std::thread>(new std::thread([&]()
+    mDownloadTimerThread = std::shared_ptr<std::thread>(new std::thread([=, this]()
     {
         int seconds = 0;
         while (!mStop)
@@ -116,14 +116,8 @@ mLoaded(false)
             {
                 seconds = 0;
             }
-            try
-            {
-                ui->listWidgetDevices->heartbeat();
-            }
-            catch (...)
-            {
-
-            }
+            qDebug() << "mDownloadTimerThread" << __LINE__;
+            this->heartBeat();
         }
     }));
 
@@ -139,14 +133,24 @@ mLoaded(false)
     Settings::setItem(KEY_APP_STATE, APP_STATE_DOWNLOADING);
 }
 
-
+void MainDialog::heartBeat(){
+    __try{
+        ui->listWidgetDevices->heartbeat();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        // 		std::cout << "showMainDlgNoExcept unkonw error!" << std::endl;
+    }
+}
 
 MainDialog::~MainDialog()
 {
     this->saveForExit();
     Settings::setItem(KEY_APP_STATE, APP_STATE_NOT_DOWNLOAD);
-    exit(1);
     mStop = true;
+    exit(1);
+//    WindowUtils::terminateProcess("FastVideo");
+
     CWaitDlg::waitForDoing(this->parentWidget(), QString::fromLocal8Bit("正在退出中..."), [this]()
     {
         if (mDownloadTimerThread)
@@ -168,7 +172,7 @@ MainDialog::~MainDialog()
 //    delete m_backBtn2;
 //    m_closeBtn2->deleteLater();
     delete ui;
-    Verify::uninit();
+
     CWaitDlg::setMainDlg(this->parentWidget());
     // exit(1);
 }
@@ -303,7 +307,7 @@ void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
     ui->widgetDisable->lower();
 }
 
-void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pFileAllRows)
+void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<pRecordFile_t> > pFileAllRows)
 {
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     if (pFileAllRows.get() == nullptr || pFileAllRows->size() > MAX_FILES_NUM)
@@ -330,7 +334,7 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pF
             return;
         }
         qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
-        std::shared_ptr< std::vector<RecordFile*> > pFiles = std::make_shared< std::vector<RecordFile*> >();
+        std::shared_ptr< std::vector<pRecordFile_t> > pFiles = std::make_shared< std::vector<pRecordFile_t> >();
         filedlg.getSelectedFiles(*pFiles);
 
         std::shared_ptr<DownloadTask> pDownloadTask = std::make_shared<DownloadTask>();
@@ -347,7 +351,8 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pF
 
         pDownloadTask->setFilePath(pDevice->getSaveDirName() + "/" + timeString);
         pDownloadTask->setName(QString("%1(%2)").arg(pDevice->getLoginInfo()->name).arg(timeString));
-
+        TaskLogRecordDialog taskLogRecordDlg(pDownloadTask->getName(), pDevice->getLoginInfo()->ip);
+        taskLogRecordDlg.exec();
         CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在加载下载通道中..."), [=]()
         {
             qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
@@ -360,8 +365,7 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pF
             onDownloadTask(pDownloadTask);
         });
 
-        TaskLogRecordDialog taskLogRecordDlg(pDownloadTask->getName(), pDevice->getLoginInfo()->ip);
-        taskLogRecordDlg.exec();
+
     }
     else
     {
@@ -397,7 +401,7 @@ void MainDialog::on_downloadButton_clicked()
     }
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     ui->widgetDisable->raise();
-    std::shared_ptr< std::vector<RecordFile> > pFileAllRows = std::make_shared< std::vector<RecordFile> >();
+    std::shared_ptr< std::vector<pRecordFile_t> > pFileAllRows = std::make_shared< std::vector<pRecordFile_t> >();
     CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在搜索通道文件中..."), [channels, pFileAllRows, this, pDevice]()
     {
         qDebug() << "正在搜索通道文件中";
@@ -414,7 +418,7 @@ void MainDialog::on_downloadButton_clicked()
             for (std::vector<RecordFile>::iterator it = fileRows.begin();
                 it != fileRows.end(); it++)
             {
-                pFileAllRows->push_back(*it);
+                pFileAllRows->push_back(std::make_shared<RecordFile>(*it));
             }
         }
 
@@ -452,7 +456,7 @@ void MainDialog::on_zonedownloadBtn_clicked()
         UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("请选择一个通道！"));
         return;
     }
-    std::shared_ptr< std::vector<RecordFile> > pFileAllRows = std::make_shared< std::vector<RecordFile> >();
+    std::shared_ptr< std::vector<pRecordFile_t> > pFileAllRows = std::make_shared< std::vector<pRecordFile_t> >();
     CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在搜索通道文件中..."), [channels, pFileAllRows, this, pDevice]()
     {
         qDebug() << "正在搜索通道文件中";
@@ -469,7 +473,7 @@ void MainDialog::on_zonedownloadBtn_clicked()
             for (std::vector<RecordFile>::iterator it = fileRows.begin();
                 it != fileRows.end(); it++)
             {
-                pFileAllRows->push_back(*it);
+                pFileAllRows->push_back(std::make_shared<RecordFile>(*it));
             }
         }
 

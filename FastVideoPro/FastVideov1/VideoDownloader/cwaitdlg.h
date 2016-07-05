@@ -63,6 +63,7 @@ public:
         CWaitDlg* pDlg = CWaitDlg::create(parent, !bCancel);
         pDlg->mbCancel = bCancel;
         pDlg->mbHideCancel = !bCancel;
+        pDlg->enableMainWidget(false);
         sCwaitdlg = pDlg;
         spDlg.insert(pDlg);
         pDlg->mFinishCall = OFF;
@@ -90,7 +91,8 @@ private slots:
 public:
     void ShowWaitDlg(const QString& text);
     void HideWaitDlg();
-
+private:
+    void enableMainWidget(bool enable);
 private:
     Ui::CWaitDlg *ui;
 };

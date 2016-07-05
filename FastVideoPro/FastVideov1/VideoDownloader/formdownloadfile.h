@@ -16,15 +16,15 @@ class FormDownloadFile : public ListViewItem
 public:
     explicit FormDownloadFile(QWidget *parent = 0);
     ~FormDownloadFile();
-    void init(RecordFile* pFile, std::shared_ptr<videoserver> pServer);
-    RecordFile* getData()
+    void init(pRecordFile_t pFile, std::shared_ptr<videoserver> pServer);
+    pRecordFile_t getData()
     {
         return mpFile;
     }
     void setChecked(bool b);
     bool isChecked();
 protected:
-    RecordFile* mpFile;
+    pRecordFile_t mpFile;
     std::shared_ptr<videoserver> mpServer;
 private slots:
     void on_pushButtonPlay_clicked();

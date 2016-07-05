@@ -106,10 +106,11 @@ MainWindow::~MainWindow()
     Verify::uninit();
     qDebug() << "~MainWindow()";
     if (nullptr != mpVideoDownloadDlg){
-        delete mpVideoDownloadDlg;
+        mpVideoDownloadDlg->accept();
+        mpVideoDownloadDlg->deleteLater();
+        mpVideoDownloadDlg = nullptr;
     }
     delete ui;
-    WindowUtils::terminateProcess("FastVideo");
 }
 void MainWindow::setProductUi(){
     if (!Settings::getItem(KEY_LOGO_FILE).isEmpty())

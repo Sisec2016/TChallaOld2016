@@ -47,15 +47,15 @@ void DeviceWidget::cancelTask()
     while (true)
     {
         QThread::msleep(100);
-        std::lock_guard<std::recursive_mutex> lock(mmtInitTask);
+        device_lock_t lock(mmtInitTask);
         if (mpInitTasks.size() == 0)
         {
             break;
         }
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mmtInitTask);
-    std::lock_guard<std::recursive_mutex> lockDownload(mMutexDownloadTask);
+    device_lock_t lockInit(mmtInitTask);
+    device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
     if (mpDownloadTask.get())
     {
         mpDownloadTask->cancel();
@@ -117,14 +117,14 @@ void DeviceWidget::login()
         mLoginThread->join();
     }
 
-    mLoginThread = std::shared_ptr<std::thread>(new std::thread([=](DeviceWidget* This){
+    mLoginThread = std::shared_ptr<std::thread>(new std::thread([this](DeviceWidget* This){
         if (mpLoginInfo.get() != nullptr)
         {
 			bool bStop = false;
             if (mpService->login(mpLoginInfo, &bStop))
             {
                 mStatus = CONNECTED;
-                std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
+                device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
                 if (nullptr != mpDownloadTask.get())
                 {
                     mpDownloadTask->initDownloadServer();
@@ -142,6 +142,7 @@ void DeviceWidget::login()
 
       //  QCoreApplication::postEvent(This, new loginEvent(this));
     }, this));
+
 
     refreshUI();
 }
@@ -182,7 +183,7 @@ void DeviceWidget::initTaskWidget(std::shared_ptr<DownloadTask> task)
     QString source;
     if (task->mTotalSize == 0)
     {
-        std::lock_guard<std::recursive_mutex> lock(task->mMutex);
+        std::lock_guard<recursive_mutex> lock(task->mMutex);
         for (DownloadRows_t::iterator it = task->readyDownloadRows.begin();
             it != task->readyDownloadRows.end(); it++)
         {
@@ -239,8 +240,9 @@ void DeviceWidget::dealDowloadfinished(DownloadWidget *souce, int channel, bool 
     }
     try
     {
-        std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
-
+        qDebug()<<__FUNCTION__<<__LINE__;
+        device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
+        qDebug() << __FUNCTION__ << __LINE__;
         std::shared_ptr<DownloadTask> pCurrentTask =  currentTask();
         if (pCurrentTask.get() != nullptr)
         {
@@ -255,7 +257,7 @@ void DeviceWidget::dealDowloadfinished(DownloadWidget *souce, int channel, bool 
 
                 if (r.get() != nullptr)
                 {
-                    if (!r->download(this, this->getDownloadPath(*pCurrentTask, r->getChannel()), souce->getService()))
+                    if (!r->download(this, this->getDownloadPath(*pCurrentTask, r->getChannel()), r, souce->getService()))
                     {
                         pCurrentTask->addFaileRow(r);
                         pCurrentTask->releaseDownloadServer(souce->getService(), channel);
@@ -276,15 +278,12 @@ void DeviceWidget::dealDowloadfinished(DownloadWidget *souce, int channel, bool 
             {
                 pCurrentTask->widget()->setProgress(100);
                 mpFinishTasks.push_back(pCurrentTask);
-                std::thread thrd([&]{
-                    nextTask();
-                    save(false);
-                    if (nullptr != currentTask().get())
-                    {
-                        currentTask()->download(this);
-                    }
-                 });
-                thrd.detach();
+                nextTask();
+                save(false);
+                if (nullptr != currentTask().get())
+                {
+                    currentTask()->download(this);
+                }
             }
 
 
@@ -296,7 +295,7 @@ void DeviceWidget::dealDowloadfinished(DownloadWidget *souce, int channel, bool 
         qDebug()<<"dealDowloadfinished unknown error";
     }
 
-    qDebug()<<"DeviceWidget::dealDowloadfinished"<<souce;
+ //   qDebug()<<"DeviceWidget::dealDowloadfinished"<<souce;
 
 }
 
@@ -326,7 +325,9 @@ void DeviceWidget::dealFailedDownloadRow()
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
+    qDebug() << __FUNCTION__ << __LINE__;
+    device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
+    qDebug() << __FUNCTION__ << __LINE__;
     auto curTask = currentTask();
     if (curTask)
     {
@@ -334,6 +335,7 @@ void DeviceWidget::dealFailedDownloadRow()
         curTask->heartBeat();
         curTask->download(this);
     }
+    qDebug() << __FUNCTION__ << __LINE__;
 }
 
 void DeviceWidget::refreshUI()
@@ -398,16 +400,18 @@ void DeviceWidget::customEvent(QEvent* event)
     {
         try
         {
-            DownloadRow* pDownloadRow = ((DownloadRowForWidget *)event)->m_pRow;
+            DownloadRow_t pDownloadRow = ((DownloadRowForWidget *)event)->m_pRow;
             auto pServer = ((DownloadRowForWidget *)event)->m_pServer;
-            std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
-            if (nullptr != pDownloadRow && pServer != nullptr && this->mpDownloadTask.get() != nullptr)
+            qDebug() << __FUNCTION__ << __LINE__;
+            device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
+            qDebug() << __FUNCTION__ << __LINE__;
+            if (pDownloadRow && !pDownloadRow->isCancel() && pServer && this->mpDownloadTask)
             {
                 qDebug()<<"pDownloadRow->getDownloadWidget()";
 
                 if (pDownloadRow->getDownloadWidget() == nullptr)
                 {
-                        qDebug()<<"getDownloadWidget() == nullptr";
+                    qDebug()<<"getDownloadWidget() == nullptr";
                     RecordFile& row = pDownloadRow->getRecordFile();
                     QString fileName = pServer->getFileName(row);
                     DownloadWidget* dlg = new DownloadWidget(pServer, this->getDownloadPath(*mpDownloadTask, pDownloadRow->getChannel()), fileName, QDateTime::fromTime_t(row.beginTime).toString("yyyy-MM-dd HH:mm:ss"),
@@ -424,9 +428,9 @@ void DeviceWidget::customEvent(QEvent* event)
                 mTreeWidget.setItemWidget(pdownLoadWidget, 0,
                     pDownloadRow->getDownloadWidget());
 
-                pDownloadRow->download(this, mpDownloadTask->getFilePath(), pServer);
-
+                pDownloadRow->download(this, mpDownloadTask->getFilePath(), pDownloadRow, pServer);
             }
+            qDebug() << "pDownloadRow->getDownloadWidget() end";
         }
         catch(...)
         {
@@ -446,10 +450,10 @@ void DeviceWidget::customEvent(QEvent* event)
 void DeviceWidget::dealCancelAll(TaskWidget *task)
 {
      mTreeWidget.dealCancelAll(task);
-     CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在取消下载任务中..."), [=]()
+     CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("正在保存数据中..."), [=, this]()
     {
-//        std::lock_guard<std::recursive_mutex> lockInitTasks(mmtInitTask);
-        std::lock_guard<std::recursive_mutex> lock(mMutexDownloadTask);
+//        device_lock_t lockInitTasks(mmtInitTask);
+//       device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
         qDebug()<<"cancelDownloading";
         bool cancelDownloading = (this->mpDownloadTask.get() != nullptr &&
                 this->mpDownloadTask->widget() == task);
@@ -457,9 +461,10 @@ void DeviceWidget::dealCancelAll(TaskWidget *task)
         {
             nextTask();
             save(false);
-            if (nullptr != currentTask().get())
+            auto t = currentTask();
+            if (t)
             {
-                currentTask()->download(this);
+                t->download(this);
             }
         }
         else
@@ -485,18 +490,8 @@ void DeviceWidget::dealCancelAll(TaskWidget *task)
             save(false);
         }
         qDebug() << "cancelDownloading end"<<__FILE__<<__FUNCTION__<<__LINE__;
-// 		for (int i = 0; i < this->mpWaitingTasksCopy.size(); i++)
-// 		{
-// 			if (mpWaitingTasksCopy[i]->widget() == task)
-// 			{
-// 				mpWaitingTasksCopy.erase(mpWaitingTasksCopy.begin() + i);
-// 				break;
-// 			}
-// 		}
 
-    }, [](bool bCancel){
-
-
+    }, [=, this](bool bCancel){
     });
 
     qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
@@ -504,12 +499,10 @@ void DeviceWidget::dealCancelAll(TaskWidget *task)
 
 void DeviceWidget::RemoveTask()
 {
-//	mmtInitTask.lock();
-	mMutexDownloadTask.lock();
+    device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
 	for (int i = 0; i < this->mpWaitingTasks.size(); i++)
 	{
         std::shared_ptr<DownloadTask> task = mpWaitingTasks[i];
-		mMutexDownloadTask.unlock();
 //		mmtInitTask.unlock();
 
         dealCancelAll(task->mpTaskWidget);
@@ -526,7 +519,7 @@ void DeviceWidget::addDowloadRow()
     {
         std::shared_ptr<DownloadRow> pDownloadRow;
         {
-            std::lock_guard<std::recursive_mutex> lock(mmtInitTask);
+            device_lock_t lock(mmtInitTask);
             while (mpInitTasks.size() > 0)
             {
                 if (mpInitTasks[0].get() == nullptr || mpInitTasks[0]->TreeWidgetItem() == nullptr)
@@ -568,7 +561,7 @@ void DeviceWidget::addDowloadRow()
 
         if (pDownloadRow->getDownloadWidget() == nullptr)
         {
-                qDebug()<<"getDownloadWidget() == nullptr";
+//                qDebug()<<"getDownloadWidget() == nullptr";
             RecordFile& row = pDownloadRow->getRecordFile();
             QString fileName = this->mpService->getFileName(row);
 
@@ -603,7 +596,7 @@ void DeviceWidget::save(bool IncludeTasks)
     }
 
 
-    std::lock_guard<std::recursive_mutex> lockDownload(mMutexDownloadTask);
+    device_lock_t lockDownload(mMutexDownloadTask);
     if (mpDownloadTask.get() != nullptr)
     {
         if (IncludeTasks)
@@ -643,7 +636,7 @@ void DeviceWidget::load()
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lockDownload(mMutexDownloadTask);
+    device_lock_t lockDownload(mMutexDownloadTask);
 
     login();
     auto pTasks = DownloadTask::query(std::make_pair("mLoginInfoID", mpLoginInfo->getLNId()));

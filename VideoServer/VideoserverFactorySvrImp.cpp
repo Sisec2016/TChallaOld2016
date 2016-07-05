@@ -48,7 +48,7 @@ int VideoserverFactorySvrImp::create(int nFactory){
 		Log::instance().AddLog(" VideoserverFactorySvrImp::create f == nullptr");
 		return PORT_NONE;
 	}
-	Log::instance().AddLog(" VideoserverSvrImp::create");
+//	Log::instance().AddLog(" VideoserverSvrImp::create");
 	return VideoserverSvrImp::create(f);
 }
 
@@ -124,8 +124,8 @@ bool VideoserverFactorySvrImp::IsOEMFac(int nFactory){
             .arg(__FUNCTION__).arg(__LINE__).arg(f->IsOEMFac()));
 		return f->IsOEMFac();
 	}
-    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
-        .arg(__FUNCTION__).arg(__LINE__).arg("f == nullptr"));
+//     Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
+//         .arg(__FUNCTION__).arg(__LINE__).arg("f == nullptr"));
 	return false;
 }
 
@@ -144,6 +144,6 @@ int VideoserverFactorySvrImp::KeepServerRunning(int nFactory, int port){
         return port;
     }
 
-    Log::instance().AddLog(" KeepServerRunning::create");
+//    Log::instance().AddLog(" KeepServerRunning::create");
     return VideoserverSvrImp::create(f);
 }
