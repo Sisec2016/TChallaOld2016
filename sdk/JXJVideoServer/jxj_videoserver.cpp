@@ -140,8 +140,8 @@ jxj_videoserver::~jxj_videoserver()
 
 IVideoServer* jxj_videoserver::clone()
 {
-    jxj_videoserver *svr = new jxj_videoserver();
-    return svr;
+    //jxj_videoserver *svr = new jxj_videoserver();
+    return NULL;
 }
 
 bool jxj_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)

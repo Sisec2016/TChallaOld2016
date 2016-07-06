@@ -170,8 +170,8 @@ gzll_videoserver::~gzll_videoserver()
 
 IVideoServer* gzll_videoserver::clone()
 {
-    gzll_videoserver *svr = new gzll_videoserver();
-    return svr;
+    //gzll_videoserver *svr = new gzll_videoserver();
+    return NULL;
 }
 
 
