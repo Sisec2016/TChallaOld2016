@@ -463,7 +463,7 @@ void MainDialog::on_zonedownloadBtn_clicked()
         return;
     }
 
-    std::shared_ptr< std::vector<RecordFile> > pFileAllRows = std::make_shared< std::vector<RecordFile> >();
+	std::shared_ptr< std::vector<pRecordFile_t> > pFileAllRows = std::make_shared< std::vector<pRecordFile_t> >();
     CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在搜索通道文件中..."), [channels, pFileAllRows, this, pDevice]()
 
     {
