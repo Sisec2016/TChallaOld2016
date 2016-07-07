@@ -3,20 +3,23 @@
 
 #include "noflamedlg.h"
 #include "videoserver.h"
-#include "noflamedlg.h"
+
+#include <memory>
 namespace Ui {
 class DialogDownloadFiles;
 }
+
+
 
 class DialogDownloadFiles : public NoFlameDlg
 {
     Q_OBJECT
 
 public:
-    explicit DialogDownloadFiles(std::shared_ptr<videoserver> pServer, std::vector<RecordFile>& files, QWidget *parent = 0);
+    explicit DialogDownloadFiles(std::shared_ptr<videoserver> pServer, std::vector<pRecordFile_t>& files, QWidget *parent = 0);
     ~DialogDownloadFiles();
 
-    void getSelectedFiles(std::vector<RecordFile*>& files);
+    void getSelectedFiles(std::vector<pRecordFile_t>& files);
 
 
 protected:
@@ -30,7 +33,7 @@ private slots:
 
 private:
     Ui::DialogDownloadFiles *ui;
-    std::vector<RecordFile>& mvcFiles;
+    std::vector< pRecordFile_t >& mvcFiles;
     std::shared_ptr<videoserver> mpServer;
     int mIndex;
 };

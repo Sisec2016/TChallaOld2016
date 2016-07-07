@@ -22,6 +22,7 @@ class MainDialog : public MyBaseDialog, public DeviceListWidgetCallback
     
 public:
     explicit MainDialog(QWidget *parent = 0);
+    void heartBeat();
     ~MainDialog();
     virtual DeviceWidget* createDeviceWidget(std::shared_ptr<videoserver> pServer);
 protected:
@@ -44,7 +45,7 @@ public:
     QDateTime getGPSEndDateTime_time();
     QDateTime getBeginDateTime_time();
     QDateTime getEndDateTime_time();
-    void onDownloadFindEnd(std::shared_ptr< std::vector<RecordFile> > pFileAllRows);
+    void onDownloadFindEnd(std::shared_ptr< std::vector<pRecordFile_t> > pFileAllRows);
     void onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask);
 
 public:

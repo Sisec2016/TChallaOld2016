@@ -15,9 +15,9 @@ void DownloadRow::setCancel(){
     }
 }
 bool DownloadRow::download(DeviceWidget* pWidget,
-    const QString& strFilePath, std::shared_ptr<videoserver> pServer)
+    const QString& strFilePath, std::shared_ptr<DownloadRow> selfP, std::shared_ptr<videoserver> pServer)
 {
-    if (mCancel)
+    if (mCancel || selfP.get() != this)
     {
         return false;
     }
@@ -43,10 +43,10 @@ bool DownloadRow::download(DeviceWidget* pWidget,
 
     if (nullptr == pDownloadWidget)
     {
-        QCoreApplication::postEvent(pWidget, new DownloadRowForWidget(this, pServer));
+        QCoreApplication::postEvent(pWidget, new DownloadRowForWidget(selfP, pServer));
         return true;
     }
-    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
+//    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     pDownloadWidget->setSource(pServer->getChannelName(f.channel));
 //     mThread = std::shared_ptr<std::thread>(new std::thread([&]{
     std::vector<QString> externs;
@@ -57,7 +57,7 @@ bool DownloadRow::download(DeviceWidget* pWidget,
         QCoreApplication::postEvent(pDownloadWidget, new downloadEvent(nullptr, 0, 0, true));
     }
 //     }));
-    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
+//    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     return true;
 }
 
@@ -173,7 +173,7 @@ void DownloadTask::download(DeviceWidget* pWidget)
             qDebug()<<"pRow->download beg";
             if (pRow.get() != nullptr)
             {
-                if (!pRow->download(pWidget, downloadPath, pServer))
+                if (!pRow->download(pWidget, downloadPath, pRow, pServer))
                 {
                     failedDownloadRows[it->first].push_back(pRow);
                     releaseDownloadServer(pServer, it->first);
@@ -304,6 +304,7 @@ void DownloadTask::heartBeat()
 {
     if (mCancel)
     {
+        qDebug() << __FUNCTION__ << __LINE__;
         return;
     }
     std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -314,6 +315,7 @@ void DownloadTask::heartBeat()
         {
             if (it->second[i]->getDownloadWidget() != nullptr)
             {
+                qDebug() << __FUNCTION__ << __LINE__;
                 it->second[i]->getDownloadWidget()->heartBeat();
             }
         }
@@ -343,14 +345,14 @@ std::shared_ptr<DownloadRow> DownloadTask::ReadyDownloadNext()
 
 void DownloadTask::cancel()
 {
+    qDebug() << "DownloadTask::cancel" << __FILE__ << __FUNCTION__ << __LINE__;
     if (mCancel)
     {
         return;
     }
     mLastDownloadSize = 0;
     mCancel = true;
-    
-    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
     qDebug() << "DownloadTask beg" << __FILE__ << __FUNCTION__ << __LINE__;
     if (mpTaskWidget)
     {
@@ -358,17 +360,21 @@ void DownloadTask::cancel()
         mpTaskWidget->setCancel();
     }
     qDebug() << "DownloadTask" << __FILE__ << __FUNCTION__ << __LINE__;
-    for (DownloadRows_t::iterator it = downloadingRows.begin();
-         it != downloadingRows.end(); it++)
     {
-        for (int i = 0; i < it->second.size(); i++)
+        qDebug() << "DownloadTask mMutex" << __FILE__ << __FUNCTION__ << __LINE__;
+        for (DownloadRows_t::iterator it = downloadingRows.begin();
+            it != downloadingRows.end(); it++)
         {
-            it->second[i]->setCancel();
+            for (int i = 0; i < it->second.size(); i++)
+            {
+                it->second[i]->setCancel();
+            }
         }
     }
+
     qDebug() << "DownloadTask end" << __FILE__ << __FUNCTION__ << __LINE__;
 
-    clearDownloadData();
+    //clearDownloadData();
     //mpTaskWidget.reset();
 }
 
@@ -489,7 +495,7 @@ void DownloadTask::removeSaveFile()
 }
 
 void DownloadTask::clearDownloadData(){
-    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    //std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     for (DownloadRows_t::iterator it = readyDownloadRows.begin();
         it != readyDownloadRows.end(); it++)

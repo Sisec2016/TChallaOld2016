@@ -7,7 +7,7 @@
 #include "screenadaption.h"
 #include "qss.h"
 
-DialogDownloadFiles::DialogDownloadFiles(std::shared_ptr<videoserver> pServer, std::vector<RecordFile>& files, QWidget *parent) :
+DialogDownloadFiles::DialogDownloadFiles(std::shared_ptr<videoserver> pServer, std::vector<pRecordFile_t>& files, QWidget *parent) :
     NoFlameDlg(parent),
     ui(new Ui::DialogDownloadFiles),
     mvcFiles(files),
@@ -42,7 +42,7 @@ DialogDownloadFiles::~DialogDownloadFiles()
     delete ui;
 }
 
-void DialogDownloadFiles::getSelectedFiles(std::vector<RecordFile*>& files)
+void DialogDownloadFiles::getSelectedFiles(std::vector<pRecordFile_t>& files)
 {
     files.clear();
     for (int i = 0; i < ui->listViewFiles->itemSize(); i++)
@@ -64,7 +64,7 @@ void DialogDownloadFiles::customEvent(QEvent* event)
         if (mIndex < mvcFiles.size())
         {
             FormDownloadFile* p = new FormDownloadFile(this);
-            p->init(&mvcFiles[mIndex], mpServer);
+            p->init(mvcFiles[mIndex], mpServer);
             p->setChecked(true);
             ui->listViewFiles->addWidgetItem(p);
             mIndex++;
@@ -81,7 +81,7 @@ void DialogDownloadFiles::on_closeButton_clicked()
 
 void DialogDownloadFiles::on_pushButtonConnect_clicked()
 {
-    std::vector<RecordFile *> Files;
+    std::vector<pRecordFile_t> Files;
     getSelectedFiles(Files);
     if (Files.size() > 0)
     {

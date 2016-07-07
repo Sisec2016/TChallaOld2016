@@ -191,10 +191,9 @@ void TaskWidget::on_cancelButton_clicked()
     {
         mCancel = true;
 
-		Log::instance().AddLog(QString("[0]on_cancelButton_clicked"));
         CWaitDlg::waitForDoing(SingleApplication::instance()->mainWidget(), QString::fromLocal8Bit("正在取消下载任务中..."), [=]()
         {
-            if (mTask.get() != nullptr)
+            if (mTask)
             {
                mTask->cancel();
             }

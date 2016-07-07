@@ -37,6 +37,7 @@ QDataStream & operator << (QDataStream &dataStream, RecordFile &d);
 QDataStream & operator >> (QDataStream &dataStream, RecordFile &d);
 
 typedef std::map<std::string, unsigned int> OEMFacMap;
+typedef std::shared_ptr<RecordFile> pRecordFile_t;
 
 struct LoginServerInfo : public SqlTable<LoginServerInfo>
 {
