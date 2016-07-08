@@ -68,47 +68,32 @@ void WindowUtils::getLocalIPs(std::vector<QString> &IPs)
     IPs.clear();
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     foreach(QNetworkInterface i, list) {
-
-		qDebug() << QString("kevin : HRN:%1, Valid:%2, isValidNetMacaddress : %3")
-			.arg(i.humanReadableName()).arg(i.isValid()).arg(isValidNetMacaddress(i.hardwareAddress()));
-
         if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()) &&
-             //i.humanReadableName() == QString::fromLocal8Bit("本地连接"))
-
-             i.humanReadableName() == QStringLiteral("本地连接"))
-            //i.humanReadableName() == WindowUtils::getLoacalNetName())
+            i.humanReadableName() == WindowUtils::getLoacalNetName())
 
         {
-            //qDebug() << i.humanReadableName();
-			qDebug() << "kevin : filter pass 1";
+            qDebug() << i.humanReadableName();
+			//Debug() << "kevin : filter pass 1";
 
             foreach(QHostAddress address,i.allAddresses())
             {
-				qDebug() << "Get the HostAddress";
-
                 if (address.protocol() == QAbstractSocket::IPv4Protocol
                         && !address.isLoopback())
                 {
-					qDebug() << "kevin : filter pass 2";
                     if (IPs.end() == std::find(IPs.begin(), IPs.end(), address.toString()))
                     {
                         IPs.push_back(address.toString());
-                        //qDebug() << address.toString();
-                        qDebug() << "kevin : " << address.toString();
+                        qDebug() << address.toString();
                     }
                 }
             }
         }
 
     }
-
-	foreach(QString s, IPs){
-		qDebug() << QString("kevin getLocalIPs 1: %1, size - %2").arg(s).arg(IPs.size());
-	}
+	
 }
 
 void WindowUtils::getLocalIPs(const QString& sHostName, std::vector<QString> &IPs){
-	qDebug() << "added by kevin getLocalIPs";
     IPs.clear();
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     foreach(QNetworkInterface i, list) {
@@ -138,11 +123,7 @@ void WindowUtils::getLocalIPs(const QString& sHostName, std::vector<QString> &IP
             }
         }
 
-    }
-
-	foreach(QString s, IPs){
-		qDebug() << QString("kevin getLocalIPs 2: %1, size - %2, HostName : %3").arg(s).arg(IPs.size()).arg(sHostName);
-	}
+    }	
 }
 
 BOOL FindProcessByName(const char* szFileName, PROCESSENTRY32& pe)
@@ -294,19 +275,12 @@ bool WindowUtils::setNetConfig(const QString& sName, const QString& sIP, const Q
 }
 
 bool WindowUtils::setNetDhcp(const QString& sName){
-    QString name = QString("name=\"%1\"").arg(sName);
-	qDebug() << "kevin : setNetDhcp" << name;
+    QString name = QString("name=\"%1\"").arg(sName);	
     QProcess::execute("netsh", QStringList() << "interface" << "ip" << "set" << "address" << name << "source=dhcp");
     
     return true;
 }
 
-//bool WindowUtils::isConnecteTo(const QString& IP){
-    //return CPing::instance().Ping(IP.toStdString().c_str(), 500);
-
-//bool WindowUtils::isConnecteTo(const QString& IP){
-	//qDebug() << "kevin : isConnecteTo";
-    //return CPing::instance().Ping(IP.toStdString().c_str(), 500);
 
 bool WindowUtils::isConnecteTo(const QString& IP, int millSeconds){
     return CPing::instance().Ping(IP.toStdString().c_str(), millSeconds);
@@ -328,27 +302,11 @@ typedef struct arppkt
     u_char dip[4];//目的IP地址
 }arpp;
 
-void qDebugPrintdevs(pcap_if_t *alldevs)
-{
-	int index = 0;
-	for (pcap_if_t *d = alldevs; d != NULL; d = d->next) {
-		index++;
-		qDebug() << QString("kevin : index : %1 pcap_if_t name: %2 description : %3 >>>>>>>>>>>>>>>>>>>>").arg(index).arg(d->name)
-			.arg(d->description);
-		for (pcap_addr_t *a = d->addresses; a != NULL; a = a->next) {
-			if (a->addr->sa_family == AF_INET)
-				qDebug() << "pcap_addr_t" << inet_ntoa(((struct sockaddr_in*)a->addr)->sin_addr);
-		}
-		qDebug() << "kevin : <<<<<<<<<<<<<<<<<<";
-	}
-}
 
 #define  INNDER_SPECIAL_IP "170.151.24.203"
 
 bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
 {
-	qDebug() << QString("kevin :start getDirectDevice 1 arg: ip: %1 gate:%2").arg(ip).arg(netGate);
-
     ip.clear();
     struct tm * timeinfo;
     struct tm *ltime;
@@ -379,12 +337,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
         return false;
     }
 
-	//alldevs in linklist ,we need loop
-	{
-		qDebugPrintdevs(alldevs);
-	}
-
-    qDebug() << QString("kevin : pcap_open_live do description: %1, name:%2").arg(alldevs->description).arg(alldevs->name);
+    qDebug() << alldevs->description << alldevs->name;
 
     if ((adhandle = pcap_open_live(alldevs->name, 65536, 1, 1000, errbuf)) == NULL)
     {
@@ -423,7 +376,6 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
     QString specialIP;
     while (true)
     {
-		qDebug() << "kevin : arp loop for waitting packet";
         if (GetTickCount() - start > 30 * 1000)
         {
             qDebug() << "arp time out";
@@ -431,7 +383,6 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
         }
         //循环解析ARP数据包
         if (pcap_next_ex(adhandle, &header, &pkt_data) == 0){
-			qDebug() << "kevin : pcap_next_ex parse packet";
             continue;
         }
         arpp* arph = (arpp *)(pkt_data + 14);
@@ -513,7 +464,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
 }
 
 bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QString>& otherIPS, int secondsWait){
-	qDebug() << QString("kevin :start getDirectDevice 2 arg: ip: %1 gate:%2").arg(ip).arg(netGate);
+
     ip.clear();
     struct tm * timeinfo;
     struct tm *ltime;
@@ -533,25 +484,17 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     //当前所有可用的网络设备
     if (pcap_findalldevs(&alldevs, errbuf) == -1)
     {
-        //qDebug() << "Error in pcap_findalldevs:" << errbuf;
-        qDebug() << "kevin : Error in pcap_findalldevs:" << errbuf;
+        qDebug() << "Error in pcap_findalldevs:" << errbuf;
         return false;
     }
 
     if (!alldevs)
     {
-        //qDebug() << "cannot find net device!  install WinPcap?";
-        qDebug() << "kevin : cannot find net device!  install WinPcap?";
+        qDebug() << "cannot find net device!  install WinPcap?";
         return false;
     }
 
     qDebug() << alldevs->description << alldevs->name;
-
-	//QString uuid = GetNICUuidByHumanReadableName(QStringLiteral("本地连接"));
-	//QString pcap_name = ConvertNICUUIDtoPcapName(alldevs, uuid);
-	
-	//qDebug() << QString("kevin : alldevs->name :%1, uuid : %2").arg(pcap_name).arg(uuid);
-
 	QString uuid = GetNICUuidByHumanReadableName(WindowUtils::getLoacalNetName());
 	QString pcap_name = ConvertNICUUIDtoPcapName(alldevs, uuid);
 
@@ -559,20 +502,16 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
 
 	if ((adhandle = pcap_open_live(pcap_name.toStdString().data(), 65536, 1, 1000, errbuf)) == NULL)
     {
-        //qDebug() << "pcap_open_live failed!  not surpport by WinPcap ?" << alldevs->name;
         qDebug() << QString("kevin : pcap_open_live failed!  not surpport by WinPcap ? alldev->name : %1").arg(alldevs->name);
         pcap_freealldevs(alldevs);
         return false;
     }
 
     if (pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL) {
-        //qDebug() << "pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL";
         qDebug() << "kevin : pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL";
         return false;
     }
 
-	
-	qDebug() << QString("kevin : pcap_open_live do description: %1, name:%2").arg(alldevs->description).arg(alldevs->name);
 
     netmask = ((struct sockaddr_in *)(alldevs->addresses->netmask))->sin_addr.S_un.S_addr;
     pcap_freealldevs(alldevs);
@@ -581,16 +520,14 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     //编译过滤器，只捕获ARP包
     if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0)
     {
-        //qDebug() << "unable to compile the packet filter.Check the syntax.";
-        qDebug() << "kevin : unable to compile the packet filter.Check the syntax.";
+        qDebug() << "unable to compile the packet filter.Check the syntax.";
         return false;
     }
 
     //设置过滤器
     if (pcap_setfilter(adhandle, &fcode) < 0)
     {
-        //qDebug() << "Error setting the filter.";
-        qDebug() << "kevin : Error setting the filter.";
+        qDebug() << "Error setting the filter.";
         return false;
     }
     QString specialIP;
@@ -603,8 +540,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     {
         if (GetTickCount() - start > secondsWait * 1000)
         {
-            //qDebug() << "arp time out";
-            qDebug() << "kevin : arp time out";
+            qDebug() << "arp time out";
             break;
         }
         //循环解析ARP数据包
@@ -615,8 +551,6 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
         arpp* arph = (arpp *)(pkt_data + 14);
         if (arph->op == 256) //arp
         {
-			qDebug() << "kevin : arph->op == 256";
-
             if (arph->sip[0] == 0)
             {
                 continue;
@@ -628,7 +562,6 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
 
             QString source = QString("%1.%2.%3.%4").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]).arg(arph->sip[3]);
             QString destIP = QString("%1.%2.%3.%4").arg(arph->dip[0]).arg(arph->dip[1]).arg(arph->dip[2]).arg(arph->dip[3]);
-			qDebug() << QString("src: %1, dest: %2").arg(source).arg(destIP);
             if (IPs.end() != std::find(IPs.begin(), IPs.end(), source)){
                 continue;
             }
@@ -703,7 +636,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
             }
 
             ip = QString("%1.%2.%3.%4").arg(arph->sip[0]).arg(arph->sip[1]).arg(arph->sip[2]).arg(44);
-            qDebug() << "kevin : aarp" << source << dest;
+            qDebug() << "aarp" << source << dest;
            // break;
         }
 
@@ -712,12 +645,10 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     std::map<QString, std::set<QString>>::iterator itNetgate = mpDestSource.end();
     for (auto it = mpDestSource.begin(); it != mpDestSource.end(); it++)
     {
-		qDebug() << QString("kevin : who has ips : ").arg(it->first);
         if (it->second.size() > 1 &&
             (itNetgate == mpDestSource.end() || itNetgate->second.size() < it->second.size()))
         {
             itNetgate = it;
-			qDebug() << QString("kevin : who is the most %1").arg(it->first);
         }
     }
     if (itNetgate != mpDestSource.end())
@@ -756,11 +687,6 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     return !ip.isEmpty();
 }
 bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
-    //QString sName = QString::fromLocal8Bit("本地连接");
-
-	//QString sName = QStringLiteral("本地连接");
-	//qDebug() << QString("kevin setIPByDHCP ip:%1, mask:%2, gate%3").arg(ip).arg(mask).arg(netGate);
-
     QString sName = WindowUtils::getLoacalNetName();
     qDebug()<<__FILE__<<__FUNCTION__<<__LINE__<<sName;
 
@@ -768,7 +694,6 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
     std::vector<QString> ips;
     int maxPingTime = 1000 * 3;
     ::Sleep(2000);
-    //for (WindowUtils::getLocalIPs(sName, ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::getLocalIPs(sName, ips)){
 	for (WindowUtils::GetIPfromLocalNIC(ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::GetIPfromLocalNIC(ips)){
         ::Sleep(1000);
         maxPingTime -= 1000;
@@ -795,19 +720,15 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
             {
                 for (IP_ADDR_STRING *pIpAddrString = &(pIpAdapterInfo->IpAddressList);
                     pIpAddrString != NULL && (!r); pIpAddrString = pIpAddrString->Next){
-					//qDebug() << "kevin for loop IP_ADDR_STRING not null";
-					qDebug() << QString("kevin : ips : %1, pIpAddrString->IpAddress.String :%2").arg(*ips.begin()).arg(pIpAddrString->IpAddress.String);
                     if (*ips.begin() == pIpAddrString->IpAddress.String)
                     {
                         if (!WindowUtils::setNetConfig(sName, *ips.begin(), pIpAddrString->IpMask.String, pIpAdapterInfo->GatewayList.IpAddress.String, true))
                         {
-							qDebug() << "kevin setNetConfig failed!";
                             break;
                         }
                         ip = *ips.begin();
                         mask = pIpAddrString->IpMask.String;
                         netGate = pIpAdapterInfo->GatewayList.IpAddress.String;
-						qDebug() << QString("kevin : ip:%1, mask:%2, gate:%3").arg(ip).arg(mask).arg(netGate);
                         r = true;
                     }
 

@@ -83,26 +83,21 @@ void LogindDeviceDialog::ipConfigGuide(){
         {
 
             *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate);
-			qDebug() << QString("kevin : setIPByDHCP : bResult %1").arg(*bResult);
             if (*bpCancel)
             {
                 return;
             }
             if (!*bResult)
             {
-                //*bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate, msetIps);
                 *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
-				qDebug() << QString("kevin : getDirectDevice : bResult %1").arg(*bResult);
                 if (*bpCancel)
                 {
                     return;
                 }
                 if (*bResult)
                 {
-                    //if (!WindowUtils::setNetConfig(QStringLiteral("本地连接"), *pIP, "255.255.255.0", *pNetGate, true))
                     if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
                     {
-						qDebug() << QString("kevin : setNetConfig : failed").arg(*bResult);
                         *bResult = false;
                     }
                 }
