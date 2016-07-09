@@ -318,19 +318,17 @@ void MainWindow::onToolBtnclicked()
 
 void MainWindow::onScreenBtnclicked()
 {
+	QString ProgramDir("C:\\Program Files (x86)\\DV2008\\TC CARD\\");
+	QString AppName("TC CARD.exe");
+	QString workingDirectory(ProgramDir);
 
-	//QString ProgramDir("C:\\Program Files (x86)\\DV2008\\TC CARD\\");
-	//QString AppName("TC CARD.exe");
-	//QString workingDirectory(ProgramDir);
+	if (!QProcess::startDetached(ProgramDir + AppName, QStringList(), workingDirectory)){
+		//fixed the path if start cmd failed!
+		ProgramDir = "C:\\Program Files\\DV2008\\TC CARD\\";
+		QProcess::startDetached(ProgramDir + AppName, QStringList(), workingDirectory);
+	}
 
-	//if (!QProcess::startDetached(ProgramDir + AppName, QStringList(), workingDirectory)){
-	//	//fixed the path if start cmd failed!
-	//	ProgramDir = "C:\\Program Files\\DV2008\\TC CARD\\";
-	//	QProcess::startDetached(ProgramDir + AppName, QStringList(), workingDirectory);
-	//}
-
-    ShellExecuteA(GetDesktopWindow(), "open", "screenRecord\\ScreenCap.exe", NULL, NULL, SW_SHOWNORMAL);
-
+    //ShellExecuteA(GetDesktopWindow(), "open", "screenRecord\\ScreenCap.exe", NULL, NULL, SW_SHOWNORMAL);
 
 }
 

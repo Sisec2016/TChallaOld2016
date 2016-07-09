@@ -48,7 +48,7 @@ mLoaded(false)
 
     m_closeBtn2 = new QPushButton(this);
     m_closeBtn2->setObjectName(QString::fromUtf8("closeBtn"));
-	m_closeBtn2->setGeometry(QRect(1235, 4, 45, 45));
+	m_closeBtn2->setGeometry(QRect(1310, 4, 45, 45));
     QIcon icon2;
     icon2.addFile(QString::fromUtf8(":/images/close.png"), QSize(), QIcon::Normal, QIcon::Off);
     m_closeBtn2->setIcon(icon2);

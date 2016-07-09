@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>800</height>
+    <width>1366</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
     <rect>
      <x>30</x>
      <y>178</y>
-     <width>1231</width>
+     <width>1311</width>
      <height>571</height>
     </rect>
    </property>
@@ -38,7 +38,7 @@
     <rect>
      <x>30</x>
      <y>81</y>
-     <width>1231</width>
+     <width>1311</width>
      <height>91</height>
     </rect>
    </property>
@@ -247,7 +247,7 @@ border-image: url(:/VisitorSystem/png/down-hover.png);
    <widget class="QPushButton" name="pushButtonFind">
     <property name="geometry">
      <rect>
-      <x>990</x>
+      <x>1050</x>
       <y>30</y>
       <width>171</width>
       <height>41</height>

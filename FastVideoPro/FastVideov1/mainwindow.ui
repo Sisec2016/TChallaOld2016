@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>800</height>
+    <width>1366</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,8 +21,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
-     <height>800</height>
+     <width>1366</width>
+     <height>768</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -407,7 +407,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QPushButton" name="closeBtn">
     <property name="geometry">
      <rect>
-      <x>1230</x>
+      <x>1310</x>
       <y>10</y>
       <width>45</width>
       <height>45</height>
@@ -433,7 +433,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QPushButton" name="minBtn">
     <property name="geometry">
      <rect>
-      <x>1186</x>
+      <x>1266</x>
       <y>10</y>
       <width>45</width>
       <height>45</height>
@@ -459,7 +459,7 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QPushButton" name="moreBtn">
     <property name="geometry">
      <rect>
-      <x>1143</x>
+      <x>1223</x>
       <y>10</y>
       <width>45</width>
       <height>45</height>

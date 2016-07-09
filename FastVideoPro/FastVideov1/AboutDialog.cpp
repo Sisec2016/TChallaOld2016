@@ -16,7 +16,7 @@
 QString GetFileVersion()
 {
     QString version = Settings::getItem(KEY_CURVERSION);
-    if (QString(Verify::version()).startsWith(version) || QString(Verify::version()).length() > 8)
+    if (version.isEmpty())
     {
         version = Verify::version();
     }

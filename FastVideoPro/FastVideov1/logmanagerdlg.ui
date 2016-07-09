@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>800</height>
+    <width>1366</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>159</y>
-     <width>1251</width>
+     <width>1341</width>
      <height>601</height>
     </rect>
    </property>
@@ -192,7 +192,7 @@ margin-top:-1px;
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>386</x>
      <y>92</y>
      <width>76</width>
      <height>24</height>
@@ -210,7 +210,7 @@ margin-top:-1px;
   <widget class="QDateEdit" name="dateEdit2">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>467</x>
      <y>87</y>
      <width>150</width>
      <height>34</height>
@@ -262,7 +262,7 @@ QDateTimeEdit::drop-down{
   <widget class="QTimeEdit" name="timeEdit2">
    <property name="geometry">
     <rect>
-     <x>690</x>
+     <x>627</x>
      <y>87</y>
      <width>91</width>
      <height>34</height>
@@ -301,7 +301,7 @@ margin-top:-1px;
   <widget class="QPushButton" name="searchBtn">
    <property name="geometry">
     <rect>
-     <x>870</x>
+     <x>730</x>
      <y>86</y>
      <width>80</width>
      <height>35</height>
@@ -321,7 +321,7 @@ margin-top:-1px;
   <widget class="QPushButton" name="outputBtn">
    <property name="geometry">
     <rect>
-     <x>960</x>
+     <x>820</x>
      <y>86</y>
      <width>80</width>
      <height>35</height>
@@ -341,7 +341,7 @@ margin-top:-1px;
   <widget class="QPushButton" name="pastPage">
    <property name="geometry">
     <rect>
-     <x>1180</x>
+     <x>1269</x>
      <y>125</y>
      <width>35</width>
      <height>30</height>
@@ -358,7 +358,7 @@ margin-top:-1px;
   <widget class="QPushButton" name="nextPage">
    <property name="geometry">
     <rect>
-     <x>1218</x>
+     <x>1310</x>
      <y>125</y>
      <width>35</width>
      <height>30</height>
@@ -375,7 +375,7 @@ margin-top:-1px;
   <widget class="QLabel" name="PageLabel">
    <property name="geometry">
     <rect>
-     <x>1130</x>
+     <x>1219</x>
      <y>130</y>
      <width>51</width>
      <height>21</height>
@@ -388,7 +388,7 @@ margin-top:-1px;
   <widget class="QPushButton" name="taskLogBtn">
    <property name="geometry">
     <rect>
-     <x>870</x>
+     <x>1150</x>
      <y>10</y>
      <width>141</width>
      <height>35</height>

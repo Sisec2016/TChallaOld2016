@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>800</height>
+    <width>1366</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>649</x>
      <y>109</y>
-     <width>600</width>
+     <width>701</width>
      <height>651</height>
     </rect>
    </property>
@@ -26,7 +26,7 @@
   <widget class="QPushButton" name="deleteBtn">
    <property name="geometry">
     <rect>
-     <x>1160</x>
+     <x>1256</x>
      <y>68</y>
      <width>81</width>
      <height>35</height>
@@ -82,7 +82,7 @@
   <widget class="QPushButton" name="fileplayBtn">
    <property name="geometry">
     <rect>
-     <x>1074</x>
+     <x>1170</x>
      <y>68</y>
      <width>81</width>
      <height>35</height>
@@ -114,7 +114,7 @@
     <rect>
      <x>2</x>
      <y>90</y>
-     <width>1278</width>
+     <width>1351</width>
      <height>681</height>
     </rect>
    </property>

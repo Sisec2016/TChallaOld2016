@@ -96,10 +96,10 @@ MyBaseDialog::MyBaseDialog(QWidget *parent):QDialog(parent)
 			"background-color: rgb(175, 211, 237);"
 		"}"
 		));
-	this->setGeometry(QRect(0, 0, 1270, 798));
+	this->setGeometry(QRect(0, 0, 1364, 766));
     closeBtn = new QPushButton(this);
     closeBtn->setObjectName(QString::fromUtf8("closeBtn"));
-    closeBtn->setGeometry(QRect(1225, 4, 45, 45));
+    closeBtn->setGeometry(QRect(this->width() - 55, 4, 45, 45));
     QIcon icon;
     icon.addFile(QString::fromUtf8(":/images/close.png"), QSize(), QIcon::Normal, QIcon::Off);
     closeBtn->setIcon(icon);
@@ -126,7 +126,7 @@ MyBaseDialog::MyBaseDialog(QWidget *parent):QDialog(parent)
 
    title_label = new QLabel(this);
    title_label->setObjectName(QString::fromUtf8("title_label"));
-   title_label->setGeometry(QRect(this->width() /2 - 80, 5, 165, 40));
+   title_label->setGeometry(QRect(this->width() / 2 - 80, 5, 200, 40));
   // QFont font;
  //  font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
  // font.setPointSize(22);//ui setStyleSheet设置UI
