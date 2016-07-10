@@ -218,7 +218,7 @@ bool bluesky_videoserver::login(const char* IP, __int32 port, const char* user, 
 bool bluesky_videoserver::logout()
 {
     int iRet = 0;
-    if (m_lLoginHandle > 0 && (iRet = Api_BlueSky::Api().Logout((DvxHandle)m_lLoginHandle)) != DVX_OK)
+    if (m_lLoginHandle != 0 && (iRet = Api_BlueSky::Api().Logout((DvxHandle)m_lLoginHandle)) != DVX_OK)
     {
         m_sLastError = GetLastErrorString(iRet);
         return false;

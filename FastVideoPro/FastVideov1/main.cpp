@@ -216,6 +216,7 @@ int main(int argc, char *argv[])
         return 0;
 
     }
+
     QTranslator qt;
     if (qt.load("qt_zh_CN.qm", appDir))
     {

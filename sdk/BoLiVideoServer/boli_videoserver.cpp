@@ -219,7 +219,7 @@ IVideoServer* boli_videoserver::clone()
 
 bool boli_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
-    if (m_lLoginHandle > 0)
+    if (m_lLoginHandle >= 0)
     {
         logout();
     }

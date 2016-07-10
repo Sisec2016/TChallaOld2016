@@ -139,6 +139,15 @@ void initDb()
     User::createTable();
     return;
 }
+void closeDb()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("fast_video.db");
+    db.setUserName("fast_video");
+    db.setPassword("fast_video!@#");
+    db.close();
+    return;
+}
 
 void outputMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -261,6 +270,5 @@ int main(int argc, char *argv[])
         Verify::uninit();
     }
 	
-
 	return  -1;
 }

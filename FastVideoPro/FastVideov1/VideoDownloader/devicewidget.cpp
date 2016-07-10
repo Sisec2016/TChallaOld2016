@@ -600,7 +600,7 @@ void DeviceWidget::save(bool IncludeTasks)
     if (mpDownloadTask.get() != nullptr)
     {
         if (IncludeTasks)
-        {
+        {  
             mpDownloadTask->mLoginInfoID = mpLoginInfo->getLNId();
             mpDownloadTask->mState = DTK_STATE_DOWNLOADING;
             mpDownloadTask->save();

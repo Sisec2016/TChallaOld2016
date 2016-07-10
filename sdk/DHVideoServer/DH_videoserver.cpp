@@ -448,7 +448,7 @@ bool dh_videoserver::login(const char* IP, __int32 port, const char* user, const
 
 bool dh_videoserver::logout()
 {
-    if (m_lLoginHandle > 0 && !Api_DH::Api().m_pLogout(m_lLoginHandle))
+    if (m_lLoginHandle != 0 && !Api_DH::Api().m_pLogout(m_lLoginHandle))
     {
         m_sLastError = GetLastErrorString();
         return false;
