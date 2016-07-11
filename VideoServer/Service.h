@@ -31,6 +31,7 @@ RCF_BEGIN(VideoserverFactorySvr, "VideoserverFactorySvr")
 	RCF_METHOD_R1(std::string, defaultUser, int);
 	RCF_METHOD_R1(std::string, defaultPasswords, int);
     RCF_METHOD_R2(int, KeepServerRunning, int, int);
+	RCF_METHOD_R2(bool, searchDevice, int, VideoServer::DeviceInfoList&);
 RCF_END(VideoserverFactorySvr);
 
 RCF_BEGIN(VideoserverSvr, "VideoserverSvr")
