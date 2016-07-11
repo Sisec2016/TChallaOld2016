@@ -254,7 +254,7 @@ bool YyShiKejiVideoServer::login(const char* IP, __int32 port, const char* user,
 bool YyShiKejiVideoServer::logout()
 {
 
-    if (m_lLoginHandle >= 0 && !NETDEV_Logout((LPVOID)m_lLoginHandle))
+    if (m_lLoginHandle != NULL && !NETDEV_Logout((LPVOID)m_lLoginHandle))
     {
         m_sLastError = GetLastErrorString();
         hk_log.AddLog(std::string("logout failed:") + m_sLastError);

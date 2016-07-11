@@ -287,7 +287,7 @@ bool haik_videoserver::logout()
     return true;
     #endif
 
-    if (m_lLoginHandle >= 0 && !NET_DVR_Logout(m_lLoginHandle))
+    if (m_lLoginHandle != -1 && !NET_DVR_Logout(m_lLoginHandle))
     {
         m_sLastError = GetLastErrorString();
         hk_log.AddLog(std::string("logout failed:") + m_sLastError);

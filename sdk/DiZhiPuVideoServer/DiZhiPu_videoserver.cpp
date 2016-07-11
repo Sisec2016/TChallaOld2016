@@ -235,9 +235,10 @@ bool gzll_videoserver::login(const char* IP, __int32 port, const char* user,
 
 bool gzll_videoserver::logout()
 {    
-
-    if (m_lLoginHandle != 0 && !H264_DVR_Logout(m_lLoginHandle))
+    Log::instance().AddLog(std::string("logout "));
+    if (m_lLoginHandle > 0 && !H264_DVR_Logout(m_lLoginHandle))
     {
+        Log::instance().AddLog(std::string("H264_DVR_Logout logout error "));
         m_sLastError = GZLL_GetLastErrorString();
         return false;
     }

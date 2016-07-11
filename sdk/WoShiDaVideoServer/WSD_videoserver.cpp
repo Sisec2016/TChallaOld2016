@@ -354,7 +354,7 @@ bool WSD_videoserver::logout()
 	sprintf(addThis, "this:%d", this);
 	g_log.AddLog(string("WSD_videoserver::logout ") + addThis);
 
-    if (m_lLoginHandle > 0 && !Api_WSD::Api().ZLNET_Logout(m_lLoginHandle))
+    if (m_lLoginHandle != 0 && !Api_WSD::Api().ZLNET_Logout(m_lLoginHandle))
     {
         m_sLastError = GetLastErrorString();
         return false;

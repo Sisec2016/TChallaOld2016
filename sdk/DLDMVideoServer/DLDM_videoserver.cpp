@@ -249,7 +249,7 @@ bool DaLi_DM_videoserver::login(const char* IP, __int32 port, const char* user, 
 
 bool DaLi_DM_videoserver::logout()
 {
-    if (m_lLoginHandle >= 0 && !Api_DaLi_DM::Api().m_pLogout(m_lLoginHandle))
+    if (m_lLoginHandle != -1 && !Api_DaLi_DM::Api().m_pLogout(m_lLoginHandle))
     {
         m_sLastError = GetLastErrorString();
         return false;
@@ -264,7 +264,7 @@ bool DaLi_DM_videoserver::logout()
 bool DaLi_DM_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
                                                        __time64_t timeEnd)
 {
-    if (m_lLoginHandle < 0)
+    if (m_lLoginHandle == -1)
     {
 		m_sLastError = "ÇëÏÈµÇÂ¼!";
 		g_log.AddLog(string("GetRecordFileList ÇëÏÈµÇÂ¼"));
@@ -408,7 +408,7 @@ bool DaLi_DM_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 
 bool DaLi_DM_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
-    if (0 > m_lLoginHandle)
+    if (-1 == m_lLoginHandle)
     {
 		m_sLastError = "ÇëÏÈµÇÂ¼!";
 		g_log.AddLog(string("downLoadByRecordFile ÇëÏÈµÇÂ¼"));

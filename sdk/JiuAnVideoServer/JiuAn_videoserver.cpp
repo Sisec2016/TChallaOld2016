@@ -417,7 +417,7 @@ bool DVR_Logout(LONG lUserID)
 
 bool JiuAn_videoserver::logout()
 {
-    if (m_lLoginHandle >= 0 && !DVR_Logout(m_lLoginHandle))
+    if (m_lLoginHandle != -1 && !DVR_Logout(m_lLoginHandle))
     {
         m_sLastError = GetLastErrorString();
         return false;
