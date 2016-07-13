@@ -2,7 +2,7 @@
 ; 有关创建 Inno Setup 脚本文件的详细资料请查阅帮助文档！
 
 #define MyAppName "VideoDownLoad"
-#define MyAppVersion "v1.3.4.10.3(widescreen)"
+#define MyAppVersion "v1.3.4.10.4(widescreen)"
 #define MyAppPublisher "珠海经济特区远宏科技有限公司"
 #define MyAppURL "http://www.rmax.com/"
 #define MyAppExeName "FastVideo.exe"
