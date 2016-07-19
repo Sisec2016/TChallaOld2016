@@ -313,19 +313,19 @@ bool VideoServer::downLoadByRecordFile(const char* saveFileName, const RecordFil
         return false;
     }
 
-    DD_TIME start;
+	DD_TIME start = { 0 };
     ToNetTime(file.beginTime, start);
-    DD_TIME end;
+	DD_TIME end = { 0 };
     ToNetTime(file.endTime, end);
-    logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
+   
     hdl = (download_handle_t)NET_SDK_GetFileByTime(m_lLoginHandle, file.channel, &start, &end, (char *)saveFileName);
-    if (HANDLE_NULL == hdl)
-    {
-        m_sLastError = GetLastErrorString();
-        logFile.AddLog(std::string("NETDEV_GetFileByTime failed:") + m_sLastError + " 文件：" + saveFileName);
-        return false;
-    }
-    logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
+	if (HANDLE_NULL == hdl)
+	{
+		m_sLastError = GetLastErrorString();
+		logFile.AddLog(std::string("NETDEV_GetFileByTime failed:") + m_sLastError + " 文件：" + saveFileName);
+		return false;
+	}		
+    
     mMpDownloadRecords[hdl] = file;
     return true;
 }
@@ -431,6 +431,7 @@ bool VideoServer::stopDownload(download_handle_t h)
 bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed){
 
     int pos = NET_SDK_GetDownloadPos(h);
+	
     if (pos < 0 ||  pos > 100)
     {
         *failed = true;
@@ -442,16 +443,20 @@ bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int6
     RecordFile& file = mMpDownloadRecords[h];
     *currentSize = file.size * pos / 100;
     *totalSize = file.size;
+	
     if (mMpDownloadSize.find(h) == mMpDownloadSize.end() || mMpDownloadSize[h] < *currentSize)
     {
         mMpDownloadSize[h] = *currentSize;
     }
-    else{
+	///<<<<<<<delete by zhangyaofa 2016/7/19
+    /*else{		
         mMpDownloadSize[h] += BYTE_ONE_SECONDS * 2;
-        *currentSize = mMpDownloadSize[h];
-    }
+        *currentSize = mMpDownloadSize[h];		
+    }*/
+	///>>>>>>>delete end
+	
     if (pos == 100)
-    {
+    {		
         mMpDownloadRecords.erase(h);
         mMpDownloadSize.erase(h);
     }
