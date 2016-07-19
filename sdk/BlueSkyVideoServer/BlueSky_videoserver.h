@@ -5,9 +5,10 @@
 #include <string>
 #include <map>
 #include <mutex>
+#include "dvxPlayer.h"
 using std::map;
 using std::string;
-#include "Api_BlueSky.h"
+
 
 class CFactoryBlueSky : public IVideoServerFactory
 {

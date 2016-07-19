@@ -3,6 +3,8 @@
 #include <time.h>
 #include <io.h>
 #include "../../VideoServer/log.h"
+#include "dvxSdk.h"
+#include "dvxSdkType.h"
 
 IVideoServerFactory* VideoServerFactory()
 {
@@ -70,7 +72,7 @@ bool CFactoryBlueSky::init()
 {
     if (!m_init)
     {
-        int iRet = Api_BlueSky::Api().Init();
+        int iRet = dvxSdkInit();
 		m_init = (iRet == 0);
         //NET_DVR_SetConnectTime(1000, 30);
         //NET_DVR_SetReconnect(3000);
@@ -90,7 +92,7 @@ bool CFactoryBlueSky::init()
 
 void CFactoryBlueSky::clean()
 {
-    Api_BlueSky::Api().Uninit();
+    dvxSdkDeInit();
 }
 
 
@@ -163,7 +165,7 @@ bool bluesky_videoserver::login(const char* IP, __int32 port, const char* user, 
 //    }
 
 	DvxHandle hHandle = 0;
-	int iRet = Api_BlueSky::Api().Login(IP, port, 3720,
+    int iRet = dvxCreate(IP, port, 3720,
                                    user, password,
                                    &hHandle);
     if (iRet != 0 || hHandle == 0)
@@ -178,7 +180,7 @@ bool bluesky_videoserver::login(const char* IP, __int32 port, const char* user, 
 	char szName[16];
 	NvrGetExistChannels stChannels;
 	ZeroMemory(&stChannels, sizeof(stChannels));
-	iRet = Api_BlueSky::Api().GetChannel((DvxHandle)m_lLoginHandle, &stChannels);
+    iRet = dvxAVExistChannelsGet((DvxHandle)m_lLoginHandle, &stChannels);
     Log::instance().AddLog(QString("stChannels.counts:%1").arg(stChannels.counts));
     if (stChannels.counts > 0)
 	{
@@ -218,7 +220,7 @@ bool bluesky_videoserver::login(const char* IP, __int32 port, const char* user, 
 bool bluesky_videoserver::logout()
 {
     int iRet = 0;
-    if (m_lLoginHandle != 0 && (iRet = Api_BlueSky::Api().Logout((DvxHandle)m_lLoginHandle)) != DVX_OK)
+    if (m_lLoginHandle != 0 && (iRet = dvxLogout((DvxHandle)m_lLoginHandle)) != DVX_OK)
     {
         m_sLastError = GetLastErrorString(iRet);
         return false;
@@ -259,7 +261,7 @@ bool bluesky_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 		Log::instance().AddLog(string(szLog));
 
 		int iCount = 0;
-		ArchEventATMOpts opts;
+		ArchEventOpts opts;
 		ZeroMemory(&opts, sizeof(opts));
 		//通道号
 		{
@@ -292,7 +294,7 @@ bool bluesky_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 		}
 		opts.count = iCount;
 		unsigned int m_iTotal = 0;
-		int iRet = Api_BlueSky::Api().EventOpen((DvxHandle)m_lLoginHandle, &opts, &m_iTotal, 5 * 1000);
+        int iRet = dvxEventOpen((DvxHandle)m_lLoginHandle, &opts, &m_iTotal, 5 * 1000);
 		if (iRet != 0)
 		{
             m_sLastError = GetLastErrorString(iRet);
@@ -303,20 +305,23 @@ bool bluesky_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 		if (m_iTotal <= 0)
 		{
 			Log::instance().AddLog(string("GetRecordFileList 查询录像成功，录像个数为0"));
+            dvxEventClose((DvxHandle)m_lLoginHandle);
 			continue;
 		}
 		FetchResult fr;
 		ZeroMemory(&fr, sizeof(fr));
-		iRet = Api_BlueSky::Api().EventFetch((DvxHandle)m_lLoginHandle, 0, PAGE_SIZE, &fr);
+        iRet = dvxEventFetch((DvxHandle)m_lLoginHandle, 0, PAGE_SIZE, &fr);
 		if (iRet != DVX_OK)
 		{
             m_sLastError = GetLastErrorString(iRet);
 			Log::instance().AddLog(string("GetRecordFileList 01 查询录像失败，错误原因：") + m_sLastError);
+            dvxEventClose((DvxHandle)m_lLoginHandle);
 			continue;
 		}
 		if (fr.total <= 0)
 		{
 			Log::instance().AddLog(string("GetRecordFileList 01 查询录像成功，录像个数为0"));
+            dvxEventClose((DvxHandle)m_lLoginHandle);
 			continue;
 		}
 		{
@@ -351,6 +356,7 @@ bool bluesky_videoserver::GetRecordFileList(std::vector<RecordFile>& files, cons
 				Log::instance().AddLog(string(szLog));
 			}
 		}
+        dvxEventClose((DvxHandle)m_lLoginHandle);
 	}
 	return true;
 }
@@ -382,19 +388,19 @@ bool bluesky_videoserver::downLoadByRecordFile(const char* saveFileName, const R
 	downParam.bSaveAI = FALSE;
 
 	DumpHandle hDump = 0;
-	int iRet = Api_BlueSky::Api().DownloadByFile((DvxHandle)m_lLoginHandle, &downParam, saveFileName, NULL, 0, &hDump, false);
+    int iRet = dvxRecordDumpOpen((DvxHandle)m_lLoginHandle, &downParam, saveFileName, NULL, 0, &hDump, false);
     if (iRet != DVX_OK)
 	{
         m_sLastError = GetLastErrorString(iRet);
-		Log::instance().AddLog(string("downLoadByRecordFile 下载录像失败，错误原因：") + m_sLastError);
+		//Log::instance().AddLog(string("downLoadByRecordFile 下载录像失败，错误原因：") + m_sLastError);
 		return false;
 	}
-	iRet = Api_BlueSky::Api().DownloadStart((DumpHandle)hDump);
+    iRet = dvxRecordDumpStart((DumpHandle)hDump);
     if (iRet != DVX_OK)
 	{
-		Api_BlueSky::Api().DownloadClose((DumpHandle)hDump);
+        dvxRecordDumpClose((DumpHandle)hDump);
         m_sLastError = GetLastErrorString(iRet);
-		Log::instance().AddLog(string("downLoadByRecordFile 01 下载录像失败，错误原因：") + m_sLastError);
+		//Log::instance().AddLog(string("downLoadByRecordFile 01 下载录像失败，错误原因：") + m_sLastError);
 		return false;
 	}
 	hdl = (download_handle_t)hDump;
@@ -427,17 +433,17 @@ bool  bluesky_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwn
 	Param.byteRate = 10 * 1024 * 1024; // 10MB
 
 	PlayHandle hDump = 0;
-	int iRet = Api_BlueSky::Api().PlayBackOpen((DvxHandle)m_lLoginHandle, &Param, hwnd, NULL, 0, &hDump);
+    int iRet = dvxRecordOpen((DvxHandle)m_lLoginHandle, &Param, hwnd, NULL, 0, &hDump);
 	if (iRet != 0 || hDump == 0)
 	{
         m_sLastError = GetLastErrorString(iRet);
 		Log::instance().AddLog(string("PlayBackByRecordFile 播放录像失败，错误原因：") + m_sLastError);
 		return false;
 	}
-	iRet = Api_BlueSky::Api().PlayBackStart((PlayHandle)hDump);
+    iRet = dvxRecordPlay((PlayHandle)hDump);
     if (iRet != DVX_OK)
 	{
-		Api_BlueSky::Api().PlayBackClose((PlayHandle)hDump);
+        dvxRecordClose((PlayHandle)hDump);
         m_sLastError = GetLastErrorString(iRet);
 		Log::instance().AddLog(string("PlayBackByRecordFile 01 播放录像失败，错误原因：") + m_sLastError);
 		return false;
@@ -457,14 +463,14 @@ bool bluesky_videoserver::SetPlayBack(__int64 playbackHandle, __int32 pos)
 
     __int64 msBegin = 0;
     __int64 msEnd = 0;
-    int nRet = Api_BlueSky::Api().RecordGetTime((PlayHandle)playbackHandle, &msBegin, &msEnd);
+    int nRet = dvxRecordGetTime((PlayHandle)playbackHandle, &msBegin, &msEnd);
     if (DVX_OK != nRet || msBegin >= msEnd)
     {
         m_sLastError = GetLastErrorString(nRet);
         return false;
     }
 
-    nRet = Api_BlueSky::Api().PlayBackSetPos((PlayHandle)playbackHandle, msBegin + (msEnd - msBegin) * pos / 100);
+    nRet = dvxRecordSeek((PlayHandle)playbackHandle, msBegin + (msEnd - msBegin) * pos / 100);
     if (DVX_OK != nRet)
     {
         m_sLastError = GetLastErrorString(nRet);
@@ -476,7 +482,7 @@ bool bluesky_videoserver::SetPlayBack(__int64 playbackHandle, __int32 pos)
 
 bool bluesky_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 {
-    if (0 >= m_lLoginHandle)
+    if (0 != m_lLoginHandle)
     {
 		m_sLastError = "请先登录";
 		Log::instance().AddLog(string("StopPlayBack 请先登录"));
@@ -485,7 +491,7 @@ bool bluesky_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 	if (mPause == 1)
 	{
 		Log::instance().AddLog(string("StopPlayBack 开始暂停播放"));
-		if (int iRet = Api_BlueSky::Api().PlayBackPause((PlayHandle)playbackHandle))
+        if (int iRet = dvxRecordPause((PlayHandle)playbackHandle))
 		{
             m_sLastError = GetLastErrorString(iRet);
 			Log::instance().AddLog(string("StopPlayBack 暂停播放失败，错误原因：") + m_sLastError);
@@ -494,20 +500,13 @@ bool bluesky_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 	}
 	else
 	{
-		char szLog[1024];
-		ZeroMemory(szLog, 1024);
-		sprintf(szLog, "StopPlayBack 开始停止播放 playbackHandle:%d", playbackHandle);
-		//Log::instance().AddLog(string("StopPlayBack ??????"));
-		Log::instance().AddLog(string(szLog));
-
-		if (int iRet = Api_BlueSky::Api().PlayBackStop((PlayHandle)playbackHandle))
+        if (int iRet = dvxRecordStop((PlayHandle)playbackHandle))
 		{
             m_sLastError = GetLastErrorString(iRet);
 			Log::instance().AddLog(string("StopPlayBack 停止播放失败，错误原因：") + m_sLastError);
-			return false;
 		}
-		PlayHandle hTmp = (PlayHandle)playbackHandle;
-		Api_BlueSky::Api().PlayBackClose(hTmp);
+        PlayHandle h = (PlayHandle)playbackHandle;
+        dvxRecordClose(h);
 		playbackHandle = 0;
 	}
 
@@ -517,14 +516,13 @@ bool bluesky_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 bool bluesky_videoserver::stopDownload(download_handle_t h)
 {
 	Log::instance().AddLog(string("stopDownload 开始停止下载"));
-    if (int iRet = Api_BlueSky::Api().DownloadStop((DumpHandle)h))
+    if (int iRet = dvxRecordDumpStop((DumpHandle)h))
     {
         m_sLastError = GetLastErrorString(iRet);
 		Log::instance().AddLog(string("stopDownload 停止下载失败，错误原因：") + m_sLastError);
-        return false;
     }
 	DumpHandle hTmp = (DumpHandle)h;
-	Api_BlueSky::Api().DownloadClose(hTmp);
+    dvxRecordDumpClose(hTmp);
     std::lock_guard<std::recursive_mutex> lock(m_mtxPos);
     mDownloadFiles.erase(h);
     return true;
@@ -587,7 +585,7 @@ bool bluesky_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize
     std::map<long long, RecordFile>::iterator itr = mDownloadFiles.find(h);
     if (itr != mDownloadFiles.end())
 	{
-        int iRet = Api_BlueSky::Api().DownloadPos((DumpHandle)h, currentSize);
+        int iRet = dvxRecordDumpPos((DumpHandle)h, currentSize);
 		if (iRet != 0)
 		{
             m_sLastError = GetLastErrorString(iRet);
@@ -595,7 +593,7 @@ bool bluesky_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize
 			return false;
 		}
         else{
-            Log::instance().AddLog(QString("download:%1, size:%2, total:%3").arg(h).arg(*currentSize).arg(itr->second.size));
+           // Log::instance().AddLog(QString("download:%1, size:%2, total:%3").arg(h).arg(*currentSize).arg(itr->second.size));
         }
         *totalSize = itr->second.size;
         *failed = false;

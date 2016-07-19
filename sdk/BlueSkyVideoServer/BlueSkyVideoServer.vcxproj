@@ -76,7 +76,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libboost_log_setup-vc120-mt-1_57.lib;libboost_log-vc120-mt-1_57.lib;libboost_system-vc120-mt-1_57.lib;libboost_date_time-vc120-mt-1_57.lib;libboost_chrono-vc120-mt-1_57.lib;libboost_filesystem-vc120-mt-1_57.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Core.lib</AdditionalDependencies>
+      <AdditionalDependencies>dvxSdk.lib;libboost_log_setup-vc120-mt-1_57.lib;libboost_log-vc120-mt-1_57.lib;libboost_system-vc120-mt-1_57.lib;libboost_date_time-vc120-mt-1_57.lib;libboost_chrono-vc120-mt-1_57.lib;libboost_filesystem-vc120-mt-1_57.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Core.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>sdk;$(QTDIR)\lib;$(SolutionDir)lib;$(SolutionDir)lib\boostlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -138,19 +138,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\VideoServer\log.cpp" />
-    <ClCompile Include="Api_BlueSky.cpp" />
     <ClCompile Include="BlueSky_videoserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\VideoServer\log.h" />
-    <ClInclude Include="Api_BlueSky.h" />
     <ClInclude Include="BlueSky_videoserver.h" />
+    <ClInclude Include="sdk\dvxSdk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="QTDIR" />
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="5.3" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

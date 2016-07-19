@@ -437,6 +437,7 @@ bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int6
         logFile.AddLog(std::string("NET_SDK_GetDownloadPos failed:") + m_sLastError);
         return true;
     }
+    //logFile.AddLog(QString("getDownloadPos  %1").arg(pos));
     *failed = false;
     std::lock_guard<std::recursive_mutex> lock(mDowloadMutex);
     RecordFile& file = mMpDownloadRecords[h];
@@ -447,7 +448,13 @@ bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int6
         mMpDownloadSize[h] = *currentSize;
     }
     else{
-        mMpDownloadSize[h] += BYTE_ONE_SECONDS * 2;
+        if (pos == 99){
+            mMpDownloadSize[h]++;
+        }
+        else{
+            mMpDownloadSize[h] += 20;
+        }
+
         *currentSize = mMpDownloadSize[h];
     }
     if (pos == 100)
