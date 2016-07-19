@@ -448,7 +448,7 @@ bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int6
         mMpDownloadSize[h] = *currentSize;
     }
     else{
-        if (pos == 99){
+        if (mMpDownloadSize[h] * 100 / file.size >= 95){
             mMpDownloadSize[h]++;
         }
         else{
