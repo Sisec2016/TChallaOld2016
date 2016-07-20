@@ -313,19 +313,19 @@ bool VideoServer::downLoadByRecordFile(const char* saveFileName, const RecordFil
         return false;
     }
 
-	DD_TIME start = { 0 };
+    DD_TIME start;
     ToNetTime(file.beginTime, start);
-	DD_TIME end = { 0 };
+    DD_TIME end;
     ToNetTime(file.endTime, end);
-   
+    logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
     hdl = (download_handle_t)NET_SDK_GetFileByTime(m_lLoginHandle, file.channel, &start, &end, (char *)saveFileName);
-	if (HANDLE_NULL == hdl)
-	{
-		m_sLastError = GetLastErrorString();
-		logFile.AddLog(std::string("NETDEV_GetFileByTime failed:") + m_sLastError + " 文件：" + saveFileName);
-		return false;
-	}		
-    
+    if (HANDLE_NULL == hdl)
+    {
+        m_sLastError = GetLastErrorString();
+        logFile.AddLog(std::string("NETDEV_GetFileByTime failed:") + m_sLastError + " 文件：" + saveFileName);
+        return false;
+    }
+    logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
     mMpDownloadRecords[hdl] = file;
     return true;
 }
@@ -431,32 +431,34 @@ bool VideoServer::stopDownload(download_handle_t h)
 bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed){
 
     int pos = NET_SDK_GetDownloadPos(h);
-	
     if (pos < 0 ||  pos > 100)
     {
         *failed = true;
         logFile.AddLog(std::string("NET_SDK_GetDownloadPos failed:") + m_sLastError);
         return true;
     }
+    //logFile.AddLog(QString("getDownloadPos  %1").arg(pos));
     *failed = false;
     std::lock_guard<std::recursive_mutex> lock(mDowloadMutex);
     RecordFile& file = mMpDownloadRecords[h];
     *currentSize = file.size * pos / 100;
     *totalSize = file.size;
-	
     if (mMpDownloadSize.find(h) == mMpDownloadSize.end() || mMpDownloadSize[h] < *currentSize)
     {
         mMpDownloadSize[h] = *currentSize;
     }
-	///<<<<<<<delete by zhangyaofa 2016/7/19
-    /*else{		
-        mMpDownloadSize[h] += BYTE_ONE_SECONDS * 2;
-        *currentSize = mMpDownloadSize[h];		
-    }*/
-	///>>>>>>>delete end
-	
+    else{
+        if (mMpDownloadSize[h] * 100 / file.size >= 95){
+            mMpDownloadSize[h]++;
+        }
+        else{
+            mMpDownloadSize[h] += 20;
+        }
+
+        *currentSize = mMpDownloadSize[h];
+    }
     if (pos == 100)
-    {		
+    {
         mMpDownloadRecords.erase(h);
         mMpDownloadSize.erase(h);
     }

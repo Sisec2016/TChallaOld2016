@@ -1,16 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Api_BlueSky.cpp" />
     <ClCompile Include="BlueSky_videoserver.cpp" />
     <ClCompile Include="..\..\VideoServer\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Api_BlueSky.h" />
     <ClInclude Include="BlueSky_videoserver.h" />
     <ClInclude Include="..\..\VideoServer\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\dvxSdk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
