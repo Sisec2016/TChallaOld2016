@@ -42,6 +42,7 @@ RD /S /Q FastVideoPro\FastVideov1\VideoDownloader\release
 RD /S /Q FastVideoPro\FastVideov1\VideoDownloader\GeneratedFiles
 RD /S /Q FastVideoPro\FastVideov1\VideoDownloader\Win32
 
+RD /S /Q sdk\BaoXinShengVideoServer\release
 RD /S /Q sdk\BlueSkyVideoServer\release
 RD /S /Q sdk\BoLiVideoServer\release
 RD /S /Q sdk\DHVideoServer\release
@@ -62,6 +63,7 @@ RD /S /Q sdk\XingWangVideoServer\release
 RD /S /Q sdk\YyShiKejiVideoServer\release
 RD /S /Q sdk\ZhongWeiVideoServer\release
 
+RD /S /Q sdk\BaoXinShengVideoServer\debug
 RD /S /Q sdk\BlueSkyVideoServer\debug
 RD /S /Q sdk\BoLiVideoServer\debug
 RD /S /Q sdk\DHVideoServer\debug
@@ -82,6 +84,7 @@ RD /S /Q sdk\XingWangVideoServer\debug
 RD /S /Q sdk\YyShiKejiVideoServer\debug
 RD /S /Q sdk\ZhongWeiVideoServer\debug
 
+RD /S /Q sdk\BaoXinShengVideoServer\win32\
 RD /S /Q sdk\BlueSkyVideoServer\Win32\
 RD /S /Q sdk\BoLiVideoServer\Win32\
 RD /S /Q sdk\DHVideoServer\Win32\
