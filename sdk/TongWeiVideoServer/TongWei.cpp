@@ -164,7 +164,7 @@ IVideoServer* VideoServer::clone()
 
 bool VideoServer::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
-
+	logout();
 	channels.clear();
     memset(&m_deviceInfo, 0, sizeof(m_deviceInfo));
     m_lLoginHandle = (long)NET_SDK_Login((char*)IP, port,
