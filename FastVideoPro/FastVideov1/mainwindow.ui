@@ -391,9 +391,9 @@ QToolButton:pressed{background-image: url(:/images/tool_pressed.png);}</string>
    <widget class="QLabel" name="logo">
     <property name="geometry">
      <rect>
-      <x>404</x>
+      <x>254</x>
       <y>8</y>
-      <width>241</width>
+      <width>511</width>
       <height>241</height>
      </rect>
     </property>

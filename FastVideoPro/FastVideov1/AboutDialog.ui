@@ -48,7 +48,7 @@
     <rect>
      <x>200</x>
      <y>55</y>
-     <width>101</width>
+     <width>281</width>
      <height>31</height>
     </rect>
    </property>
@@ -66,7 +66,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>版权所有 © 深圳市龙脉安信软件技术有限公司 2015-2016</string>
+    <string>版权所有  © 2015 - 2016 珠海经济特区远宏科技有限公司</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -79,7 +79,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Shenzhen Information Security CO.,LTD</string>
+    <string>Copyright © 2015 - 2016 EHONG Technology Co.,Ltd.</string>
    </property>
   </widget>
  </widget>
