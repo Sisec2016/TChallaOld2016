@@ -158,12 +158,13 @@ VideoServer::~VideoServer()
 
 IVideoServer* VideoServer::clone()
 {
-    VideoServer *svr = new VideoServer();
-    return svr;
+    //VideoServer *svr = new VideoServer();
+    return NULL;
 }
 
 bool VideoServer::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
+    logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
     logout();
 	channels.clear();
     memset(&m_deviceInfo, 0, sizeof(m_deviceInfo));
@@ -194,6 +195,8 @@ bool VideoServer::logout()
         return false;
     }
     else {
+        mMpDownloadRecords.clear();
+        mMpDownloadSize.clear();
         m_lLoginHandle = HANDLE_NULL;
         logFile.AddLog(std::string("VideoServerlogout ok!"));
     }
@@ -297,6 +300,19 @@ bool VideoServer::GetRecordFileList(std::vector<RecordFile>& files, const std::v
    return true;
 }
 
+void addLog(const char* sLog, int nLine)
+{
+
+    logFile.AddLog(QString("%1 %2").arg(nLine).arg(sLog));
+}
+
+LONG sheNET_SDK_GetFileByTime(LONG lUserID, LONG lChannel, DD_TIME * lpStartTime, DD_TIME * lpStopTime, char *sSavedFileName){
+    long hdl = HANDLE_NULL;
+    SHE_BEGING
+        hdl = (download_handle_t)NET_SDK_GetFileByTime(lUserID, lChannel, lpStartTime, lpStopTime, sSavedFileName);
+    return hdl;
+    SHE_END_RETURN(hdl)
+}
 
 bool VideoServer::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
@@ -317,16 +333,19 @@ bool VideoServer::downLoadByRecordFile(const char* saveFileName, const RecordFil
     ToNetTime(file.beginTime, start);
     DD_TIME end;
     ToNetTime(file.endTime, end);
-    logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
-    hdl = (download_handle_t)NET_SDK_GetFileByTime(m_lLoginHandle, file.channel, &start, &end, (char *)saveFileName);
+    char sPath[MAX_PATH] = {0};
+    strcpy_s(sPath, saveFileName);
+    hdl = (download_handle_t)sheNET_SDK_GetFileByTime(m_lLoginHandle, file.channel, &start, &end, sPath);
     if (HANDLE_NULL == hdl)
     {
         m_sLastError = GetLastErrorString();
         logFile.AddLog(std::string("NETDEV_GetFileByTime failed:") + m_sLastError + " ÎÄ¼þ£º" + saveFileName);
         return false;
     }
+
     logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
     mMpDownloadRecords[hdl] = file;
+    mMpDownloadSize[hdl] = 0;
     return true;
 }
 
@@ -429,7 +448,7 @@ bool VideoServer::stopDownload(download_handle_t h)
 
 
 bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed){
-
+    //logFile.AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
     int pos = NET_SDK_GetDownloadPos(h);
     if (pos < 0 ||  pos > 100)
     {
@@ -448,11 +467,11 @@ bool VideoServer::getDownloadPos(download_handle_t h, __int64* totalSize, __int6
         mMpDownloadSize[h] = *currentSize;
     }
     else{
-        if (mMpDownloadSize[h] * 100 / file.size >= 95){
+        if (mMpDownloadSize[h] * 100 / file.size >= 99){
             mMpDownloadSize[h]++;
         }
         else{
-            mMpDownloadSize[h] += 20;
+            mMpDownloadSize[h] += BYTE_ONE_SECONDS;
         }
 
         *currentSize = mMpDownloadSize[h];

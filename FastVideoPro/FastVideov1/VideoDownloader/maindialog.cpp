@@ -349,11 +349,18 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<pRecordFile_t> >
             auto timeEnd = getGPSEndDateTime_time();
             timeString = QString("%1-%2_%3-%4").arg(timeBeg.toString("yyMMdd")).arg(timeEnd.toString("yyMMdd")).arg(timeBeg.toString("HHmm")).arg(timeEnd.toString("HHmm"));
         }
-
-        pDownloadTask->setFilePath(pDevice->getSaveDirName() + "/" + timeString);
         pDownloadTask->setName(QString("%1(%2)").arg(pDevice->getLoginInfo()->name).arg(timeString));
         TaskLogRecordDialog taskLogRecordDlg(pDownloadTask->getName(), pDevice->getLoginInfo()->ip);
         taskLogRecordDlg.exec();
+        QString sCaseDir = taskLogRecordDlg.caseDir();
+        if (!sCaseDir.isEmpty())
+        {
+            pDownloadTask->setFilePath(pDevice->getSaveDirName() + "/" + sCaseDir + "/" + timeString);
+        }
+        else{
+            pDownloadTask->setFilePath(pDevice->getSaveDirName() + "/" + timeString);
+        }
+        
         CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在加载下载通道中..."), [=]()
         {
             qDebug() << __FILE__ << __FUNCTION__ << __LINE__;

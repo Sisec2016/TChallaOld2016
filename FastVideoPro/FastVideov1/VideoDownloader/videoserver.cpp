@@ -1085,8 +1085,8 @@ bool videoserver::GetRecordFileListZone(std::vector<RecordFile>& files, /*int nC
 
     return true;
 }
-#define SLEEP_MILLISECONDE                      500
-#define DISCONNECT_TIME                         1
+#define SLEEP_MILLISECONDE                      2000
+#define DISCONNECT_TIME                         4
 #define CONNECTD_TIME                           20
 bool videoserver::downLoad(const QString& saveFileName, const RecordFile& file, QObject* eventReceiver)
 {
@@ -1114,24 +1114,23 @@ bool videoserver::downLoad(const QString& saveFileName, const RecordFile& file, 
                 mpThrDowload = new std::thread([&](videoserver* pThis)
                 {
                     int mTimes = 0;
-                    int totalTime = 20;
-                    bool isconnect = false;
+                    int totalTime = CONNECTD_TIME;
+                    bool isconnect = true;
                     qint64  totalSize = 0;
                     qint64 currentSize = 0;
                     bool failed = false;
 
                     while (!mStop)
                     {
-                        mTimes = mTimes + 2;
-                        
+                       
                         if (mTimes >= totalTime)
                         {
                             isconnect = WindowUtils::isConnecteTo(pThis->ip(), 3000);
                             if (!isconnect)
                             {
-                                //Log::instance().AddLog(QString("################### 05"));
+                                Log::instance().AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
                                 DealDisconnectCallback();
-                                //Log::instance().AddLog(QString("################### 06"));
+                                Log::instance().AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
                                 totalTime = DISCONNECT_TIME;
                             }
                             else if (totalTime == DISCONNECT_TIME)
@@ -1144,8 +1143,13 @@ bool videoserver::downLoad(const QString& saveFileName, const RecordFile& file, 
                             }
                             mTimes = 0;
                         }
+                        else{
+                            QThread::msleep(SLEEP_MILLISECONDE);
+                            mTimes++;
+                        }
                         if (!isconnect)
                         {
+                            //Log::instance().AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
                             continue;
                         }
                          std::lock_guard<std::recursive_mutex> locker(mMutexEventRecievers);
@@ -1154,8 +1158,10 @@ bool videoserver::downLoad(const QString& saveFileName, const RecordFile& file, 
                          {
 							 std::map<download_handle_t, QObject*>::iterator itTmp = it;
 							 it++;
+                             Log::instance().AddLog(QString("%1 %2 %3").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__));
 							 if (pThis->mpServer->getDownloadPos(itTmp->first, &totalSize, &currentSize, &failed))
                              {
+                                 totalTime = CONNECTD_TIME;
 								 DealDownLoadCallback(itTmp->first, totalSize, currentSize, failed);
                              }
                              else
