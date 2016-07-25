@@ -18,13 +18,14 @@ class TaskLogRecordDialog : public MyBaseDialog {
 public:
     TaskLogRecordDialog(const QString& taskName, const QString& deviceIP, QWidget *parent = 0);
     ~TaskLogRecordDialog();
-
+    QString caseDir();
 protected slots:
     void onOkBtn();
 signals:
 
 protected:
     TaskLog mTaskLog;
+    QString mCaseDir;
 private:
     Ui::TaskLogRecordDialog *ui;
 };

@@ -28,8 +28,12 @@ TaskLogRecordDialog::TaskLogRecordDialog(const QString& taskName, const QString&
     ui->lineEdit_tasktime->setText(QDateTime::currentDateTime().toString(SQL_UTIL_TIME_FORMAT));
     ui->lineEdit_tasktime->setEnabled(false);
     ui->lineEdit_taskDeviceIP->setText(deviceIP);
-
-
+    ui->comboBox_taskDir->addItem(QStringLiteral("案件一"));
+    ui->comboBox_taskDir->addItem(QStringLiteral("案件二"));
+    ui->comboBox_taskDir->addItem(QStringLiteral("案件三"));
+    ui->comboBox_taskDir->addItem(QStringLiteral("案件四"));
+    ui->comboBox_taskDir->addItem(QStringLiteral("案件五"));
+    ui->comboBox_taskDir->setCurrentText("");
 	connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(onOkBtn()));
 
 }
@@ -38,7 +42,9 @@ TaskLogRecordDialog::~TaskLogRecordDialog()
 {
     delete ui;
 }
-
+QString TaskLogRecordDialog::caseDir(){
+    return ui->comboBox_taskDir->currentText();
+}
 void TaskLogRecordDialog::onOkBtn()
 {
     mTaskLog.mName = ui->lineEdit_taskName->text();

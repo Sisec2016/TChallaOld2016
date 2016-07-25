@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>812</width>
+    <width>791</width>
     <height>521</height>
    </rect>
   </property>
@@ -43,21 +43,11 @@
     <string>案件名称：</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_taskName">
-   <property name="geometry">
-    <rect>
-     <x>161</x>
-     <y>40</y>
-     <width>598</width>
-     <height>31</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_taskCollectMan">
    <property name="geometry">
     <rect>
-     <x>161</x>
-     <y>201</y>
+     <x>160</x>
+     <y>240</y>
      <width>598</width>
      <height>31</height>
     </rect>
@@ -66,8 +56,8 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>201</y>
+     <x>20</x>
+     <y>240</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -79,8 +69,8 @@
   <widget class="QLineEdit" name="lineEdit_taskAddress">
    <property name="geometry">
     <rect>
-     <x>161</x>
-     <y>150</y>
+     <x>160</x>
+     <y>189</y>
      <width>598</width>
      <height>31</height>
     </rect>
@@ -92,8 +82,8 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>150</y>
+     <x>20</x>
+     <y>189</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -105,8 +95,8 @@
   <widget class="QLineEdit" name="lineEdit_taskDescript">
    <property name="geometry">
     <rect>
-     <x>161</x>
-     <y>255</y>
+     <x>160</x>
+     <y>294</y>
      <width>598</width>
      <height>31</height>
     </rect>
@@ -115,8 +105,8 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>255</y>
+     <x>20</x>
+     <y>294</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -128,8 +118,8 @@
   <widget class="QLineEdit" name="lineEdit_taskText">
    <property name="geometry">
     <rect>
-     <x>161</x>
-     <y>361</y>
+     <x>160</x>
+     <y>400</y>
      <width>598</width>
      <height>31</height>
     </rect>
@@ -138,8 +128,8 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>361</y>
+     <x>20</x>
+     <y>400</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -151,8 +141,8 @@
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>92</y>
+     <x>20</x>
+     <y>131</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -164,8 +154,8 @@
   <widget class="QLineEdit" name="lineEdit_tasktime">
    <property name="geometry">
     <rect>
-     <x>161</x>
-     <y>92</y>
+     <x>160</x>
+     <y>131</y>
      <width>598</width>
      <height>31</height>
     </rect>
@@ -177,8 +167,8 @@
   <widget class="QLineEdit" name="lineEdit_taskDeviceIP">
    <property name="geometry">
     <rect>
-     <x>161</x>
-     <y>307</y>
+     <x>160</x>
+     <y>346</y>
      <width>598</width>
      <height>31</height>
     </rect>
@@ -187,14 +177,53 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>307</y>
+     <x>20</x>
+     <y>346</y>
      <width>91</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>设备IP：</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_taskDir">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>80</y>
+     <width>598</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>案件目录：</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_taskName">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>40</y>
+     <width>598</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
