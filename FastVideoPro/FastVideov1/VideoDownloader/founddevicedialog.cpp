@@ -108,6 +108,33 @@ void FoundDeviceDialog::init(){
 
 }
 
+bool setNetwork(const QString& ipDevice){
+    std::vector<QString> ips;
+    WindowUtils::getLocalIPs(ips);
+    QString sNet(ipDevice.mid(0, ipDevice.lastIndexOf(".") + 1));
+    for (int i = 0; i < ips.size(); i++)
+    {
+        if (ips[i].mid(0, ips[i].lastIndexOf(".") + 1) == sNet)
+        {
+            return true;
+        }
+    }
+    
+    QString setIP;
+    for (int i = 2; i < 255; i++)
+    {
+        setIP = sNet + QString::number(i);
+        if (setIP != ipDevice)
+        {
+            break;;
+        }
+    }
+
+    QString sName = WindowUtils::getLoacalNetName();
+    qDebug() << setIP << sName << sNet;
+    return WindowUtils::setNetConfig(sName, setIP, "255.255.255.0", sNet + "1", true);
+}
+
 void FoundDeviceDialog::onLoginClicked()
 {
     if (!WindowUtils::isOnLine())
@@ -116,6 +143,8 @@ void FoundDeviceDialog::onLoginClicked()
             QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
         return;
     }
+    
+
     int row = ui->ip_tableWidget->currentRow();
     if (row > -1 && row < mDeviceInfos.size())
     {
@@ -146,6 +175,12 @@ void FoundDeviceDialog::onLoginClicked()
         CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在初始化..."), [=, this]()
         {
             DeviceInfo& d = mDeviceInfos[row];
+            if (!setNetwork(d.szIP.c_str()))
+            {
+                UIUtils::showTip(*this,
+                    QString::fromLocal8Bit("与设备不在同一网络中，请检查一下！"));
+                return;
+            }
             auto pFactory = videoserverFactory::getFactory(d.Factory);
             auto pServer = pFactory->create();
             if (!pServer)
