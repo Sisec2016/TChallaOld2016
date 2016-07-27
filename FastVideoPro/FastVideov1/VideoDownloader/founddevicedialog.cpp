@@ -102,6 +102,10 @@ void FoundDeviceDialog::init(){
                 this->addToTableWidget(it->second);
                 mDeviceInfos.push_back(it->second);
             }
+            if (pMpDIs->size() == 0)
+            {
+                UIUtils::showTip(*this->ui->pushButtonOther, QStringLiteral("未发现到设备，请点击“其它设备”按钮进行设备搜索"));
+            }
 
         }, bpCancel);
 
@@ -175,12 +179,18 @@ void FoundDeviceDialog::onLoginClicked()
         CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在初始化..."), [=, this]()
         {
             DeviceInfo& d = mDeviceInfos[row];
-            if (!setNetwork(d.szIP.c_str()))
+            bool b = setNetwork(d.szIP.c_str());
+            if (!b)
+            {
+                b = setNetwork(d.szIP.c_str());
+            }
+            if (!b)
             {
                 UIUtils::showTip(*this,
                     QString::fromLocal8Bit("与设备不在同一网络中，请检查一下！"));
                 return;
             }
+
             auto pFactory = videoserverFactory::getFactory(d.Factory);
             auto pServer = pFactory->create();
             if (!pServer)
@@ -254,6 +264,7 @@ void FoundDeviceDialog::onLoginClicked()
 void FoundDeviceDialog::onPushButtonOtherClicked(){
 
     LogindDeviceDialog dlg(this);
+    dlg.ipConfigGuide();
     dlg.exec();
     this->mResults = dlg.getLoginServerInfo();
     this->accept();
