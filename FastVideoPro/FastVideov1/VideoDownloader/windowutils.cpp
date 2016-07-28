@@ -670,16 +670,14 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
 }
 bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
     QString sName = WindowUtils::getLoacalNetName();
-    qDebug()<<__FILE__<<__FUNCTION__<<__LINE__<<sName;
     WindowUtils::setNetDhcp(sName);
     std::vector<QString> ips;
     int maxPingTime = 1000 * 3;
     ::Sleep(2000);
-	for (WindowUtils::GetIPfromLocalNIC(ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::GetIPfromLocalNIC(ips)){
+    for (WindowUtils::getLocalIPs(sName, ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::getLocalIPs(ips)){
         ::Sleep(1000);
         maxPingTime -= 1000;
     }
-    
     bool r = false;
     if (ips.size() > 0)
     {
@@ -697,25 +695,26 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
 
         if (NO_ERROR == errorNo)
         {
-            while (pIpAdapterInfo && (!r))
+            _IP_ADAPTER_INFO* pNext = pIpAdapterInfo;
+            while (pNext && (!r))
             {
-                for (IP_ADDR_STRING *pIpAddrString = &(pIpAdapterInfo->IpAddressList);
+                for (IP_ADDR_STRING *pIpAddrString = &(pNext->IpAddressList);
                     pIpAddrString != NULL && (!r); pIpAddrString = pIpAddrString->Next){
                     if (*ips.begin() == pIpAddrString->IpAddress.String)
                     {
-                        if (!WindowUtils::setNetConfig(sName, *ips.begin(), pIpAddrString->IpMask.String, pIpAdapterInfo->GatewayList.IpAddress.String, true))
+                        if (!WindowUtils::setNetConfig(sName, *ips.begin(), pIpAddrString->IpMask.String, pNext->GatewayList.IpAddress.String, true))
                         {
                             break;
                         }
                         ip = *ips.begin();
                         mask = pIpAddrString->IpMask.String;
-                        netGate = pIpAdapterInfo->GatewayList.IpAddress.String;
+                        netGate = pNext->GatewayList.IpAddress.String;
                         r = true;
                     }
 
 
                 }
-                pIpAdapterInfo = pIpAdapterInfo->Next;
+                pNext = pNext->Next;
             }
         }
         free(pIpAdapterInfo);

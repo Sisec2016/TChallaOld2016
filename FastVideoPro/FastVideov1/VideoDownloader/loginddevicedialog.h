@@ -57,6 +57,8 @@ private:
     void setPage(int num);
     void initNetCombobox();
 protected:
+    void mannulConfigNet();
+    void intelligentConfig();
     void finishNetConfig();
 	std::vector<std::thread*> connectThreads;
 	bool m_bStop;
