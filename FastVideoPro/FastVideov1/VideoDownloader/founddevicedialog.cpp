@@ -265,6 +265,7 @@ void FoundDeviceDialog::onPushButtonOtherClicked(){
 
     LogindDeviceDialog dlg(this);
     dlg.ipConfigGuide();
+    qDebug() << __FUNCTION__ << __LINE__;
     dlg.exec();
     this->mResults = dlg.getLoginServerInfo();
     this->accept();

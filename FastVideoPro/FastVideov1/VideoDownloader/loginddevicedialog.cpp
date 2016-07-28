@@ -68,7 +68,7 @@ void LogindDeviceDialog::finishNetConfig(){
 }
 
 void LogindDeviceDialog::mannulConfigNet(){
-    netDlg netDlg_(nullptr);
+    netDlg netDlg_(this->parentWidget());
     netDlg_.setTitleName(QStringLiteral("网络配置"));
     netDlg_.exec();
 }
@@ -84,6 +84,7 @@ void LogindDeviceDialog::intelligentConfig(){
         *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate);
         if (*bpCancel)
         {
+            qDebug()<<__FUNCTION__<<__LINE__;
             return;
         }
         if (!*bResult)
@@ -91,6 +92,7 @@ void LogindDeviceDialog::intelligentConfig(){
             *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
             if (*bpCancel)
             {
+                qDebug() << __FUNCTION__ << __LINE__;
                 return;
             }
             if (*bResult)
@@ -103,16 +105,21 @@ void LogindDeviceDialog::intelligentConfig(){
         }
 
     }, [=, this](bool bCancel){
-        if (bCancel)
+        if (*bpCancel)
         {
-            this->finishNetConfig();
+            qDebug() << __FUNCTION__ << __LINE__;
+            QThread::msleep(1000);
             return;
         }
+        qDebug() << __FUNCTION__ << __LINE__;
         if (*bResult)
         {
             IPConfigSucessDialog dlg(*pIP, "255.255.255.0", *pNetGate);
             dlg.exec();
-            this->finishNetConfig();
+            if (dlg.isMannualConfig())
+            {
+                this->mannulConfigNet();
+            }
         }
         else{
             if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE, 
@@ -123,7 +130,6 @@ void LogindDeviceDialog::intelligentConfig(){
             }
             else{
                 this->mannulConfigNet();
-                this->finishNetConfig();
             }
 
         }

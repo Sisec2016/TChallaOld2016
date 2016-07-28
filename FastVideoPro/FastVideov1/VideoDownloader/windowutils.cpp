@@ -554,7 +554,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
             }
             if (!Utils::isInnerIP(source))
             {
-                continue;
+                //continue;
             }
             
             if (netGate.isEmpty())
@@ -580,7 +580,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
 
             
             otherIPS.insert(source);
-            if (Utils::isInnerIP(destIP))
+            //if (Utils::isInnerIP(destIP))
             {
                 mpDestSource[destIP].insert(source);
             }
@@ -606,7 +606,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
             }
             if (!Utils::isInnerIP(source))
             {
-                continue;
+                //continue;
             }
 
             netGate = source;

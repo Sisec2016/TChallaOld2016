@@ -18,6 +18,7 @@ void FormDeviceInfo::init(std::shared_ptr<LoginServerInfo> pInfo)
 {
     if (pInfo)
     {
+        this->setStyleSheet("color: rgb(0, 0, 0);");
         videoserverFactory* pVF = videoserverFactory::getFactory((DeviceFactory)pInfo->factory);
         if (pVF != nullptr)
         {
