@@ -18,13 +18,16 @@ class IPConfigSucessDialog : public MyBaseDialog {
 public:
     IPConfigSucessDialog(const QString&ip, const QString& subMask, const QString& netGate, QWidget *parent = 0);
     ~IPConfigSucessDialog();
-
+    bool isMannualConfig(){
+        return m_bMannual;
+    }
 protected slots:
     void onOkBtn();
+    void onMannualConfigBtn();
 signals:
 
 protected:
-
+    bool m_bMannual;
 private:
     Ui::IPConfigSucessDialog *ui;
 };

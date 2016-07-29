@@ -18,7 +18,7 @@
 
 
 IPConfigSucessDialog::IPConfigSucessDialog(const QString& ip, const QString& subMask, const QString& netGate, QWidget *parent) :
-    MyBaseDialog(parent),
+MyBaseDialog(parent), m_bMannual(false),
     ui(new Ui::IPConfigSucessDialog)
 {
     ui->setupUi(this);
@@ -27,7 +27,8 @@ IPConfigSucessDialog::IPConfigSucessDialog(const QString& ip, const QString& sub
     ui->label_submask->setText(subMask);
     ui->label_netgate->setText(netGate);
 
-	connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(onOkBtn()));
+    connect(ui->pushButtonConfig, SIGNAL(clicked()), this, SLOT(onOkBtn()));
+    connect(ui->pushButtonConfigMannual, SIGNAL(clicked()), this, SLOT(onMannualConfigBtn()));
 }
 
 IPConfigSucessDialog::~IPConfigSucessDialog()
@@ -37,6 +38,10 @@ IPConfigSucessDialog::~IPConfigSucessDialog()
 
 void IPConfigSucessDialog::onOkBtn()
 {
-    
 	this->close();
+}
+
+void IPConfigSucessDialog::onMannualConfigBtn(){
+    m_bMannual = true;
+    this->close();
 }
