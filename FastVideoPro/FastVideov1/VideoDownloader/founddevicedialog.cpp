@@ -181,8 +181,13 @@ void FoundDeviceDialog::onLoginClicked()
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
         CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在初始化..."), [=, this]()
         {
-            DeviceInfo& d = mDeviceInfos[row];
+            DeviceInfo& d = this->mDeviceInfos[row];
             bool b = setNetwork(d.szIP.c_str());
+            if (*bpCancel)
+            {
+                qDebug() << __FUNCTION__ << __LINE__;
+                return;
+            }
             if (!b)
             {
                 b = setNetwork(d.szIP.c_str());
@@ -203,6 +208,7 @@ void FoundDeviceDialog::onLoginClicked()
             }
             if (*bpCancel)
             {
+                qDebug() << __FUNCTION__<<__LINE__;
                 return;
             }
             std::shared_ptr<LoginServerInfo> pInfo = std::shared_ptr<LoginServerInfo>(new LoginServerInfo());
@@ -233,6 +239,7 @@ void FoundDeviceDialog::onLoginClicked()
             qDebug() << "if (!*login_result)";
             if (*bpCancel)
             {
+                qDebug() << __FUNCTION__ << __LINE__;
                 mResults.clear();
             }
             else

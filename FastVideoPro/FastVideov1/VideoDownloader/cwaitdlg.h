@@ -75,7 +75,6 @@ public:
         });
         pDlg->mThread->start();
         pDlg->ShowWaitDlg(s);
-		pDlg->setEnabled(true);
     }
 
     static CWaitDlg &instanceCwaitdlg(QWidget *parent = 0);
