@@ -176,7 +176,6 @@ void FoundDeviceDialog::onLoginClicked()
 
         std::shared_ptr<int> login_result = std::shared_ptr<int>(new int());
         *login_result = 0;
-        std::shared_ptr<std::recursive_mutex> mtLoginResult = std::shared_ptr<std::recursive_mutex>(new std::recursive_mutex());;
         mResults.clear();
         ui->pushButtonConnect->setEnabled(false);
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
@@ -202,7 +201,10 @@ void FoundDeviceDialog::onLoginClicked()
                 qDebug() << "nullptr == pServer";
                 return;
             }
-
+            if (*bpCancel)
+            {
+                return;
+            }
             std::shared_ptr<LoginServerInfo> pInfo = std::shared_ptr<LoginServerInfo>(new LoginServerInfo());
             pInfo->factory = d.Factory;
             pInfo->ip = d.szIP.c_str();
@@ -218,8 +220,6 @@ void FoundDeviceDialog::onLoginClicked()
             pInfo->user = user;
             if (pServer->login(pInfo, bpCancel.get()))
             {
-                std::lock_guard<std::recursive_mutex>  lockLoginResult(*mtLoginResult);
-
                 if (!*bpCancel)
                 {
                     mResults.push_back(pInfo);
@@ -354,7 +354,7 @@ void FoundDeviceDialog::ipConfigGuide(){
     //this->hide();
     if (!WindowUtils::isOnLine())
     {
-        UIUtils::showTip(*this->parentWidget(),
+        UIUtils::showTip(*this,
             QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
         return;
     }
