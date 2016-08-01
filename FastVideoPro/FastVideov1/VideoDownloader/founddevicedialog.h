@@ -26,9 +26,14 @@ public:
     {
         return mResults;
     }
+    void ipConfigGuide();
 protected:
     void addToTableWidget(const DeviceInfo& d);
     void init();
+    void mannulConfigNet();
+    void intelligentConfig();
+    void deepConfig();
+    void startLoginDlg();
 private slots:
     void onLoginClicked();
     void onPushButtonOtherClicked();

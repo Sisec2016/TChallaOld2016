@@ -9,9 +9,13 @@
 #include "cwaitdlg.h"
 #include "uiutils.h"
 #include "windowutils.h"
+#include "utils.h"
+#include "netdlg.h"
+#include "IPConfigSucessDialog.h"
 
 
 
+#define     IP_CONFIG_GUIDE_TITLE  QStringLiteral("IP自动匹配向导")
 FoundDeviceDialog::FoundDeviceDialog(QWidget *parent) :
     MyBaseDialog(parent),
     ui(new Ui::FoundDeviceDialog)
@@ -260,13 +264,151 @@ void FoundDeviceDialog::onLoginClicked()
     }
 
 }
-
-void FoundDeviceDialog::onPushButtonOtherClicked(){
-
+void FoundDeviceDialog::startLoginDlg(){
     LogindDeviceDialog dlg(this);
-    dlg.ipConfigGuide();
     qDebug() << __FUNCTION__ << __LINE__;
     dlg.exec();
     this->mResults = dlg.getLoginServerInfo();
     this->accept();
+}
+void FoundDeviceDialog::onPushButtonOtherClicked(){
+
+    ipConfigGuide();
+
+}
+
+
+void FoundDeviceDialog::mannulConfigNet(){
+    netDlg netDlg_(this->parentWidget());
+    netDlg_.setTitleName(QStringLiteral("网络配置"));
+    netDlg_.exec();
+}
+
+void FoundDeviceDialog::intelligentConfig(){
+    std::shared_ptr<QString> pIP = std::make_shared<QString>();
+    std::shared_ptr<QString> pNetGate = std::make_shared<QString>();
+    std::shared_ptr<QString> pMask = std::make_shared<QString>("255.255.255.0");
+    std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
+    std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在智能匹配，请稍等...."), [=, this]()
+    {
+        *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate);
+        if (*bpCancel)
+        {
+            qDebug() << __FUNCTION__ << __LINE__;
+            return;
+        }
+        if (!*bResult)
+        {
+            *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
+            if (*bpCancel)
+            {
+                qDebug() << __FUNCTION__ << __LINE__;
+                return;
+            }
+            if (*bResult)
+            {
+                if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
+                {
+                    *bResult = false;
+                }
+            }
+        }
+
+    }, [=, this](bool bCancel){
+        if (*bpCancel)
+        {
+            qDebug() << __FUNCTION__ << __LINE__ << "sleep 1000";
+            this->startLoginDlg();
+            return;
+        }
+        qDebug() << __FUNCTION__ << __LINE__;
+        if (*bResult)
+        {
+            IPConfigSucessDialog dlg(*pIP, "255.255.255.0", *pNetGate);
+            dlg.exec();
+            if (dlg.isMannualConfig())
+            {
+                this->mannulConfigNet();
+            }
+        }
+        else{
+            if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE,
+                QStringLiteral("智能识别网段失败！重新匹配或手工配置？"), QStringLiteral("重新匹配"),
+                QStringLiteral("手工配置")))
+            {
+                this->intelligentConfig();
+                return;
+            }
+            else{
+                this->mannulConfigNet();
+            }
+
+        }
+        this->startLoginDlg();
+    }, bpCancel);
+}
+
+void FoundDeviceDialog::ipConfigGuide(){
+
+    //this->hide();
+    if (!WindowUtils::isOnLine())
+    {
+        UIUtils::showTip(*this->parentWidget(),
+            QString::fromLocal8Bit("本地连接断开，请插好网线或开启本地连接！"));
+        return;
+    }
+
+    this->intelligentConfig();
+}
+
+void FoundDeviceDialog::deepConfig(){
+    std::shared_ptr<bool> bResult = std::make_shared<bool>(false);
+    std::shared_ptr<QString> pIP = std::make_shared<QString>();
+    std::shared_ptr<QString> pNetGate = std::make_shared<QString>();
+    std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
+    CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在深度匹配，请稍等..."), [=, this](){
+        for (int i = 0; i < 255; i++)
+        {
+            *pNetGate = QString("192.168.%1.1").arg(i);
+            *pIP = QString("192.168.%1.44").arg(i);
+            if (*bpCancel)
+            {
+                return;
+            }
+            if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
+            {
+                continue;
+            }
+
+
+            if (CPing::instance().instance().ScanOneIP(*pNetGate, *pIP, false))
+            {
+                *bResult = true;
+                break;
+            }
+        }
+    }, [=, this](bool bCancel){
+        if (*bpCancel)
+        {
+            
+            return;
+        }
+        if (*bResult)
+        {
+            IPConfigSucessDialog dlg(*pIP, "255.255.255.0", *pNetGate);
+            dlg.exec();
+            
+        }
+        else{
+            UIUtils::showTip(*this,
+                QString::fromLocal8Bit("智能识别网段失败！请手动设置！"));
+            netDlg netDlg_(nullptr);
+            netDlg_.setTitleName(QStringLiteral("网络配置"));
+            netDlg_.exec();
+            
+        }
+
+    }, bpCancel);
+
 }

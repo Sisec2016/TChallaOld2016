@@ -30,14 +30,14 @@ public:
     {
 		return mResults;
     }
-    void ipConfigGuide();
+
 signals:
     void onClose();
     void onPreStep();
     void onNextStep();
 protected:
 
-    void deepConfig();
+
     void initFactory();
     void getIps();
 private slots:
@@ -57,9 +57,6 @@ private:
     void setPage(int num);
     void initNetCombobox();
 protected:
-    void mannulConfigNet();
-    void intelligentConfig();
-    void finishNetConfig();
 	std::vector<std::thread*> connectThreads;
 	bool m_bStop;
     std::set<QString> msetIps;
