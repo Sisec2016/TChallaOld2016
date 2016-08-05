@@ -117,9 +117,9 @@ void FoundDeviceDialog::init(){
 }
 
 bool setNetwork(const QString& ipDevice){
+    QString sNet(ipDevice.mid(0, ipDevice.lastIndexOf(".") + 1));
     std::vector<QString> ips;
     WindowUtils::getLocalIPs(ips);
-    QString sNet(ipDevice.mid(0, ipDevice.lastIndexOf(".") + 1));
     for (int i = 0; i < ips.size(); i++)
     {
         if (ips[i].mid(0, ips[i].lastIndexOf(".") + 1) == sNet)
@@ -127,6 +127,17 @@ bool setNetwork(const QString& ipDevice){
             return true;
         }
     }
+
+    QString ip;
+    QString mask;
+    QString netGate;
+    if (WindowUtils::setIPByDHCP(ip, mask, netGate)){
+        if (ipDevice.mid(0, ip.lastIndexOf(".") + 1) == sNet)
+        {
+            return true;
+        }
+    }
+
     
     QString setIP;
     for (int i = 2; i < 255; i++)

@@ -233,6 +233,7 @@ IVideoServer* haik_videoserver::clone()
 
 bool haik_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
+    logout();
 	channels.clear();
     memset(&m_deviceInfo, 0, sizeof(m_deviceInfo));
     m_lLoginHandle = NET_DVR_Login_V30((char*)IP, port,
@@ -291,9 +292,11 @@ bool haik_videoserver::logout()
     {
         m_sLastError = GetLastErrorString();
         hk_log.AddLog(std::string("logout failed:") + m_sLastError);
+        m_lLoginHandle = -1;
         return false;
     }
     else {
+        m_lLoginHandle = -1;
         hk_log.AddLog(std::string("haik_videoserverlogout ok!"));
     }
 
@@ -318,7 +321,17 @@ void TMToNetTime(const tm& t, NET_DVR_TIME& nt)
     nt.dwMinute = t.tm_min;
     nt.dwSecond = t.tm_sec;
 }
+void addLog(const char* sLog, int nLine)
+{
 
+    hk_log.AddLog(QString("%1 %2").arg(nLine).arg(sLog));
+}
+
+void sheNET_DVR_FindClose_V30(LONG lFind){
+    SHE_BEGING
+    //NET_DVR_FindClose(lFind);
+    SHE_END
+}
 bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
                                                        __time64_t timeEnd)
 {
@@ -328,34 +341,9 @@ bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 
     _localtime64_s(&Tm, (const time_t*)&timeStart);
     TMToNetTime(Tm, f.struStartTime);
-    qDebug()<<"timeStart:"<<timeStart<<":"<<Tm.tm_year<<"/"<<Tm.tm_mon<<"/"<<Tm.tm_mday<<" "<<Tm.tm_hour
-              <<":"<<Tm.tm_min<<":"<<Tm.tm_sec;
 
     _localtime64_s(&Tm, (const time_t*)&timeEnd);
     TMToNetTime(Tm, f.struStopTime);
-    qDebug()<<"timeEnd:"<<timeEnd<<":"<<Tm.tm_year<<"/"<<Tm.tm_mon<<"/"<<Tm.tm_mday<<" "<<Tm.tm_hour
-              <<":"<<Tm.tm_min<<":"<<Tm.tm_sec;
-#ifdef LNM_TEST
-    __time64_t tmZone = timeEnd - timeStart;
-    int fileNum = ::rand() % 1000;
-    RecordFile rfTest;
-    rfTest.endTime = timeStart;
-    char sName[256];
-    for (int i = 0; i < fileNum; i++)
-    {
-        rfTest.beginTime = rfTest.endTime;
-        rfTest.endTime = rfTest.beginTime + tmZone / fileNum;
-        rfTest.channel = nChannelId;
-        sprintf(sName, "test%d", i);
-        rfTest.name = sName;
-        rfTest.size = 1024 * tmZone / fileNum;
-        files.push_back(rfTest);
-    }
-
-    return true;
-#endif
-
-
 
     if (m_lLoginHandle < 0)
     {
@@ -375,8 +363,9 @@ bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 	auto itr = channelVec.begin();
 	for (; itr != channelVec.end(); itr++)
 	{
+        hk_log.AddLog(QString("channelVec beg:%1").arg(files.size()));
 		int nChannelId = *itr;
-
+        hk_log.AddLog(QString("nChannelId:%1").arg(nChannelId));
 		f.dwFileType = 0xff;
 		f.dwIsLocked = 0xff;
 		f.dwUseCardNo = 0;
@@ -390,12 +379,9 @@ bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 		{
 			m_sLastError = GetLastErrorString();
 			hk_log.AddLog(std::string("NET_DVR_FindFile_V40 failed:") + m_sLastError);
-			/*return false;*/
 			continue;
 		}
 		std::shared_ptr<NET_DVR_FINDDATA_V40> nriFileinfo(new NET_DVR_FINDDATA_V40());
-		int iFinds = 0;
-
 		LONG re = NET_DVR_FindNextFile_V40(lfind, nriFileinfo.get());
 		RecordFile rf;
 		hk_log.AddLog(QString("NET_DVR_FindNextFile_V40 re:%1").arg(re));
@@ -403,6 +389,7 @@ bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 		{
 			if (re == NET_DVR_FILE_SUCCESS && nriFileinfo->dwFileSize > 0)
 			{
+                hk_log.AddLog(QString("NET_DVR_FindNextFile_V40:%1").arg(re));
 				struct tm Tm;
 				NetTimeToTM(nriFileinfo->struStartTime, Tm);
 				rf.beginTime = _mktime64(&Tm);
@@ -416,7 +403,6 @@ bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 
 				rf.setPrivateData(nriFileinfo.get(), sizeof(NET_DVR_FINDDATA_V40));
 				files.push_back(rf);
-				iFinds++;
 			}
 			else
 			{
@@ -428,17 +414,11 @@ bool haik_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 
 		hk_log.AddLog(QString("NET_DVR_FindNextFile_V40 end re:%1").arg(re));
 
-		if (-1 == re)
-		{
-
-		}
-
-		if (FALSE == NET_DVR_FindClose_V30(lfind))
-		{
-
-		}
+        sheNET_DVR_FindClose_V30(lfind);
+        hk_log.AddLog(QString("sheNET_DVR_FindClose_V30 end:%1").arg(files.size()));
 	}
 
+    hk_log.AddLog(QString("files:%1").arg(files.size()));
     return true;
 }
 
