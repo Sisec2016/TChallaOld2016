@@ -13,7 +13,7 @@ class ListViewItem : public QWidget
 public:
     explicit ListViewItem(QWidget *parent = 0);
     void initListViewItem();
-    void setSelected(bool sel);
+    virtual void setSelected(bool sel);
 protected:
 
     virtual void mousePressEvent(QMouseEvent *);

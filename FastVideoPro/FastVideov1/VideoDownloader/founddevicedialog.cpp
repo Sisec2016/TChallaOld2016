@@ -132,7 +132,7 @@ bool setNetwork(const QString& ipDevice){
     QString mask;
     QString netGate;
     if (WindowUtils::setIPByDHCP(ip, mask, netGate)){
-        if (ipDevice.mid(0, ip.lastIndexOf(".") + 1) == sNet)
+        if (ip.mid(0, ip.lastIndexOf(".") + 1) == sNet)
         {
             return true;
         }

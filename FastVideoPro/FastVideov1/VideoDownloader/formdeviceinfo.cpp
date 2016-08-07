@@ -18,7 +18,7 @@ void FormDeviceInfo::init(std::shared_ptr<LoginServerInfo> pInfo)
 {
     if (pInfo)
     {
-        this->setStyleSheet("color: rgb(0, 0, 0);");
+        this->setStyleSheet("QWidget\n{\n	border-bottom:1px,rgb(255,255,255),solid;\n	background-color: rgb(255, 255, 255, 0);\n	color: rgb(0, 0, 0);\n}");
         videoserverFactory* pVF = videoserverFactory::getFactory((DeviceFactory)pInfo->factory);
         if (pVF != nullptr)
         {
@@ -33,4 +33,15 @@ void FormDeviceInfo::init(std::shared_ptr<LoginServerInfo> pInfo)
     }
 
 
+}
+
+void FormDeviceInfo::setSelected(bool sel){
+    if (sel)
+    {
+        this->setStyleSheet("QWidget\n{\n	border-bottom:1px,rgb(255,255,255),solid;\n	background-color: rgb(255, 255, 255);\n	color: rgb(0, 0, 0);\n}");
+    } 
+    else
+    {
+        this->setStyleSheet("QWidget\n{\n	border-bottom:1px,rgb(255,255,255),solid;\n	background-color: rgb(255, 255, 255, 0);\n	color: rgb(0, 0, 0);\n}");
+    }
 }
