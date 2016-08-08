@@ -20,7 +20,7 @@ public:
     {
         return mpInfo;
     }
-
+    virtual void setSelected(bool sel);
 private:
     Ui::FormDeviceInfo *ui;
     std::shared_ptr<LoginServerInfo> mpInfo;
