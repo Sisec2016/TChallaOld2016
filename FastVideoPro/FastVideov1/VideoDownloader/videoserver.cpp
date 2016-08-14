@@ -405,7 +405,7 @@ videoserverFactory* videoserverFactory::getFactory(DeviceFactory f)
 {
     getFactorys();
     std::lock_guard<std::recursive_mutex> lock(s_mutexFactorys);
-    if (s_mpFactorys.find(f))
+    if (s_mpFactorys.find(f) != s_mpFactorys.end())
     {
         return s_mpFactorys[f];
     }
