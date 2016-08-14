@@ -77,6 +77,7 @@ QDataStream & operator >> (QDataStream &dataStream, LoginServerInfo &d)
 
 
 std::deque<videoserverFactory *> videoserverFactory::s_Factorys;
+std::map<DeviceFactory, videoserverFactory *> videoserverFactory::s_mpFactorys;
 std::recursive_mutex videoserverFactory::s_mutexFactorys;
 std::vector<std::string> videoserverFactory::s_vcExternFunStrings;
 
@@ -112,6 +113,7 @@ const std::deque<videoserverFactory*>& videoserverFactory::getFactorys()
             videoserverFactory* pvsf = new videoserverFactory(pFactory);
             s_Factorys.push_back(pvsf);
             qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << f;
+            s_mpFactorys[(DeviceFactory)f] = pvsf;
             addFakeFactory(pFactory);
         }
     }
@@ -403,12 +405,9 @@ videoserverFactory* videoserverFactory::getFactory(DeviceFactory f)
 {
     getFactorys();
     std::lock_guard<std::recursive_mutex> lock(s_mutexFactorys);
-    for (int index = 0; index < s_Factorys.size(); index++)
+    if (s_mpFactorys.find(f))
     {
-        if (s_Factorys[index]->factory() == f)
-        {
-            return s_Factorys[index];
-        }
+        return s_mpFactorys[f];
     }
     return nullptr;
 }
@@ -755,26 +754,10 @@ bool videoserver::StopPlayBack(play_handle_t playbackHandle, int mPause)
 void getCommonFactorys(std::vector<videoserverFactory *>& factorys)
 {
     factorys.clear();
-    XmlSettings setings("cf");
-    auto fs = videoserverFactory::getFactorys();
-    std::vector< std::pair<int, int> > vcSorts;
-    for (auto it = fs.begin(); it != fs.end(); it++)
-    {
-        videoserverFactory* pF = (*it);
-		factorys.push_back(pF);
-//         vcSorts.push_back(std::make_pair(pF->factory(),
-//                                          setings.value(QString::number(pF->factory()), 0).toInt()));
+    for (auto it = videoserverFactory::s_mpFactorys.begin(); it != videoserverFactory::s_mpFactorys.end();
+        it++){
+        factorys.push_back(it->second);
     }
-//     std::stable_sort(vcSorts.begin(), vcSorts.end(),
-//               [](const std::pair<int, int>& f, const std::pair<int, int>& s)
-//     {
-//         return f.second > s.second;
-//     });
-
-//     for (int i = 0; i < vcSorts.size(); i++)
-//     {
-//         factorys.push_back((DeviceFactory)vcSorts[i].first);
-//     }
 }
 
 void plusCommonFactorySort(const std::vector<DeviceFactory>& factories, int index)
