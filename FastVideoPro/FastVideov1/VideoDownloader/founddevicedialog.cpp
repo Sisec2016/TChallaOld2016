@@ -138,20 +138,21 @@ bool setNetwork(const QString& ipDevice){
         }
     }
 
-    
+    QString sName = WindowUtils::getLoacalNetName();
     QString setIP;
-    for (int i = 2; i < 255; i++)
+    for (int i = 254; i > 1; i--)
     {
         setIP = sNet + QString::number(i);
         if (setIP != ipDevice)
         {
-            break;;
+            if (WindowUtils::setNetConfig(sName, setIP, "255.255.255.0", sNet + "1", true)){
+                return true;
+            }
         }
     }
 
-    QString sName = WindowUtils::getLoacalNetName();
-    qDebug() << setIP << sName << sNet;
-    return WindowUtils::setNetConfig(sName, setIP, "255.255.255.0", sNet + "1", true);
+    
+    return false;
 }
 
 void FoundDeviceDialog::onLoginClicked()

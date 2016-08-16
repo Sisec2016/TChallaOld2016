@@ -287,7 +287,6 @@ bool MainDialog::isOverZoneTime(int channelNum)
 
 void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
 {
-    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     DeviceWidget* pDevice = ui->listWidgetDevices->cuurentDevice();
     if (nullptr == pDevice)
     {
@@ -297,12 +296,9 @@ void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
     pDevice->initTaskWidget(pDownloadTask);
     CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在加载下载通道中..."), [=]()
     {
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
         pDownloadTask->save();
         pDevice->save(false);
         pDevice->addTask(pDownloadTask);
-        
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     }, [=](bool bCancel){pDevice->save(true); ui->widgetDisable->lower();  });
 
     ui->widgetDisable->lower();
@@ -310,7 +306,6 @@ void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
 
 void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<pRecordFile_t> > pFileAllRows)
 {
-    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     if (pFileAllRows.get() == nullptr || pFileAllRows->size() > MAX_FILES_NUM)
     {
         UIUtils::showTip(*ui->downloadButton, QString::fromLocal8Bit("单次搜索的文件过多，请缩短下载时段或者减少下载通道。"));
@@ -334,7 +329,7 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<pRecordFile_t> >
             ui->widgetDisable->lower();
             return;
         }
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
+
         std::shared_ptr< std::vector<pRecordFile_t> > pFiles = std::make_shared< std::vector<pRecordFile_t> >();
         filedlg.getSelectedFiles(*pFiles);
 
@@ -363,7 +358,6 @@ void MainDialog::onDownloadFindEnd(std::shared_ptr< std::vector<pRecordFile_t> >
         
         CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在加载下载通道中..."), [=]()
         {
-            qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
             for (int i = 0; i < pFiles->size(); i++)
             {
                 pDownloadTask->addRow(std::make_shared<DownloadRow>(i, *((*pFiles)[i])));
@@ -391,7 +385,7 @@ void MainDialog::on_downloadButton_clicked()
         on_zonedownloadBtn_clicked();
         return;
     }
-    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
+
     DeviceWidget* pDevice = ui->listWidgetDevices->cuurentDevice();
     if (pDevice == nullptr)
     {
@@ -399,7 +393,6 @@ void MainDialog::on_downloadButton_clicked()
             QString::fromLocal8Bit("请选择一个设备！"));
         return;
     }
-    qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
     std::vector<int> channels;
     ui->listWidgetChannels->getSelectedChannels(channels);
     if (channels.size() == 0)
@@ -525,7 +518,6 @@ void MainDialog::on_btnAddDevice_clicked()
             {
                 ui->listWidgetDevices->addDevice(pServer, pInfo, false);
                 pInfo->save();
-                //Log::instance().AddLog(pInfo->name + " " + pInfo->ip + ", id:" + pInfo->id);
                 QThread::msleep(10);
             }
 

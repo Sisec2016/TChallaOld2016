@@ -178,7 +178,9 @@ private:
 
 class videoserverFactory
 {
+public:
     static std::deque<videoserverFactory *> s_Factorys;
+    static std::map<DeviceFactory, videoserverFactory *> s_mpFactorys;
     static std::recursive_mutex s_mutexFactorys;
     static std::vector<std::string> s_vcExternFunStrings;
     std::recursive_mutex m_mutexService;
