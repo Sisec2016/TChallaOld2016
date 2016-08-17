@@ -40,7 +40,7 @@ bool g_bDecoding = false;
 __int64 g_iTotalSize = 0;
 __int64 g_fileRealSize = 0;
 HWND g_hWnd = NULL;
-float g_iBitRate = (397 * 1024 * 1024 / 1600);//文件大小/文件时间长度秒
+float g_iBitRate = (397 * 1024 / 160);//文件大小/文件时间长度秒
 int g_iPos = 0;
 int g_iTimeLen = 1600;
 
@@ -53,6 +53,7 @@ void ZhongWei_videoserver::dealConnected(ZhongWei::JCLink_t nLinkID, const QStri
     std::lock_guard<std::recursive_mutex> lck(sMutexLinkVideservrs);
     if (sLinkeVideoserver.find(nLinkID) == sLinkeVideoserver.end() || sLinkeVideoserver[nLinkID] == NULL)
     {
+        g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         return;
     }
     sLinkeVideoserver[nLinkID]->onConnected(sError);
@@ -68,10 +69,11 @@ void ZhongWei_videoserver::dealDisConnected(ZhongWei::JCLink_t nLinkID, const QS
     std::lock_guard<std::recursive_mutex> lck(sMutexLinkVideservrs);
     if (sLinkeVideoserver.find(nLinkID) == sLinkeVideoserver.end() || sLinkeVideoserver[nLinkID] == NULL)
     {
+        g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         return;
     }
     sLinkeVideoserver[nLinkID]->onDisConnected(sError);
-
+    g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     std::lock_guard<std::recursive_mutex> lock(sMutexLinkVideservrs);
     sLinkeVideoserver.erase(nLinkID);
 }
@@ -79,6 +81,7 @@ void ZhongWei_videoserver::dealDownloadData(ZhongWei::JCLink_t nLinkID, char* da
     std::lock_guard<std::recursive_mutex> lck(sMutexLinkVideservrs);
     if (sLinkeVideoserver.find(nLinkID) == sLinkeVideoserver.end() || sLinkeVideoserver[nLinkID] == NULL)
     {
+        g_log.AddLog(QString("dealDownloadData NULL"));
         return;
     }
     sLinkeVideoserver[nLinkID]->onDownloadData(data, len);
@@ -87,9 +90,12 @@ void ZhongWei_videoserver::dealFinishDownload(ZhongWei::JCLink_t nLinkID, const 
     std::lock_guard<std::recursive_mutex> lck(sMutexLinkVideservrs);
     if (sLinkeVideoserver.find(nLinkID) == sLinkeVideoserver.end() || sLinkeVideoserver[nLinkID] == NULL)
     {
+        g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         return;
     }
+    g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     sLinkeVideoserver[nLinkID]->onFinishDownload(sError);
+   // sLinkeVideoserver.erase(nLinkID);
 }
 
 
@@ -98,6 +104,7 @@ void ZhongWei_videoserver::dealFindFiles(ZhongWei::JCLink_t nLinkID, ZhongWei::P
     std::lock_guard<std::recursive_mutex> lck(sMutexLinkVideservrs);
     if (sLinkeVideoserver.find(nLinkID) == sLinkeVideoserver.end() || sLinkeVideoserver[nLinkID] == NULL)
     {
+        g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         return;
     }
     sLinkeVideoserver[nLinkID]->onFindFiles(pInfos, nCount);
@@ -106,7 +113,7 @@ void ZhongWei_videoserver::dealFindFiles(ZhongWei::JCLink_t nLinkID, ZhongWei::P
 
 void funJCEventCallback(ZhongWei::JCLink_t nLinkID, ZhongWei::JCEventType etType, DWORD_PTR pData1, DWORD_PTR pData2, LPVOID pUserData)
 {
-
+    g_log.AddLog(QString("link %1 type %2").arg(nLinkID).arg(etType));
 	switch(etType)
 	{
 	case ZhongWei::JCET_DownloadData://录像下载数据
@@ -314,6 +321,7 @@ void ZhongWei_videoserver::onDownloadData(char* data, int len){
         fwrite(data, len, 1, m_pRecFile);
         mDownloadSize += len;
     }
+    g_log.AddLog(QString("onDownloadData:%1").arg(len));
 }
 
 void ZhongWei_videoserver::onFinishDownload(const QString& sError){
@@ -343,7 +351,8 @@ void ZhongWei_videoserver::onFindFiles(ZhongWei::PJCRecFileInfo pInfos, int nCou
 
 bool ZhongWei_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
-    logout();
+//    logout();
+    std::lock_guard<std::recursive_mutex> lock(m_linksMutex);
 
     m_strIP = IP;
     m_iPort = port;
@@ -352,10 +361,20 @@ bool ZhongWei_videoserver::login(const char* IP, __int32 port, const char* user,
 
     int channel = 1;
     channels.clear();
-    while (this->connectChannel(channel)){
-        channels[channel];
-        channel++;
+    if (m_mpLinks.size() > 0)
+    {
+        for (auto it = m_mpLinks.begin(); it != m_mpLinks.end(); it++)
+        {
+            channels[it->first];
+        }
     }
+    else{
+        while (this->connectChannel(channel)){
+            channels[channel];
+            channel++;
+        }
+    }
+
     
     return channels.size() > 0;
 }
@@ -363,6 +382,7 @@ bool ZhongWei_videoserver::login(const char* IP, __int32 port, const char* user,
 
 bool ZhongWei_videoserver::logout()
 {
+    g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     std::lock_guard<std::recursive_mutex> lock(m_linksMutex);
     for (auto it = m_mpLinks.begin(); it != m_mpLinks.end(); it++)
     {
@@ -435,6 +455,7 @@ bool ZhongWei_videoserver::GetRecordFileList(std::vector<RecordFile>& files, con
             jcdb.nEndMonth = jcdb.nBeginMonth = start.month();
             jcdb.nEndDay = jcdb.nBeginDay = start.day();
             m_RecFileInfoList.clear();
+
             if (!Api_ZhongWei::Api().m_pSearchFileByTime(iLinkID, &jcdb))
             {
                 m_sLastError = GetLastErrorString();
@@ -460,7 +481,8 @@ bool ZhongWei_videoserver::GetRecordFileList(std::vector<RecordFile>& files, con
                 {
                     continue;
                 }
-                QTime tEnd(tBegin.addSecs(30 * 60));
+
+                QTime tEnd(tBegin.addSecs(10 * 60));
                 if (tEnd < tmS)
                 {
                     continue;
@@ -469,6 +491,10 @@ bool ZhongWei_videoserver::GetRecordFileList(std::vector<RecordFile>& files, con
                 f.endTime = QDateTime(start, tEnd).toTime_t();
                 sprintf(item.szPathName, "%d", iLinkID);
                 f.setPrivateData(&item, sizeof(ZhongWei::JCRecFileInfo));
+                if (files.size() > 0)
+                {
+                    files.rbegin()->endTime = f.beginTime;
+                }
                 files.push_back(f);
             }
         }
@@ -519,21 +545,21 @@ bool ZhongWei_videoserver::downLoadByRecordFile(const char* saveFileName, const 
 
     int iLinkID = m_mpLinks[file.channel];
 
-	//ZhongWei::JCRecFileInfo* pData = (ZhongWei::JCRecFileInfo *)file.getPrivateData();
+    ZhongWei::JCRecFileInfo* pData = (ZhongWei::JCRecFileInfo *)file.getPrivateData();
     //if (atoi(pData->szPathName) != iLinkID)
-    {
-        std::vector<RecordFile> files;
-        std::vector<int> vcChannels;
-        vcChannels.push_back(file.channel);
-        if (!this->GetRecordFileList(files, vcChannels, file.beginTime, file.endTime) || files.size() < 0)
-        {
-            g_log.AddLog(string("downLoadByRecordFile GetRecordFileList failed:") + m_sLastError);
-            return false;
-        }
-        RecordFile& f = *((RecordFile*)&file);
-        f = files[0];
-    }
-    ZhongWei::JCRecFileInfo *pData = (ZhongWei::JCRecFileInfo *)file.getPrivateData();
+//     {
+//         std::vector<RecordFile> files;
+//         std::vector<int> vcChannels;
+//         vcChannels.push_back(file.channel);
+//         if (!this->GetRecordFileList(files, vcChannels, file.beginTime, file.endTime) || files.size() < 0)
+//         {
+//             g_log.AddLog(string("downLoadByRecordFile GetRecordFileList failed:") + m_sLastError);
+//             return false;
+//         }
+//         RecordFile& f = *((RecordFile*)&file);
+//         f = files[0];
+//     }
+//     ZhongWei::JCRecFileInfo *pData = (ZhongWei::JCRecFileInfo *)file.getPrivateData();
 	bool bRet = Api_ZhongWei::Api().m_pDownloadByFile(iLinkID, pData->nRecFileID);
 	if (!bRet)
 	{
@@ -688,11 +714,6 @@ bool ZhongWei_videoserver::StopPlayBack(__int64 playbackHandle, __int32 mPause)
 bool ZhongWei_videoserver::stopDownload(download_handle_t h)
 {
     std::lock_guard<std::recursive_mutex> lck(m_recFileMutex);
-    if (m_pRecFile == NULL)
-    {
-        return true;
-    }
-
 	g_log.AddLog(string("stopDownload ------"));
 	bool bRet = Api_ZhongWei::Api().m_pDownloadByFile(h - 1, -1);
 	if (!m_pRecFile)
@@ -747,6 +768,7 @@ bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSiz
         *failed = !msDownloadError.isEmpty();
         m_sLastError = msDownloadError.toLocal8Bit().data();
         stopDownload(h);
+        g_iPos = 0;
 		return true;
 	}
     
@@ -756,12 +778,13 @@ bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSiz
     if (mDownloadSize / mDownloadTotalSize >= 94)
     {
         *currentSize = (mDownloadTotalSize * 94) / 100;
-        *currentSize += mDownloadSize / mDownloadTotalSize - 94;
+        *currentSize += g_iPos++;
     }
-    if (*currentSize >= *totalSize)
-	{
-        *currentSize = *totalSize - g_iPos;
-	}
+    else
+    {
+        g_iPos = 0;
+    }
+
 	*failed = false;
 	return true;
 }
@@ -772,7 +795,7 @@ bool ZhongWei_videoserver::connectChannel(int channel){
     if (iLinkID == JCSDK_INVALID_LINKVALUE)
     {
         m_sLastError = "通道连接失败!";
-        g_log.AddLog(string("GetRecordFileList 通道连接失败"));
+        g_log.AddLog(string("connectChannel 通道连接失败"));
         return false;
     }
 
@@ -784,6 +807,7 @@ bool ZhongWei_videoserver::connectChannel(int channel){
     DWORD dwRet = WaitForSingleObject(mhConnectEvent, 5 * 1000);
     if (dwRet != WAIT_OBJECT_0)
     {
+        g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         std::lock_guard<std::recursive_mutex> lock(sMutexLinkVideservrs);
         sLinkeVideoserver.erase(iLinkID);
         return false;
@@ -806,6 +830,7 @@ bool ZhongWei_videoserver::disconnectChannel(int channel){
         {
             Api_ZhongWei::Api().m_pLogout(m_mpLinks[channel]);
             std::lock_guard<std::recursive_mutex> lock(sMutexLinkVideservrs);
+            g_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
             sLinkeVideoserver.erase(m_mpLinks[channel]);
             m_mpLinks[channel] = NULL;
         }
