@@ -714,9 +714,9 @@ bool  JiuAn_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwnd,
         return false;
     }
 
+	HISI_DVR_FIND_DATA* pData = (HISI_DVR_FIND_DATA*)file.getPrivateData();
 
-
-    playbackHandle = DVR_PlayBackByName(m_lLoginHandle, (char *)(file.name.c_str()), hwnd);
+	playbackHandle = DVR_PlayBackByName(m_lLoginHandle, pData->sFileName, hwnd);
     if (playbackHandle == 0)
     {
         DVR_StopPlayBack(playbackHandle);
