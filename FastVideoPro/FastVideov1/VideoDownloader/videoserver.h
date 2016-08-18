@@ -38,7 +38,7 @@ QDataStream & operator >> (QDataStream &dataStream, RecordFile &d);
 
 typedef std::map<std::string, unsigned int> OEMFacMap;
 typedef std::shared_ptr<RecordFile> pRecordFile_t;
-
+extern bool isTheSame(DeviceFactory f, DeviceFactory other);
 struct LoginServerInfo : public SqlTable<LoginServerInfo>
 {
     SERIAL_MEMMBER_HEAD()
@@ -63,7 +63,7 @@ struct LoginServerInfo : public SqlTable<LoginServerInfo>
         }
 
         return ip == other.ip && port == other.port &&
-                user == other.user && password == other.password && factory == other.factory;
+            user == other.user && password == other.password && isTheSame((DeviceFactory)factory, (DeviceFactory)other.factory);
     }
 };
 typedef std::vector< std::shared_ptr<LoginServerInfo> > ServerInfoList_t;
@@ -181,6 +181,7 @@ class videoserverFactory
 public:
     static std::deque<videoserverFactory *> s_Factorys;
     static std::map<DeviceFactory, videoserverFactory *> s_mpFactorys;
+    static std::map<DeviceFactory, videoserverFactory *> s_mpFakeFactorys;
     static std::recursive_mutex s_mutexFactorys;
     static std::vector<std::string> s_vcExternFunStrings;
     std::recursive_mutex m_mutexService;
@@ -263,7 +264,17 @@ public:
             return SISC_IPC_UNDEFINE;
         }
     }
-
+    DeviceFactory commonFactory()
+    {
+        if (nullptr != mpFactory)
+        {
+            return mpFactory->CommonFactory();
+        }
+        else
+        {
+            return SISC_IPC_UNDEFINE;
+        }
+    }
     std::shared_ptr<videoserver> create(bool nullSver = false);
     void destroy(videoserver* p);
      IVideoServer* createDerect();
@@ -706,7 +717,10 @@ public:
 	{
 		return m_OemFlag;
 	}
-
+    virtual DeviceFactory CommonFactory()
+    {
+        return m_pFactory->factory();
+    }
 private:
 
 	std::string m_name;

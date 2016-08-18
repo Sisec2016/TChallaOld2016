@@ -273,6 +273,11 @@ struct IVideoServerFactory
     virtual bool searchDevice(std::vector<DeviceInfo>& devices){
         return false;
     }
+
+    virtual DeviceFactory CommonFactory()
+    {
+        return this->factory();
+    }
 protected:
     bool m_init;
     std::string  m_sLastError;
