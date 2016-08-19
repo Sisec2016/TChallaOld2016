@@ -17,6 +17,22 @@
 #include "time.h"
 #include "videoserversSvr.h"
 
+bool isTheSame(DeviceFactory f, DeviceFactory other){
+    if (f == other)
+    {
+        return true;
+    }
+    videoserverFactory* pVFf = videoserverFactory::getFactory(f);
+    videoserverFactory* pVFother = videoserverFactory::getFactory(other);
+    if (nullptr != pVFf && pVFother != nullptr)
+    {
+        return pVFother->commonFactory() == pVFother->commonFactory();
+    }
+
+    return false;
+}
+
+
 SERIAL_MEMMBER_8(LoginServerInfo, name, ip, port, user, password, macAddress, factory, id)
 
 
@@ -78,6 +94,7 @@ QDataStream & operator >> (QDataStream &dataStream, LoginServerInfo &d)
 
 std::deque<videoserverFactory *> videoserverFactory::s_Factorys;
 std::map<DeviceFactory, videoserverFactory *> videoserverFactory::s_mpFactorys;
+std::map<DeviceFactory, videoserverFactory *> videoserverFactory::s_mpFakeFactorys;
 std::recursive_mutex videoserverFactory::s_mutexFactorys;
 std::vector<std::string> videoserverFactory::s_vcExternFunStrings;
 
@@ -300,6 +317,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 				{
 					videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
 					s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
 				}
 			}
 			
@@ -315,6 +333,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 				{
 					videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
 					s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
 				}
 			}
 			
@@ -330,6 +349,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
                 {
                     videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
                     s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
                 }
             }
 			
@@ -345,6 +365,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 				{
 					videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
 					s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
 				}
 			}
 			
@@ -360,6 +381,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 				{
 					videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
 					s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
 				}
 			}
 			
@@ -375,6 +397,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
 				{
 					videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
 					s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
 				}
 			}
 			
@@ -391,6 +414,7 @@ void videoserverFactory::addFakeFactory(IVideoServerFactory *pFactory)
                 {
                     videoserverFactory* pvsf = new videoserverFactory(pOEMFactory);
                     s_Factorys.push_back(pvsf);
+                    s_mpFactorys[(DeviceFactory)itr->second] = pvsf;
                 }
             }
 
@@ -409,6 +433,11 @@ videoserverFactory* videoserverFactory::getFactory(DeviceFactory f)
     {
         return s_mpFactorys[f];
     }
+    if (s_mpFakeFactorys.find(f) != s_mpFakeFactorys.end())
+    {
+        return s_mpFakeFactorys[f];
+    }
+
     return nullptr;
 }
 
