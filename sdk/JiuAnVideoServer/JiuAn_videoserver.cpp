@@ -491,7 +491,10 @@ LONG DVR_GetFileByTime(LONG lUserID, int channel, PHISI_DVR_TIME lpStartTime, PH
 bool JiuAn_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
     __time64_t timeEnd)
 {
-	if (m_lLoginHandle <= 0) return false;
+	if (m_lLoginHandle <= 0) {
+        Log::instance().AddLog(string("GetRecordFileList ²éÑ¯Â¼ÏñÊ§°Ü£¬´íÎóÔ­Òò£º") + m_sLastError);
+        return false;
+    }
 	if (timeStart >= timeEnd) return false;
 
     files.clear();

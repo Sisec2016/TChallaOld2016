@@ -313,7 +313,7 @@ LONG sheNET_SDK_GetFileByTime(LONG lUserID, LONG lChannel, DD_TIME * lpStartTime
     return hdl;
     SHE_END_RETURN(hdl)
 }
-
+    
 bool VideoServer::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
     std::lock_guard<std::recursive_mutex> lock(mDowloadMutex);

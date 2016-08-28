@@ -246,7 +246,7 @@ void netDlg::onSearchClicked()
     {
         CWaitDlg::setShowMsg(QString::fromLocal8Bit("正在识别网关..."));
         *bResult = WindowUtils::setIPByDHCP(m_strIp, m_strNetMask, m_strGate);
-        QString sName = QString::fromLocal8Bit("本地连接");
+        QString sName = WindowUtils::getLoacalNetName();
 
         CWaitDlg::setShowMsg(QString::fromLocal8Bit("正在智能识别..."));
         if ((!*bResult) && WindowUtils::getDirectDevice(m_strIp, m_strGate))
@@ -415,7 +415,7 @@ void netDlg::onConfigClicked()
         QString addr = QString("addr=%1").arg(t_HostIPAddress.strIP);
         QString mask = QString("mask=%1").arg(t_HostIPAddress.strMaskIP);
         QString gateway = QString("gateway=%1").arg(t_HostIPAddress.strGateIP);
-        QString sName = QString("name=\"%1\"").arg(QString::fromLocal8Bit("本地连接"));
+        QString sName = QString("name=\"%1\"").arg(WindowUtils::getLoacalNetName());
         QProcess::execute("netsh", QStringList() <<
             "interface" << "ip" << "set" << "address"
             << sName << "source=static" << addr << mask << gateway);

@@ -235,7 +235,6 @@ void WindowUtils::copy(const QFileInfo& source, const QDir& dest, const QString&
     }
 }
 bool WindowUtils::setNetConfig(const QString& sName, const QString& sIP, const QString& sMask, const QString& sGate, bool bWait){
-//    return true;
     QString mask = QString("mask=%1").arg(sMask);
     QString name = QString("name=\"%1\"").arg(sName);
     QString addr = QString("addr=%1").arg(sIP);
@@ -710,9 +709,8 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
                         mask = pIpAddrString->IpMask.String;
                         netGate = pNext->GatewayList.IpAddress.String;
                         r = true;
+                        break;
                     }
-
-
                 }
                 pNext = pNext->Next;
             }
@@ -731,7 +729,7 @@ const QString& WindowUtils::getLoacalNetName(){
             if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()))
             {
                 qDebug() << i.name() << i.humanReadableName();
-                if (i.humanReadableName().contains(QString::fromLocal8Bit("本地连接")))
+                if (i.humanReadableName().contains(WindowUtils::getLoacalNetName()))
                 {
                     localNetName = i.humanReadableName();
                     break;
