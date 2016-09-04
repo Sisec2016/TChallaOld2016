@@ -5,17 +5,33 @@
 
 #define TIME_OUT                (500)    // 500ms
 SingleApplication* SingleApplication::sInstance = nullptr;
-SingleApplication::SingleApplication(int &argc, char **argv)
+SingleApplication::SingleApplication(int &argc, char **argv, const QString& uniqueKey)
     : QApplication(argc, argv)
     , w(NULL)
     , _isRunning(false)
     , _localServer(NULL) {
 
+    _serverName = uniqueKey;
+    if (_serverName.isEmpty())
+    {
+        _serverName = QFileInfo(QCoreApplication::applicationFilePath()).fileName();
+    }
 
-    _serverName = QFileInfo(QCoreApplication::applicationFilePath()).fileName();
-
-    _initLocalConnection();
     sInstance = this;
+    sharedMemory.setKey(_serverName);
+    _isRunning = sharedMemory.attach();
+    if (!_isRunning)
+    {
+        sharedMemory.create(1);
+        _newLocalServer();
+    }
+    else{
+        QLocalSocket socket;
+        socket.connectToServer(_serverName);
+        socket.waitForConnected(TIME_OUT);
+    }
+
+
 }
 
 
@@ -37,20 +53,9 @@ void SingleApplication::_newLocalConnection() {
 
 
 void SingleApplication::_initLocalConnection() {
-    _isRunning = false;
-
     QLocalSocket socket;
     socket.connectToServer(_serverName);
-    if(socket.waitForConnected(TIME_OUT)) {
-        fprintf(stderr, "%s already running.\n",
-                _serverName.toLocal8Bit().constData());
-        _isRunning = true;
-
-        return;
-    }
-
-
-    _newLocalServer();
+    socket.waitForConnected(TIME_OUT);
 }
 
 

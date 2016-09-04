@@ -17,6 +17,9 @@
 #define PORT_PUBLISH			40001
 #define PORT_VIDEOS_SERVER		60000
 
+#define APP_KEY_FAST_EXE  "fast_video_shm"
+#define APP_KEY_VIDEO_SERVER  "videoserver_shm"
+#define APP_KEY_VIDEO_SERVER_D  "fast_video_d_shm"
 
 RCF_BEGIN(VideoserverFactorySvr, "VideoserverFactorySvr")
 RCF_METHOD_R1(int, getByIndex, int);

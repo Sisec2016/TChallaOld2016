@@ -49,13 +49,21 @@ public:
 };
 struct DownloadInfo
 {
-    DownloadInfo(){
+    DownloadInfo() : mDownloadHandle(-1){
+        
+        init();
+    }
+    void init(){
         mDownloadHandle = -1;
         mDownloadSize = 0;
+        mLastDownloadSize = 0;
+        mLastFileSize = 0;
         mDownloadBeginTime = -1;
     }
     long mDownloadHandle;
     __int64 mDownloadSize;
+    __int64 mLastDownloadSize;
+    __int64 mLastFileSize;
     __int64 mDownloadBeginTime;
     RecordFile mDownloadFile;
     QString mPath;
@@ -84,8 +92,12 @@ public:
     virtual bool StopPlayBack(play_handle_t playbackHandle, __int32 mPause);
     virtual bool getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed);
 private:
+    bool reLogin();
     __time64_t mStartPlayTime;
-
+    std::string mIP;
+    int mPort;
+    std::string mUser;
+    std::string mPassword;
 
     std::map<play_handle_t, long> mMpPlaybackHandles;
     QDateTime mPlayBeg;

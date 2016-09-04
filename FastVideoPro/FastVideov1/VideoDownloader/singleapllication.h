@@ -8,13 +8,14 @@
 #include <QApplication>
 #include <QtNetwork/QLocalServer>
 #include <QWidget>
+#include <QSharedMemory>
 
 class SingleApplication : public QApplication {
 
         Q_OBJECT
         static SingleApplication* sInstance;
     public:
-        SingleApplication(int &argc, char **argv);
+        SingleApplication(int &argc, char **argv, const QString& uniqueKey = "");
 
         bool isRunning();
         void setMainWidget(QWidget* mainW)
@@ -32,7 +33,7 @@ class SingleApplication : public QApplication {
 
 protected:
         QWidget *w;
-
+        QSharedMemory sharedMemory;
     private slots:
         void _newLocalConnection();
 

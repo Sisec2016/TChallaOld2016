@@ -4,7 +4,7 @@
 
 #include <qdebug.h>
 #include <QProcess>
-
+#include <QSharedMemory>
 
 #include "windowservice.h"
 #include <RCF/RCF.hpp>
@@ -63,65 +63,76 @@ void DisableSetUnhandledExceptionFilter()
 #define PORT_VIDEO_MAIN         100000
 void WindowService::StartVideoServer(DWORD argc, LPTSTR *argv){
     DisableSetUnhandledExceptionFilter();
-	int arg = argc;
-	SingleApplication a(arg, argv);
-	QUdpSocket udp;
-    if (!udp.bind(PORT_VIDEO_SERVER, QAbstractSocket::DontShareAddress))
-	{
-		return;
-	}
+    int arg = argc;
+    QApplication a(arg, argv);
+    QSharedMemory sharedMemory;
+    sharedMemory.setKey(APP_KEY_VIDEO_SERVER_D);
+    if (sharedMemory.attach())
+    {
+        return;
+    }
+    sharedMemory.create(1);
+
     Log::instance().AddLog(QObject::tr("StartVideoServer Is Starting"));
-	Log::instance().CheckDirectory();
-	RCF::RcfInitDeinit rcfInit;
+    Log::instance().CheckDirectory();
+    RCF::RcfInitDeinit rcfInit;
 
-	// Start a TCP server on port 50001, and expose MyServiceImpl.
-	//std::make_share<>
-	videoserverFactory::getFactorys();
-	VideoserverFactorySvrImp myVideoserverFactorySvr;
-	RCF::RcfServer server(RCF::TcpEndpoint("0.0.0.0", PORT_FACTORY));
-	server.bind<VideoserverFactorySvr>(myVideoserverFactorySvr);
-	server.start();
-	PublicsherServer::instance();
+    // Start a TCP server on port 50001, and expose MyServiceImpl.
+    //std::make_share<>
+    videoserverFactory::getFactorys();
+    VideoserverFactorySvrImp myVideoserverFactorySvr;
+    RCF::RcfServer server(RCF::TcpEndpoint("0.0.0.0", PORT_FACTORY));
+    server.bind<VideoserverFactorySvr>(myVideoserverFactorySvr);
+    server.start();
+    PublicsherServer::instance();
 
-	while (true)
-	{
-		Sleep(500);
-	}
+    while (true)
+    {
+        Sleep(500);
+    }
 }
 
 void WINAPI WindowService::ServiceMain(DWORD argc, LPTSTR *argv)
 {
     int arg = 0;
-	SingleApplication a(arg, argv, true);
-    Log::instance().CheckDirectory();
-    Log::instance().AddLog(QObject::tr("VideoService Is Starting"));
-    if (a.isRunning())
+    QApplication a(arg, argv);
+    QSharedMemory sharedMemory;
+    sharedMemory.setKey(APP_KEY_VIDEO_SERVER);
+    if (sharedMemory.attach())
     {
+        sharedMemory.detach();
         return;
     }
 
+    sharedMemory.create(1);
+    Log::instance().CheckDirectory();
+
+
+    Log::instance().AddLog(QObject::tr("VideoService Is Starting"));
 
     while (true)
     {
-		QUdpSocket udp;
-        if (!udp.bind(PORT_VIDEO_SERVER, QAbstractSocket::DontShareAddress))
-		{
-            if (!udp.bind(PORT_VIDEO_MAIN, QAbstractSocket::DontShareAddress))
+        QSharedMemory tempMemory;
+        tempMemory.setKey(APP_KEY_VIDEO_SERVER_D);
+        if (tempMemory.attach())
+        {
+            tempMemory.detach();
+            tempMemory.setKey(APP_KEY_FAST_EXE);
+            if (tempMemory.attach())
             {
+                tempMemory.detach();
                 ::Sleep(5000);
             }
             else{
-                udp.close();
                 QProcess::startDetached(QApplication::applicationDirPath() + "/FastVideo.exe  -s");
                 ::Sleep(2000);
             }
-		}
-		else{   
-			udp.close();
-			QProcess::startDetached(QApplication::applicationDirPath() + "/" + QApplication::applicationName() + " -d");
-			::Sleep(2000);
-		}
-		
+        }
+        else{
+            QProcess::startDetached(QApplication::applicationDirPath() + "/" + QApplication::applicationName() + " -d");
+            ::Sleep(2000);
+        }
+
     }
 
 

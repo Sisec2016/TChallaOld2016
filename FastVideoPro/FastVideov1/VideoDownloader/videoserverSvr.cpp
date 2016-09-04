@@ -4,6 +4,7 @@
 #include <QUdpSocket>
 #include <QApplication>
 #include <QProcess>
+#include <QSharedMemory>
 #include "log.h"
 
 #include "ServiceUtils.h"
@@ -25,6 +26,9 @@ if (init_service()) \
 		{	\
 			Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)	\
 				.arg(__FUNCTION__).arg(__LINE__).arg(e.getError().getErrorString().c_str())); \
+                std::lock_guard<std::recursive_mutex> lock(sMutexService); \
+                spService.reset(); \
+                init_service(); \
 		}	\
 	}
 
@@ -44,17 +48,22 @@ if (init_service()) \
 {	\
     Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, port:%4, error:%5").arg(__FILE__)	\
     .arg(__FUNCTION__).arg(__LINE__).arg(mPort).arg(e.getError().getErrorString().c_str()));    \
+    std::lock_guard<std::recursive_mutex> lock(mMutexService);\
+    mpService.reset();\
+    init_service();\
+    relogin();\
 }	\
 }
 
 void SvrFactory::startSver(){
-    QUdpSocket udp;
-    if (!udp.bind(PORT_FACTORY, QAbstractSocket::DontShareAddress))
+    QSharedMemory sharedMemory;
+    sharedMemory.setKey(APP_KEY_VIDEO_SERVER);
+    if (sharedMemory.attach())
     {
+        sharedMemory.detach();
         return;
     }
     else{
-        udp.close();
         QProcess::startDetached(QApplication::applicationDirPath() + "/VideoService.exe");
         Sleep(1000);
     }
@@ -63,7 +72,7 @@ void SvrFactory::startSver(){
 std::recursive_mutex SvrFactory::sMutexService;
 std::shared_ptr< RcfClient<VideoserverFactorySvr> > SvrFactory::spService;
 bool SvrFactory::init_service(){
-	if (spService.get() == nullptr)
+	if (!spService)
 	{   
 		try{
             
@@ -253,10 +262,15 @@ SvrVideoserver* SvrVideoserver::getServerByPort(int port){
 
 
 bool SvrVideoserver::init_service(){
-    if (mpService.get() == nullptr)
+    std::lock_guard<std::recursive_mutex> lock(mMutexService);
+    if (!mpService)
     {
+        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3").arg(__FILE__)
+            .arg(__FUNCTION__).arg(__LINE__));
         if (!SvrFactory::getRefreshPort(mPort, mFactory, mPort))
         {
+            Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3, error:%4").arg(__FILE__)
+                .arg(__FUNCTION__).arg(__LINE__).arg("getRefreshPort error"));
             return false;
         }
         
@@ -284,13 +298,18 @@ bool SvrVideoserver::init_service(){
             mpService.reset();
             return false;
         }
+
+        Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3").arg(__FILE__)
+            .arg(__FUNCTION__).arg(__LINE__));
     }
-    
+    Log::instance().AddLog(QString("File:%1, Function:%2, Line:%3").arg(__FILE__)
+        .arg(__FUNCTION__).arg(__LINE__));
     return true;
 }
-
+#define  NOLOGIN_PORT    -1
 SvrVideoserver::SvrVideoserver(int port, int factory) : mPort(port), mFactory(factory)
 {
+    mloginPort = NOLOGIN_PORT;
     std::lock_guard<std::recursive_mutex> lock(SvrVideoserver::sMtServers);
     sServers.push_back(this);
 }
@@ -343,6 +362,10 @@ bool SvrVideoserver::login(const char* IP, __int32 port, const char* user,
             {
                 channels[vcchannels[i]] = vcchannelNames[i];
             }
+            mloginIP = IP;
+            mloginPort = port;
+            mUser = user;
+            mPassword = password;
             return true;
         }
         else{
@@ -494,6 +517,28 @@ bool SvrVideoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __i
         *failed = (bool)nFailed;
         return true;
     }
+    return false;
     VDS_END()
-        return b;
+    this->init_service();
+    return b;
+}
+
+bool SvrVideoserver::relogin()
+{
+    if (mloginPort == NOLOGIN_PORT)
+    {
+        return false;
+    }
+    VDS_BEGIN()
+    std::vector<int32_t> vcchannels;
+    std::vector<std::string> vcchannelNames;
+    if (mpService->login(mloginIP.c_str(), mloginPort, mUser.c_str(), mPassword.c_str(), vcchannels, vcchannelNames))
+    {
+        return true;
+    }
+    else{
+    }
+    VDS_END()
+
+        return false;
 }

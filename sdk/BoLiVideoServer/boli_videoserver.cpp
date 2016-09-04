@@ -20,6 +20,7 @@ extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory()
     return new CFactory();
 }
 
+#define  WP_PDVR_SHE_ERROR  100001
 const char* GetErrorString(int error)
 {
     switch (error)
@@ -74,7 +75,7 @@ const char* GetErrorString(int error)
     case WP_PDVR_USER_PASSWORD_ERROR: return "WP_PDVR_USER_PASSWORD_ERROR";
     case WP_PDVR_UPDATE_FAILED: return "WP_PDVR_UPDATE_FAILED";
     case WP_PDVR_UPDATE_CAMERA_FAILED: return "WP_PDVR_UPDATE_CAMERA_FAILED";
-        
+    case WP_PDVR_SHE_ERROR: return "异常错误";
     }
 
     return "未定义";
@@ -122,6 +123,7 @@ void CFactory::clean()
     WP_Cleanup();
     WP_DISPLAY_CleanupSdk();
     WP_DECODE_CleanupSdk();
+    m_init = false;
 }
 
 
@@ -140,21 +142,21 @@ IVideoServer* CFactory::create()
 #define  ONE_SEC_FILE_SIZE    26 * 10 * 1024
 std::vector<boli_videoserver*> boli_videoserver::sServers;
 std::recursive_mutex boli_videoserver::sMtServers;
+std::recursive_mutex  sMtDownloadInfo;
 DownloadInfo g_DownloadInfo;
 DATETIME dtStart;
 DATETIME dtEnd;
 bool CALLBACK ProgressDownload(int currentPos)
 {
+    std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
     if (g_DownloadInfo.mDownloadBeginTime == -1 || currentPos > 100 )
     {
-        //g_DownloadInfo.mDownloadBeginTime = -1;
-        //g_DownloadInfo.mDownloadSize = 0;
-        boli_log.AddLog(QString("%1 %2 ").arg("g_DownloadInfo.mDownloadBeginTime == ").arg(currentPos));
+        boli_log.AddLog(QString("%1 %2 ").arg("ProgressDownload1 ").arg(currentPos));
         if (currentPos == 101)
         {
-            int ret = WP_PDVR_GetFileByTime(g_DownloadInfo.mDownloadHandle, g_DownloadInfo.mDownloadFile.channel, 
-                dtStart, dtEnd, g_DownloadInfo.mPath.toLocal8Bit().data());
-            DEAL_RETURN_VALUE_FALSE(ret, "WP_PDVR_GetFileByTime failed")
+            //int ret = WP_PDVR_GetFileByTime(g_DownloadInfo.mDownloadHandle, g_DownloadInfo.mDownloadFile.channel, 
+            //    dtStart, dtEnd, g_DownloadInfo.mPath.toLocal8Bit().data());
+            //DEAL_RETURN_VALUE_FALSE(ret, "WP_PDVR_GetFileByTime failed")
         }
         return true;
     }
@@ -163,18 +165,9 @@ bool CALLBACK ProgressDownload(int currentPos)
 
     if (g_DownloadInfo.mDownloadBeginTime != currentPos)
     {
-        boli_log.AddLog(QString("%1 %2 ").arg("ProgressDownload").arg(currentPos));
+        boli_log.AddLog(QString("%1 %2 ").arg("ProgressDownload2").arg(currentPos));
         g_DownloadInfo.mDownloadBeginTime = currentPos;
         g_DownloadInfo.mDownloadSize = currentPos * g_DownloadInfo.mDownloadFile.size / 100;
-    }
-    else
-    {
-
-        if (g_DownloadInfo.mDownloadSize < (currentPos + 1) * g_DownloadInfo.mDownloadFile.size / 100
-            && g_DownloadInfo.mDownloadSize < g_DownloadInfo.mDownloadFile.size - ONE_SEC_FILE_SIZE)
-        {
-            g_DownloadInfo.mDownloadSize += ONE_SEC_FILE_SIZE / 10;
-        }
     }
 
     if (currentPos == 100)
@@ -183,7 +176,7 @@ bool CALLBACK ProgressDownload(int currentPos)
         return true;
     }
 
-    return false;
+    return true;
 }
 
 /*
@@ -216,27 +209,135 @@ IVideoServer* boli_videoserver::clone()
     //boli_videoserver *svr = new boli_videoserver();
     return nullptr;
 }
+void addLog(const char* sLog, int nLine)
+{
 
+    boli_log.AddLog(QString("%1 %2").arg(nLine).arg(sLog));
+}
+
+#define  HANDLE_NULL -1
+int sheWP_PDVR_Connect(char *pszAddress, DWORD dwPort, char *pszUserName, char *pszPassWord, LPARAM lparam = NULL){
+    long hdl = HANDLE_NULL;
+    SHE_BEGING
+        hdl = WP_PDVR_Connect(pszAddress, dwPort, pszUserName, pszPassWord, lparam);
+    return hdl;
+    SHE_END_RETURN(hdl)
+}
+
+int sheWP_PDVR_GetDeviceInfo(int serverId, DVR_DEVICEINFO *pDvrDeviceInfo){
+    SHE_BEGING
+        return WP_PDVR_GetDeviceInfo(serverId, pDvrDeviceInfo);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_GetProgressCallBack(ProgressCallBack fProgress){
+    SHE_BEGING
+        return WP_GetProgressCallBack(fProgress);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+
+int sheWP_PDVR_DestroyPlayBack(int serverId){
+    SHE_BEGING
+        return WP_PDVR_DestroyPlayBack(serverId);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+
+int sheWP_PDVR_DisConnect(int serverId){
+    SHE_BEGING
+        return WP_PDVR_DisConnect(serverId);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_PDVR_CheckHasRecord(int serverId, int year, int month, int day){
+    SHE_BEGING
+        return WP_PDVR_CheckHasRecord(serverId, year, month, day);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_PDVR_GetADayRecordInfo(int serverId, int year, int month, int day, FIINFO **pFiHead){
+    SHE_BEGING
+        return WP_PDVR_GetADayRecordInfo(serverId, year, month, day, pFiHead);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_PDVR_GetFileByTime(int serverId, int cameraId, DATETIME dateStartTime, DATETIME dateEndTime, const char *pFilePath){
+    SHE_BEGING
+        return WP_PDVR_GetFileByTime(serverId, cameraId, dateStartTime, dateEndTime, pFilePath);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_PDVR_StopPlayBack(int serverId, int cameraId){
+    SHE_BEGING
+        return WP_PDVR_StopPlayBack(serverId, cameraId);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DECODE_DecVideo(int decodeIndex, unsigned char *istream, int istream_size, unsigned char *ostream){
+    SHE_BEGING
+        return WP_DECODE_DecVideo(decodeIndex, istream, istream_size, ostream);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DISPLAY_DisplayFrame(int hWndId, BYTE *pVData){
+    SHE_BEGING
+        return WP_DISPLAY_DisplayFrame(hWndId, pVData);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_PDVR_StartPlayBack(int serverId, int cameraId){
+    SHE_BEGING
+        return WP_PDVR_StartPlayBack(serverId, cameraId);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DISPLAY_CreateOneSurface(int hWndId, int width, int height){
+    SHE_BEGING
+        return WP_DISPLAY_CreateOneSurface(hWndId, width, height);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DECODE_InitVideoDec(int width, int height, int encodeFormat){
+    SHE_BEGING
+        return WP_DECODE_InitVideoDec(width, height, encodeFormat);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_GetPlaybackDataCallBack(PlaybackDataCallBack fData, int serverId = 0, void *pReserved = NULL, int len = 0){
+    SHE_BEGING
+        return WP_GetPlaybackDataCallBack(fData, serverId, pReserved, len);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_PDVR_JumpToPlay(int serverId, int cameraId, int jumpTime){
+    SHE_BEGING
+        return WP_PDVR_JumpToPlay(serverId, cameraId, jumpTime);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DISPLAY_FreeOneSurface(int hWndId){
+    SHE_BEGING
+        return WP_DISPLAY_FreeOneSurface(hWndId);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DISPLAY_ReleaseDevice(int hWndId){
+    SHE_BEGING
+        return WP_DISPLAY_ReleaseDevice(hWndId);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DECODE_DestroyVideoDec(int decodeIndex){
+    SHE_BEGING
+        return WP_DECODE_DestroyVideoDec(decodeIndex);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
+int sheWP_DISPLAY_InitDevice(HWND hWnd){
+    SHE_BEGING
+        return WP_DISPLAY_InitDevice(hWnd);
+    SHE_END_RETURN(WP_PDVR_SHE_ERROR)
+}
 bool boli_videoserver::login(const char* IP, __int32 port, const char* user, const char* password, std::map<__int32, std::string>& channels)
 {
+    boli_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     if (m_lLoginHandle >= 0)
     {
         logout();
     }
 	channels.clear();
-    int nTimeOut = 10;
-    long lLogin = -1;
-
-    m_lLoginHandle = WP_PDVR_Connect((char*)IP, port, (char*)user, (char*)password);
+    m_lLoginHandle = sheWP_PDVR_Connect((char*)IP, port, (char*)user, (char*)password);
     if (m_lLoginHandle < 0 || m_lLoginHandle >= MAX_SERVER) {
-        m_lLoginHandle = -1;
+        m_lLoginHandle = HANDLE_NULL;
         boli_log.AddLog(QStringLiteral("登陆失败!"));
         return false;
     }
 
-   
     memset(&mDeviceInfo, 0, sizeof(mDeviceInfo));
-    int ret = WP_PDVR_GetDeviceInfo(m_lLoginHandle, &mDeviceInfo);
+    int ret = sheWP_PDVR_GetDeviceInfo(m_lLoginHandle, &mDeviceInfo);
     DEAL_RETURN_VALUE_FALSE(ret, QStringLiteral("获取设备信息失败!"))
     boli_log.AddLog(QString("mDeviceInfo.connCamNum %1 mDeviceInfo.maxCamNum %2").arg(mDeviceInfo.connCamNum).arg(mDeviceInfo.maxCamNum));
     for (int i = 0; i < mDeviceInfo.maxCamNum; i++)
@@ -244,15 +345,35 @@ bool boli_videoserver::login(const char* IP, __int32 port, const char* user, con
         channels[i];
     }
     mChannels = channels;
-    WP_GetProgressCallBack(ProgressDownload);
+    sheWP_GetProgressCallBack(ProgressDownload);
+    mIP = IP;
+    mPort = port;
+    mUser = user;
+    mPassword = password;
     return true;
 }
-
-bool boli_videoserver::logout()
-{
+bool boli_videoserver::reLogin(){
     if (m_lLoginHandle >= 0)
     {
-        int r = WP_PDVR_DisConnect(m_lLoginHandle);
+        sheWP_PDVR_DisConnect(m_lLoginHandle);
+        m_lLoginHandle = sheWP_PDVR_Connect((char*)mIP.c_str(), mPort, (char*)mUser.c_str(), (char*)mPassword.c_str());
+        if (m_lLoginHandle < 0 || m_lLoginHandle >= MAX_SERVER) {
+            m_lLoginHandle = HANDLE_NULL;
+            boli_log.AddLog(QStringLiteral("重新登陆失败!"));
+            return false;
+        }
+        
+        return true;
+    }
+    boli_log.AddLog(QStringLiteral("重新登陆失败,之前未登陆!"));
+    return false;
+}
+bool boli_videoserver::logout()
+{
+    boli_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
+    if (m_lLoginHandle >= 0)
+    {
+        int r = sheWP_PDVR_DisConnect(m_lLoginHandle);
         DEAL_RETURN_VALUE_FALSE(r, "登出失败")
         m_lLoginHandle = -1;
     }
@@ -269,6 +390,19 @@ bool boli_videoserver::logout()
 bool boli_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
                                                        __time64_t timeEnd)
 {
+    {
+        std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
+        if (g_DownloadInfo.mDownloadBeginTime < 0)
+        {
+            if (!reLogin())
+            {
+                m_sLastError = "重登录失败!";
+                boli_log.AddLog(m_sLastError);
+                return false;
+            }
+        }
+    }
+    
     if (m_lLoginHandle < 0)
     {
         m_sLastError = "请先登录!";
@@ -290,6 +424,7 @@ bool boli_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
     
     RecordFile rf;
     QTime time;
+    boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
     for (QDate start(begDt.date()); start <= endDt.date(); start = start.addDays(1))
     {
         if (start == begDt.date())
@@ -311,7 +446,7 @@ bool boli_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
         else{
             tmE = QTime(23, 59);
         }
-        int has_record = WP_PDVR_CheckHasRecord(m_lLoginHandle, start.year(), start.month(), start.day());
+        int has_record = sheWP_PDVR_CheckHasRecord(m_lLoginHandle, start.year(), start.month(), start.day());
         //DEAL_RETURN_VALUE_FALSE(has_record, QStringLiteral("WP_PDVR_CheckHasRecord！%1").arg(start.toString(Qt::LocaleDate)));
         if (THE_DAY_NOT_RECORD == has_record){
             boli_log.AddLog(QString("%1:%2/%3/%4").arg("no has record in ").arg(start.year()).arg(start.month()).arg(start.day()));
@@ -319,18 +454,21 @@ bool boli_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
         }
 
         FIINFO *pFiHead[MAX_CAMERA] = {0};
-        int r = WP_PDVR_GetADayRecordInfo(m_lLoginHandle, start.year(), start.month(), start.day(), pFiHead);
+        int r = sheWP_PDVR_GetADayRecordInfo(m_lLoginHandle, start.year(), start.month(), start.day(), pFiHead);
         DEAL_RETURN_VALUE_FALSE(r, QStringLiteral("获取一天文件失败！"));
+        boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
         if (pFiHead != nullptr)
         {
             for (int i = 0; i < channelVec.size(); i++)
             {
+                boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
                 for (FIINFO* pFileInfo = pFiHead[channelVec[i]]; pFileInfo != nullptr; pFileInfo = pFileInfo->next)
                 {
                     time.setHMS(pFileInfo->fi.hour, pFileInfo->fi.min, pFileInfo->fi.sec);
                     rf.beginTime = QDateTime(start, time).toTime_t();
                     rf.endTime = QDateTime(start, time.addSecs(pFileInfo->fi.len)).toTime_t();
                     if (rf.endTime <= timeStart || rf.beginTime >= timeEnd){
+                        boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
                         continue;
                     }
                     
@@ -349,6 +487,7 @@ bool boli_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
                     }
                     if (rf.size != 0 && (rf.endTime - rf.beginTime) < 4 * 60)
                     {
+                        boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
                         continue;
                     }
                     else{
@@ -382,6 +521,7 @@ bool boli_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const s
 
 bool boli_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
+    boli_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     if (0 > m_lLoginHandle)
     {
         m_sLastError = "请先登录!";
@@ -389,14 +529,17 @@ bool boli_videoserver::downLoadByRecordFile(const char* saveFileName, const Reco
         return false;
     }
 
-    if (g_DownloadInfo.mDownloadBeginTime >= 0)
     {
-        m_sLastError = "只支持一个文件下载";
-        boli_log.AddLog(m_sLastError);
-        return false;
+        std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
+        if (g_DownloadInfo.mDownloadBeginTime >= 0)
+        {
+            m_sLastError = "只支持一个文件下载";
+            boli_log.AddLog(m_sLastError);
+            return false;
+        }
+        g_DownloadInfo.mDownloadBeginTime = 0;
     }
-    g_DownloadInfo.mDownloadBeginTime = 0; 
-    g_DownloadInfo.mDownloadSize = 0;
+
     QDateTime begDt = QDateTime::fromTime_t(file.beginTime);
     QDateTime endDt = QDateTime::fromTime_t(file.endTime);
 
@@ -416,12 +559,22 @@ bool boli_videoserver::downLoadByRecordFile(const char* saveFileName, const Reco
     dtEnd.ss = endDt.time().second();
     boli_log.AddLog(begDt.toString() + "---" + endDt.toString() + QString::fromLocal8Bit(saveFileName));
     ::Sleep(1500);
-    int ret = WP_PDVR_GetFileByTime(m_lLoginHandle, file.channel, dtStart, dtEnd, QString::fromLocal8Bit(saveFileName).replace("/", "\\").toLocal8Bit().data());
+    int ret = sheWP_PDVR_GetFileByTime(m_lLoginHandle, file.channel, dtStart, dtEnd, QString::fromLocal8Bit(saveFileName).replace("/", "\\").toLocal8Bit().data());
+    if (ret != WP_PDVR_NOERROR) {
+        boli_log.AddLog(QString("WP_PDVR_GetFileByTime:%2-%3").arg(ret).arg(GetErrorString(ret)));
+        std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
+        g_DownloadInfo.init();
+        return ret;
+    }
+
     DEAL_RETURN_VALUE_FALSE(ret, "WP_PDVR_GetFileByTime failed")
-    
+    boli_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     hdl = (download_handle_t)new RecordFile(file);
+    std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
+    g_DownloadInfo.init();
+    g_DownloadInfo.mDownloadBeginTime = 0;
     g_DownloadInfo.mDownloadFile = file;
-    g_DownloadInfo.mDownloadHandle = m_lLoginHandle;
+    g_DownloadInfo.mDownloadHandle = hdl;
     g_DownloadInfo.mPath = QString::fromLocal8Bit(saveFileName).replace("/", "\\");
     return true;
 }
@@ -433,7 +586,7 @@ int g_channel = -1;
 bool CALLBACK recPlaybackDataCallBack(int serverId, int cameraId, int type, BYTE *pData, int len, int param1, int param2, void *pReserved)
 {
     if (0 == len && 0 == param1 && 0 == param2) {
-        int ret = WP_PDVR_StopPlayBack(serverId, cameraId);
+        int ret = sheWP_PDVR_StopPlayBack(serverId, cameraId);
         if (ret != WP_PDVR_NOERROR) {
             DEAL_RETURN_VALUE_FALSE(ret, "recPlaybackDataCallBack failed")
             return false;
@@ -445,11 +598,11 @@ bool CALLBACK recPlaybackDataCallBack(int serverId, int cameraId, int type, BYTE
     int ret = 0;
     if (type != DATA_TYPE_AUDIO) {
         //if (type == DATA_TYPE_HD_IFRAME) {
-            ret = WP_DECODE_DecVideo(g_pbDecodeId, pData, len, g_pPlaybackFrameBuf);
+            ret = sheWP_DECODE_DecVideo(g_pbDecodeId, pData, len, g_pPlaybackFrameBuf);
             if (ret != WP_DECODE_NOERROR) {
                 DEAL_RETURN_VALUE_FALSE(ret, "WP_DECODE_DecVideo failed")
             }
-            ret = WP_DISPLAY_DisplayFrame(g_pbHwndId, g_pPlaybackFrameBuf);
+            ret = sheWP_DISPLAY_DisplayFrame(g_pbHwndId, g_pPlaybackFrameBuf);
        // }
     }
 
@@ -488,39 +641,39 @@ bool  boli_videoserver::PlayBackByRecordFile(const RecordFile& file, HWND hwnd, 
     dtEnd.min = endDt.time().minute();
     dtEnd.ss = endDt.time().second();
 
-    int has_record = WP_PDVR_CheckHasRecord(m_lLoginHandle, begDt.date().year(), begDt.date().month(), begDt.date().day());
+    int has_record = sheWP_PDVR_CheckHasRecord(m_lLoginHandle, begDt.date().year(), begDt.date().month(), begDt.date().day());
 
-    int ret = WP_PDVR_StartPlayBack(m_lLoginHandle, file.channel);
+    int ret = sheWP_PDVR_StartPlayBack(m_lLoginHandle, file.channel);
     //int ret = WP_PDVR_PlaybackByTime(m_lLoginHandle, file.channel, dtStart, dtEnd);
     DEAL_RETURN_VALUE_FALSE(ret, "WP_PDVR_StartPlayBack")
-    g_pbHwndId = WP_DISPLAY_InitDevice(hwnd);
+    g_pbHwndId = sheWP_DISPLAY_InitDevice(hwnd);
     if (g_pbHwndId < 0 || g_pbHwndId >= MAX_DEVICE){
-        boli_log.AddLog(QString("WP_DISPLAY_InitDevice failed!"));
+        boli_log.AddLog(QString("sheWP_DISPLAY_InitDevice failed!"));
         return false;
     }
 
-    ret = WP_DISPLAY_CreateOneSurface(g_pbHwndId, mDeviceInfo.camVideoInfo[file.channel].stream0_width,
+    ret = sheWP_DISPLAY_CreateOneSurface(g_pbHwndId, mDeviceInfo.camVideoInfo[file.channel].stream0_width,
         mDeviceInfo.camVideoInfo[file.channel].stream0_height);
-    DEAL_RETURN_VALUE_FALSE(ret, "WP_DISPLAY_CreateOneSurface failed")
-    g_pbDecodeId = WP_DECODE_InitVideoDec(mDeviceInfo.camVideoInfo[file.channel].stream0_width,
+    DEAL_RETURN_VALUE_FALSE(ret, "sheWP_DISPLAY_CreateOneSurface failed")
+    g_pbDecodeId = sheWP_DECODE_InitVideoDec(mDeviceInfo.camVideoInfo[file.channel].stream0_width,
         mDeviceInfo.camVideoInfo[file.channel].stream0_height,
         mDeviceInfo.camVideoInfo[file.channel].streamType);
     if (g_pbDecodeId >= 0 && g_pbDecodeId < MAX_DECODE) {
         int value = m_lLoginHandle;
-        ret = WP_GetPlaybackDataCallBack(recPlaybackDataCallBack, m_lLoginHandle, &value, sizeof(value));
-        DEAL_RETURN_VALUE_FALSE(ret, "WP_GetPlaybackDataCallBack failed")
+        ret = sheWP_GetPlaybackDataCallBack(recPlaybackDataCallBack, m_lLoginHandle, &value, sizeof(value));
+        DEAL_RETURN_VALUE_FALSE(ret, "sheWP_GetPlaybackDataCallBack failed")
     }
     else
     {
-        boli_log.AddLog(QString("WP_DECODE_InitVideoDec failed!"));
+        boli_log.AddLog(QString("sheWP_DECODE_InitVideoDec failed!"));
         return false;
     }
 
     g_channel = file.channel;
     RecordFile *Temp = new RecordFile(file);
     playbackHandle = (play_handle_t)Temp;
-    ret = WP_PDVR_JumpToPlay(m_lLoginHandle, file.channel, begDt.time().hour() * 3600 + begDt.time().minute() * 60 + begDt.time().second());
-    DEAL_RETURN_VALUE_FALSE(ret, "WP_PDVR_JumpToPlay failed")
+    ret = sheWP_PDVR_JumpToPlay(m_lLoginHandle, file.channel, begDt.time().hour() * 3600 + begDt.time().minute() * 60 + begDt.time().second());
+    DEAL_RETURN_VALUE_FALSE(ret, "sheWP_PDVR_JumpToPlay failed")
     return true;
 }
 
@@ -537,8 +690,8 @@ bool boli_videoserver::SetPlayBack(download_handle_t playbackHandle, __int32 pos
         RecordFile* f = (RecordFile *)playbackHandle;
         QDateTime begDt = QDateTime::fromTime_t(f->beginTime);
         QDateTime playDt = begDt.addSecs((f->endTime - f->beginTime) * pos / 100);
-        int ret = WP_PDVR_JumpToPlay(m_lLoginHandle, g_channel, playDt.time().hour() * 3600 + playDt.time().minute() * 60 + playDt.time().second());
-        DEAL_RETURN_VALUE_FALSE(ret, "WP_PDVR_JumpToPlay failed")
+        int ret = sheWP_PDVR_JumpToPlay(m_lLoginHandle, g_channel, playDt.time().hour() * 3600 + playDt.time().minute() * 60 + playDt.time().second());
+        DEAL_RETURN_VALUE_FALSE(ret, "sheWP_PDVR_JumpToPlay failed")
     }
     
     return true;
@@ -554,13 +707,13 @@ bool boli_videoserver::StopPlayBack(download_handle_t playbackHandle, __int32 mP
 
     if (g_channel >= 0)
     {
-        WP_PDVR_StopPlayBack(m_lLoginHandle, g_channel);
+        sheWP_PDVR_StopPlayBack(m_lLoginHandle, g_channel);
         g_channel = -1;
-        WP_DISPLAY_FreeOneSurface(g_pbHwndId);
-        WP_DISPLAY_ReleaseDevice(g_pbHwndId);
+        sheWP_DISPLAY_FreeOneSurface(g_pbHwndId);
+        sheWP_DISPLAY_ReleaseDevice(g_pbHwndId);
         g_pbHwndId = -1;
-        WP_DECODE_DestroyVideoDec(g_pbDecodeId);
-        WP_PDVR_DestroyPlayBack(m_lLoginHandle);
+        sheWP_DECODE_DestroyVideoDec(g_pbDecodeId);
+        sheWP_PDVR_DestroyPlayBack(m_lLoginHandle);
         g_pbDecodeId = 16;
         delete (RecordFile *)playbackHandle;
     }
@@ -572,29 +725,54 @@ bool boli_videoserver::StopPlayBack(download_handle_t playbackHandle, __int32 mP
 
 bool boli_videoserver::stopDownload(download_handle_t h)
 {
-    if (g_DownloadInfo.mDownloadBeginTime >= 0)
+    std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
+    if (g_DownloadInfo.mDownloadBeginTime >= 0 && h == g_DownloadInfo.mDownloadHandle)
     {
-        g_DownloadInfo.mDownloadBeginTime = -1;
-        g_DownloadInfo.mDownloadSize = 0;
-        WP_PDVR_DestroyPlayBack(m_lLoginHandle);
+        boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
+        g_DownloadInfo.init();
+        
+        sheWP_PDVR_DestroyPlayBack(m_lLoginHandle);
     }
     return true;
 }
 
 bool boli_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed){
-
+    boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
     *failed = false;
-    if (g_DownloadInfo.mDownloadBeginTime != -1)
-    {
-        *currentSize = g_DownloadInfo.mDownloadSize;
-        *totalSize = g_DownloadInfo.mDownloadFile.size;
-        if (*currentSize >= *totalSize)
-        {
-            g_DownloadInfo.mDownloadBeginTime = -1;
-            g_DownloadInfo.mDownloadSize = 0;
-        }
-        return true;
+    std::lock_guard<std::recursive_mutex> lock(sMtDownloadInfo);
+    if (g_DownloadInfo.mDownloadBeginTime < 0 || h != g_DownloadInfo.mDownloadHandle){
+        boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
+        return false;
     }
 
-    return false;
+    boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
+
+    if (g_DownloadInfo.mDownloadSize != g_DownloadInfo.mLastDownloadSize){
+        g_DownloadInfo.mLastDownloadSize = g_DownloadInfo.mDownloadSize;
+        boli_log.AddLog(QString("%1 %2! %3 --- %4").arg(__FUNCTION__).arg(__LINE__).arg(g_DownloadInfo.mDownloadSize)
+            .arg(g_DownloadInfo.mDownloadFile.size));
+    }
+    else{
+        QFile f(g_DownloadInfo.mPath);
+        if (!f.exists())
+        {
+            boli_log.AddLog(g_DownloadInfo.mPath + QString(" not exist!"));
+            return false;
+        }
+        else if (f.size() != g_DownloadInfo.mLastFileSize){
+            boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
+            g_DownloadInfo.mLastFileSize = f.size();
+            g_DownloadInfo.mLastDownloadSize = ++g_DownloadInfo.mDownloadSize;
+        }
+        else{
+            boli_log.AddLog(QString("%1 %2!").arg(__FUNCTION__).arg(__LINE__));
+        }
+    }
+
+    *currentSize = g_DownloadInfo.mDownloadSize;
+    *totalSize = g_DownloadInfo.mDownloadFile.size;
+    boli_log.AddLog(QString("%1 %2! %3 --- %4").arg(__FUNCTION__).arg(__LINE__).arg(*currentSize)
+        .arg(*totalSize));
+
+    return true;
 }

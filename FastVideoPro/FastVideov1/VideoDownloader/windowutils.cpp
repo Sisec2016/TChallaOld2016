@@ -71,7 +71,7 @@ void WindowUtils::getLocalIPs(std::vector<QString> &IPs)
         if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()) &&
             i.humanReadableName() == WindowUtils::getLoacalNetName())
         {
-            qDebug() << i.humanReadableName();
+//            qDebug() << i.humanReadableName();
             foreach(QHostAddress address,i.allAddresses())
             {
                 if (address.protocol() == QAbstractSocket::IPv4Protocol
@@ -93,13 +93,15 @@ void WindowUtils::getLocalIPs(const QString& sHostName, std::vector<QString> &IP
     IPs.clear();
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     foreach(QNetworkInterface i, list) {
+        qDebug() << __FUNCTION__ << __LINE__;
         if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()) &&
             i.humanReadableName() == WindowUtils::getLoacalNetName())
         {
-            qDebug() << i.name() << i.humanReadableName();
+            //qDebug() << i.name() << i.humanReadableName();
             
             foreach(QHostAddress address, i.allAddresses())
             {
+                qDebug() << __FUNCTION__ << __LINE__;
                 if (address.protocol() == QAbstractSocket::IPv4Protocol
                     && !address.isLoopback() && Utils::isInnerIP(address.toString()))
                 {
@@ -111,8 +113,10 @@ void WindowUtils::getLocalIPs(const QString& sHostName, std::vector<QString> &IP
                 }
             }
         }
-
+        qDebug() << __FUNCTION__ << __LINE__;
     }
+
+    qDebug() << __FUNCTION__ << __LINE__;
 }
 
 BOOL FindProcessByName(const char* szFileName, PROCESSENTRY32& pe)
@@ -724,12 +728,14 @@ const QString& WindowUtils::getLoacalNetName(){
     static QString localNetName;
     if (localNetName.isEmpty())
     {
+        qDebug() << __FUNCTION__ << __LINE__;
         QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
         foreach(QNetworkInterface i, list) {
+            qDebug() << __FUNCTION__ << __LINE__;
             if (i.isValid() && isValidNetMacaddress(i.hardwareAddress()))
             {
                 qDebug() << i.name() << i.humanReadableName();
-                if (i.humanReadableName().contains(WindowUtils::getLoacalNetName()))
+                if (i.humanReadableName().contains(QStringLiteral("本地连接")))
                 {
                     localNetName = i.humanReadableName();
                     break;
@@ -744,7 +750,7 @@ const QString& WindowUtils::getLoacalNetName(){
 bool WindowUtils::isOnLine(){
     
     QString localNetName(WindowUtils::getLoacalNetName());
-    
+    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << localNetName;
     if (localNetName.isEmpty())
     {
         return false;

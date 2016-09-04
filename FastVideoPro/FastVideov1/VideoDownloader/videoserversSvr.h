@@ -53,6 +53,7 @@ public:
 public:
 	static std::recursive_mutex sMtServers;
     static std::vector<SvrVideoserver*> sServers;
+    static void refreshAll();
 public:
     SvrVideoserver(int port, int factory);
     ~SvrVideoserver();
@@ -74,7 +75,13 @@ public:
 	virtual bool StopPlayBack(__int64 playbackHandle, __int32 mPause);
     virtual const char* getLastError();
     virtual bool getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed);
+
 protected:
+    bool relogin();
+    std::string mloginIP;
+    __int32 mloginPort;
+    std::string mUser;
+    std::string mPassword;
 };
 
 
