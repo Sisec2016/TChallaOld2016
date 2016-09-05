@@ -1,5 +1,6 @@
 ﻿#include "GetMac.h"
 #include <QtNetwork/QNetworkInterface>
+#include "windowutils.h"
 
 void byte2Hex(unsigned char bData, unsigned char hex[])
 {
@@ -15,7 +16,7 @@ bool getLocalMac(QString& PhysicalAddr)
 
 	foreach(QNetworkInterface nif, QNetworkInterface::allInterfaces())
 	{
-		const QString LocalAdpterName(QStringLiteral("本地连接"));
+        const QString LocalAdpterName(WindowUtils::getLoacalNetName());
 		QString msg("flags:%1, mac:%2, humanRN:%3, index:%4, isValid:%5, name:%6");
 		if (LocalAdpterName == nif.humanReadableName()){
 			PhysicalAddr = nif.hardwareAddress().remove(":");

@@ -189,7 +189,8 @@ void FoundDeviceDialog::onLoginClicked()
         std::shared_ptr<int> login_result = std::shared_ptr<int>(new int());
         *login_result = 0;
         mResults.clear();
-        ui->pushButtonConnect->setEnabled(false);
+        this->enableButton(false);
+        
         std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
         CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在初始化..."), [=, this]()
         {
@@ -277,8 +278,7 @@ void FoundDeviceDialog::onLoginClicked()
                 }
 
             }
-            ui->pushButtonConnect->setEnabled(true);
-
+            this->enableButton(true);
         }, bpCancel);
     }
 
@@ -430,4 +430,13 @@ void FoundDeviceDialog::deepConfig(){
 
     }, bpCancel);
 
+}
+
+void FoundDeviceDialog::enableButton(bool b){
+
+    closeBtn->setEnabled(b);
+    minBtn->setEnabled(b);
+    backBtn->setEnabled(b);
+    ui->pushButtonConnect->setEnabled(b);
+    ui->pushButtonOther->setEnabled(b);
 }

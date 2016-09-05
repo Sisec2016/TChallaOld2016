@@ -38,6 +38,7 @@ using namespace std;
 #include "./VideoDownloader/singleapllication.h"
 #include "TempAuthDialog.h"
 #include "TaskLog.h"
+#include "Service.h"
 void execDlg(MainWindow& dlg)
 {
 // 	__try{
@@ -201,7 +202,7 @@ int main(int argc, char *argv[])
     SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT | SEM_NOOPENFILEERRORBOX);
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
     set_terminate(my_terminate_handler);
-	SingleApplication a(argc, argv);
+	SingleApplication a(argc, argv, APP_KEY_FAST_EXE);
     qInstallMessageHandler(outputMessage);
 	if (a.isRunning())
 	{

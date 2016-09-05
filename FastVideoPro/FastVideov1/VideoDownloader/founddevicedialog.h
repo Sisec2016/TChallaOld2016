@@ -34,6 +34,7 @@ protected:
     void intelligentConfig();
     void deepConfig();
     void startLoginDlg();
+    void enableButton(bool b);
 private slots:
     void onLoginClicked();
     void onPushButtonOtherClicked();

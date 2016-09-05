@@ -372,9 +372,15 @@ void addLog(const JTime& nt)
     jxj_log.AddLog(QString("%1/%2/%3 %4:%5:%6").arg(nt.year).arg(nt.month)
                            .arg(nt.date).arg(nt.hour).arg(nt.minute).arg(nt.second));
 }
+
+#define WRITE_FILE_FAILED   -2
 int  __stdcall JRecDownload(long lHandle, LPBYTE pBuff, DWORD dwRevLen, void* pUserParam)
 {
     DownloadInfo *pDlg = (DownloadInfo *)pUserParam;
+    if (pDlg->mDownloadBeginTime == WRITE_FILE_FAILED){
+        return 0;
+    }
+
     if (pBuff)
     {
 
@@ -393,7 +399,13 @@ int  __stdcall JRecDownload(long lHandle, LPBYTE pBuff, DWORD dwRevLen, void* pU
         //jxj_log.AddLog(QString("pFrame->timestamp_sec %1 pDlg->mDownloadBeginTime %2 f.size %3 "
        //     "(f.endTime - f.beginTime) %4").arg(pFrame->timestamp_sec).arg(pDlg->mDownloadBeginTime).arg(f.size).arg(f.endTime - f.beginTime));
         pDlg->mDownloadSize = (pFrame->timestamp_sec - pDlg->mDownloadBeginTime) * f.size / (f.endTime - f.beginTime);
-        AVP_WriteRecFile(pDlg->mDownloadHandle, pBuff, dwRevLen, NULL, 0);
+        int r = AVP_WriteRecFile(pDlg->mDownloadHandle, pBuff, dwRevLen, NULL, 0);
+        if (r != dwRevLen)
+        {
+            jxj_log.AddLog(QString("AVP_WriteRecFile:%1----%2").arg(r).arg(dwRevLen));
+            pDlg->mDownloadBeginTime = WRITE_FILE_FAILED;
+        }
+        
     }
     return 0;
 }
@@ -527,8 +539,13 @@ bool jxj_videoserver::stopDownload(download_handle_t h)
 }
 
 bool jxj_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed){
-    
-    *failed = false;
+    jxj_log.AddLog(QString("getDownloadPos"));
+    if (mMpDownloadInfos[h]->mDownloadBeginTime == WRITE_FILE_FAILED){
+        *failed = true;
+        jxj_log.AddLog(QString("mDownloadBeginTime == WRITE_FILE_FAILED"));
+        return true;
+    }
+
     if (mMpDownloadInfos[h]->mDownloadBeginTime != -1)
     {
         *currentSize = mMpDownloadInfos[h]->mDownloadSize;
