@@ -1065,7 +1065,16 @@ bool videoserver::GetRecordFileList(std::vector<RecordFile>& files, /*int nChann
         }
 		
         std::stable_sort(files.begin(), files.end(), [](const RecordFile& a, const RecordFile& b){
-            return a.channel < b.channel;
+            if (a.channel < b.channel)
+            {
+                return true;
+            }
+            else if (a.channel > b.channel)
+            {
+                return false;
+            }
+
+            return  a.beginTime < b.beginTime;
         });
 
         return true;
