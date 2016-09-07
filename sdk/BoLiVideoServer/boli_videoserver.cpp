@@ -13,12 +13,11 @@
 #include "WP_SAVEIMAGE.H"
 
 Log boli_log("boli_videoserver");
-CFactory* boliFactory = NULL;
-bool haveDestroy = false;
+
 extern "C" VIDEOSERVER_EXPORT IVideoServerFactory* VideoServerFactory()
 {
-    boliFactory = new CFactory();
-    return boliFactory;
+
+    return new CFactory();
 }
 
 #define  WP_PDVR_SHE_ERROR  100001
@@ -354,22 +353,20 @@ bool boli_videoserver::login(const char* IP, __int32 port, const char* user, con
     return true;
 }
 bool boli_videoserver::reLogin(){
-    if (m_lLoginHandle >= 0 && haveDestroy)
+    if (m_lLoginHandle >= 0)
     {
         sheWP_PDVR_DisConnect(m_lLoginHandle);
-        boliFactory->clean();
-        boliFactory->init();
         m_lLoginHandle = sheWP_PDVR_Connect((char*)mIP.c_str(), mPort, (char*)mUser.c_str(), (char*)mPassword.c_str());
         if (m_lLoginHandle < 0 || m_lLoginHandle >= MAX_SERVER) {
             m_lLoginHandle = HANDLE_NULL;
             boli_log.AddLog(QStringLiteral("ÖØÐÂµÇÂ½Ê§°Ü!"));
             return false;
         }
-        haveDestroy = false;
+        
         return true;
     }
     boli_log.AddLog(QStringLiteral("ÖØÐÂµÇÂ½Ê§°Ü,Ö®Ç°Î´µÇÂ½!"));
-    return true;
+    return false;
 }
 bool boli_videoserver::logout()
 {
@@ -735,7 +732,6 @@ bool boli_videoserver::stopDownload(download_handle_t h)
         g_DownloadInfo.init();
         
         sheWP_PDVR_DestroyPlayBack(m_lLoginHandle);
-        haveDestroy = true;
     }
     return true;
 }
