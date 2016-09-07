@@ -87,22 +87,22 @@ QString Utils::getChineseSpell(const QString& src)
 }
 
 
-long getIpNum(const QString& ipAddress) {
+qint64 getIpNum(const QString& ipAddress) {
     auto ips = ipAddress.split(".");
     if (ips.size() < 4)
     {
         return 0;
     }
-    long a = ips.at(0).toULong();
-    long b = ips.at(1).toULong();
-    long c = ips.at(2).toULong();
-    long d = ips.at(3).toULong();
+    qint64 a = ips.at(0).toULong();
+    qint64 b = ips.at(1).toULong();
+    qint64 c = ips.at(2).toULong();
+    qint64 d = ips.at(3).toULong();
 
-    long ipNum = a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
+    qint64 ipNum = a * 1000 * 1000 * 1000 + b * 1000 * 1000 + c * 1000 + d;
     return ipNum;
 }
 
-bool isInner(long userIp, long begin, long end){
+bool isInner(qint64 userIp, qint64 begin, qint64 end){
     return (userIp >= begin) && (userIp <= end);
 }
 bool Utils::isInnerIP(const QString& ipAddress){
@@ -114,12 +114,12 @@ bool Utils::isInnerIP(const QString& ipAddress){
     C类  192.168.0.0-192.168.255.255
     当然，还有127这个网段是环回地址
     **/
-    long aBegin = getIpNum("10.0.0.0");
-    long aEnd = getIpNum("10.255.255.255");
-    long bBegin = getIpNum("172.16.0.0");
-    long bEnd = getIpNum("172.31.255.255");
-    long cBegin = getIpNum("192.0.0.0");
-    long cEnd = getIpNum("192.255.255.255");
+    qint64 aBegin = getIpNum("10.0.0.0");
+    qint64 aEnd = getIpNum("10.255.255.255");
+    qint64 bBegin = getIpNum("172.16.0.0");
+    qint64 bEnd = getIpNum("172.31.255.255");
+    qint64 cBegin = getIpNum("192.0.0.0");
+    qint64 cEnd = getIpNum("192.255.255.255");
     isInnerIp = isInner(ipNum, aBegin, aEnd) || isInner(ipNum, bBegin, bEnd) || isInner(ipNum, cBegin, cEnd);
     return isInnerIp;
 }

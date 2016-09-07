@@ -378,6 +378,7 @@ int  __stdcall JRecDownload(long lHandle, LPBYTE pBuff, DWORD dwRevLen, void* pU
 {
     DownloadInfo *pDlg = (DownloadInfo *)pUserParam;
     if (pDlg->mDownloadBeginTime == WRITE_FILE_FAILED){
+        jxj_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         return 0;
     }
 
@@ -407,6 +408,7 @@ int  __stdcall JRecDownload(long lHandle, LPBYTE pBuff, DWORD dwRevLen, void* pU
         }
         
     }
+    
     return 0;
 }
 bool jxj_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
@@ -541,6 +543,7 @@ bool jxj_videoserver::stopDownload(download_handle_t h)
 bool jxj_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed){
     jxj_log.AddLog(QString("getDownloadPos"));
     if (mMpDownloadInfos[h]->mDownloadBeginTime == WRITE_FILE_FAILED){
+        jxj_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         *failed = true;
         jxj_log.AddLog(QString("mDownloadBeginTime == WRITE_FILE_FAILED"));
         return true;
@@ -548,10 +551,14 @@ bool jxj_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __
 
     if (mMpDownloadInfos[h]->mDownloadBeginTime != -1)
     {
+        *failed = false;
+        jxj_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
         *currentSize = mMpDownloadInfos[h]->mDownloadSize;
         *totalSize = mMpDownloadInfos[h]->mDownloadFile.size;
         return *currentSize * 100 >= *totalSize;
     }
+
+    jxj_log.AddLog(QString("%1 %2").arg(__FUNCTION__).arg(__LINE__));
     *failed = false;
     return false;
 }
