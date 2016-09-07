@@ -28,6 +28,10 @@ PJiuAn_DVR_FindClose pJiuAn_DVR_FindClose = NULL;
 PJiuAn_DVR_GetFileByName pJiuAn_DVR_GetFileByName = NULL;
 PJiuAn_DVR_StopGetFile pJiuAn_DVR_StopGetFile = NULL;
 PJiuAn_DVR_PlayBackByName pJiuAn_DVR_PlayBackByName = NULL;
+PJiuAn_DVR_PlayBackSaveData pJiuAn_DVR_PlayBackSaveData = NULL;
+PJiuAn_DVR_SetPlayDataCallBack pJiuAn_DVR_SetPlayDataCallBack = NULL;
+PJiuAn_DVR_StopPlayBackSave pJiuAn_DVR_StopPlayBackSave = NULL;
+PJiuAn_DVR_PlayBackByTime pJiuAn_DVR_PlayBackByTime = NULL;
 PJiuAn_DVR_StopPlayBack pJiuAn_DVR_StopPlayBack = NULL;
 PJiuAn_DVR_PlayBackControl pJiuAn_DVR_PlayBackControl = NULL;
 PJiuAn_DVR_GetLastError pJiuAn_DVR_GetLastError = NULL;
@@ -183,6 +187,39 @@ bool CFactory::init()
             FreeLibrary(m_hINSTANCE);
             return false;
         }
+        pJiuAn_DVR_StopPlayBackSave = (PJiuAn_DVR_StopPlayBackSave)GetProcAddress(m_hINSTANCE, "HISI_DVR_StopPlayBackSave");
+        if (NULL == pJiuAn_DVR_PlayBackByName)
+        {
+            m_sLastError = "无法加载动态链接库::pJiuAn_DVR_StopPlayBackSave";
+            Log::instance().AddLog(m_sLastError);
+            FreeLibrary(m_hINSTANCE);
+            return false;
+        }
+        pJiuAn_DVR_PlayBackSaveData = (PJiuAn_DVR_PlayBackSaveData)GetProcAddress(m_hINSTANCE, "HISI_DVR_PlayBackSaveData");
+        if (NULL == pJiuAn_DVR_PlayBackSaveData)
+        {
+            m_sLastError = "无法加载动态链接库::pJiuAn_DVR_PlayBackSaveData";
+            Log::instance().AddLog(m_sLastError);
+            FreeLibrary(m_hINSTANCE);
+            return false;
+        }
+        pJiuAn_DVR_SetPlayDataCallBack = (PJiuAn_DVR_SetPlayDataCallBack)GetProcAddress(m_hINSTANCE, "HISI_DVR_SetPlayDataCallBack");
+        if (NULL == pJiuAn_DVR_SetPlayDataCallBack)
+        {
+            m_sLastError = "无法加载动态链接库::pJiuAn_DVR_SetPlayDataCallBack";
+            Log::instance().AddLog(m_sLastError);
+            FreeLibrary(m_hINSTANCE);
+            return false;
+        }
+        pJiuAn_DVR_PlayBackByTime = (PJiuAn_DVR_PlayBackByTime)GetProcAddress(m_hINSTANCE, "HISI_DVR_PlayBackByTime");
+        if (NULL == pJiuAn_DVR_PlayBackByTime)
+        {
+            m_sLastError = "无法加载动态链接库::pJiuAn_DVR_PlayBackByTime";
+            Log::instance().AddLog(m_sLastError);
+            FreeLibrary(m_hINSTANCE);
+            return false;
+        }
+
         pJiuAn_DVR_StopPlayBack = (PJiuAn_DVR_StopPlayBack)GetProcAddress(m_hINSTANCE, "HISI_DVR_StopPlayBack");
         if (NULL == pJiuAn_DVR_StopPlayBack)
         {
@@ -463,10 +500,59 @@ bool DVR_FindClose(LONG lFindHandle)
         return false;
     }
 }
-LONG DVR_GetFileByName(LONG lUserID, char *sDVRFileName, char *sSavedFileName)
+
+LONG DVR_PlayBackByTime(LONG lUserID, LONG lChannel, PHISI_DVR_TIME lpStartTime, PHISI_DVR_TIME lpStopTime, HWND hWnd)
 {
     __try{
 
+        return pJiuAn_DVR_PlayBackByTime(lUserID, lChannel, lpStartTime, lpStopTime, hWnd);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        Log::add("SDK-Hisi.DVR_GetFileByName:下载文件出错 ", error);
+        return -1;
+    }
+}
+
+
+LONG DVR_PlayBackSaveData(LONG lPlayHandle, char *sFileName){
+    __try{
+
+        return pJiuAn_DVR_PlayBackSaveData(lPlayHandle, sFileName);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        Log::add("SDK-Hisi.DVR_PlayBackSaveData:下载文件出错 ", error);
+        return -1;
+    }
+}
+LONG DVR_SetPlayDataCallBack(LONG lPlayHandle, fPlayDataCallBack cbPlayDataCallBack,   DWORD dwUser){
+    __try{
+
+        return pJiuAn_DVR_SetPlayDataCallBack(lPlayHandle, cbPlayDataCallBack, dwUser);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        Log::add("SDK-Hisi.SetPlayDataCallBack:下载文件出错 ", error);
+        return -1;
+    }
+}
+LONG DVR_StopPlayBackSave(LONG lPlayHandle){
+    __try{
+
+        return pJiuAn_DVR_StopPlayBackSave(lPlayHandle);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        Log::add("SDK-Hisi.DVR_GetFileByName:下载文件出错 ", error);
+        return -1;
+    }
+}
+
+LONG DVR_GetFileByName(LONG lUserID, char *sDVRFileName, char *sSavedFileName)
+{
+    __try{
+        
         return pJiuAn_DVR_GetFileByName(lUserID, sDVRFileName, sSavedFileName);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
@@ -625,6 +711,17 @@ void JiuAn_videoserver::InitTime(HISI_DVR_TIME& struStartTime, HISI_DVR_TIME& st
 	struStopTime.dwSecond = Tm.tm_sec;
 }
 
+void CALLBACK playDataCallBack(
+    LONG      lRemotePlayHandle,
+    DWORD     dwDataType,
+    BYTE      *pBuffer,
+    DWORD     dwBufSize,
+    DWORD     dwUser
+    )
+{
+    Log::instance().AddLog(QString("playDataCallBack：%1").arg(dwBufSize));
+}
+
 bool JiuAn_videoserver::downLoadByRecordFile(const char* saveFileName, const RecordFile& file, download_handle_t& hdl)
 {
     if (0 >= m_lLoginHandle)
@@ -635,15 +732,22 @@ bool JiuAn_videoserver::downLoadByRecordFile(const char* saveFileName, const Rec
     }
 
     HISI_DVR_FIND_DATA* pData = (HISI_DVR_FIND_DATA *)file.getPrivateData();
-    //hdl = DVR_GetFileByName(m_lLoginHandle, pData->sFileName, (char*)saveFileName);
-    hdl = DVR_GetFileByTime(m_lLoginHandle, file.channel, &pData->struStartTime, &pData->struStopTime, (char*)saveFileName);
-
+    hdl = DVR_PlayBackByTime(m_lLoginHandle, file.channel, &pData->struStartTime, &pData->struStopTime, NULL);
     if (hdl < 0)
     {
         m_sLastError = GetLastErrorString();
-        Log::instance().AddLog(string("downLoadByRecordFile 下载录像失败，错误原因：") + m_sLastError);
+        Log::instance().AddLog(string("DVR_PlayBackByTime 下载录像失败，错误原因：") + m_sLastError);
         return false;
     }
+    DVR_SetPlayDataCallBack(hdl, playDataCallBack, (DWORD)this);
+    LONG r = DVR_PlayBackSaveData(hdl,  (char *)saveFileName);
+    if (r == 0)
+    {
+        m_sLastError = GetLastErrorString();
+        Log::instance().AddLog(string("DVR_PlayBackSaveData 下载录像失败，错误原因：") + m_sLastError);
+        return false;
+    }
+    
     std::lock_guard<std::recursive_mutex> lock(m_mtxPos);
     m_mapDownloadTotalSize[hdl] = file.size;
     return true;
@@ -672,7 +776,7 @@ bool JiuAn_videoserver::stopDownload(download_handle_t h)
         return false;
     }
 
-    if (FALSE == DVR_StopGetFile(h))
+    if (0 > DVR_StopPlayBackSave(h))
     {
         m_sLastError = GetLastErrorString();
         Log::instance().AddLog(string("stopDownload 停止下载失败，错误原因：") + m_sLastError);
@@ -786,16 +890,17 @@ bool JiuAn_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, 
         return false;
     }
 
-    DWORD pos = 0;
+    DWORD pos = -1;
     bool bRet = DVR_PlayBackControl(h, HISI_DVR_PLAYGETPOS, 0, &pos);
-    if (!bRet)
+    if (!bRet || pos < 0)
     {
         m_sLastError = GetLastErrorString();
         Log::instance().AddLog(string("getDownloadPos 获取进度失败") + m_sLastError);
         *failed = false;
         return false;
     }
-    
+
+    Log::instance().AddLog(QString("getDownloadPos:%1").arg(pos));
     std::lock_guard<std::recursive_mutex> lock(m_mtxPos);
     if (m_mapDownloadPos.find(h) == m_mapDownloadPos.end())
     {
@@ -807,15 +912,8 @@ bool JiuAn_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, 
         *totalSize = itr->second;
         *currentSize = *totalSize * (pos) / 100;
         if (*currentSize - m_mapDownloadPos[h] < 1024){
-            if (*totalSize - m_mapDownloadPos[h] > 1024 * 600)
-            {
-                m_mapDownloadPos[h] += 1024 * 500;
-            }
-            else{
-                m_mapDownloadPos[h] += 1024;
-            }
-            
-            *currentSize = m_mapDownloadPos[h];
+              m_mapDownloadPos[h]++;
+              *currentSize = m_mapDownloadPos[h];
         }
         else{
             m_mapDownloadPos[h] = *currentSize;

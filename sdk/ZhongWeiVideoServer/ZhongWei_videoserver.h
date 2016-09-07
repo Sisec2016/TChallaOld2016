@@ -137,6 +137,7 @@ public:
     std::map<int, int> m_mpLinks;
     INT64 mDownloadTotalSize;
     INT64 mDownloadSize;
+    INT64 mLastDownloadSize;
 private:
     bool connectChannel(int channel);
     bool disconnectChannel(int channel);

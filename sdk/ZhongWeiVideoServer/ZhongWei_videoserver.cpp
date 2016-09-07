@@ -318,24 +318,22 @@ void ZhongWei_videoserver::onDownloadData(char* data, int len){
     std::lock_guard<std::recursive_mutex> lck(m_recFileMutex);
     if (m_pRecFile != NULL)
     {
-        fwrite(data, len, 1, m_pRecFile);
+
+        int r = fwrite(data, len, 1, m_pRecFile);
+        g_log.AddLog(QString("onDownloadData:%1-----%2").arg(len).arg(r));
         mDownloadSize += len;
     }
-    g_log.AddLog(QString("onDownloadData:%1").arg(len));
+    
 }
 
 void ZhongWei_videoserver::onFinishDownload(const QString& sError){
     msDownloadError = sError;
-    if (m_pRecFile != NULL)
-    {
-        fclose(m_pRecFile);
-        m_pRecFile = NULL;
-    }
     if (sError.isEmpty())
     {
-        mDownloadSize = mDownloadTotalSize;
+        //mDownloadSize = mDownloadTotalSize;
     }
     m_bDownloadFinished = true;
+    mLastDownloadSize = 0;
 }
 
 void ZhongWei_videoserver::onFindFiles(ZhongWei::PJCRecFileInfo pInfos, int nCount){
@@ -754,9 +752,18 @@ bool ZhongWei_videoserver::getPlayBackPos(__int64 playbackHandle, __int32* pos)
 
 bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed)
 {
+
 	if (m_bDownloadFinished)
 	{
-
+        if (mLastDownloadSize != mDownloadSize)
+        {
+            mLastDownloadSize = ++mDownloadSize;
+            *failed = false;
+            *totalSize = mDownloadTotalSize;
+            *currentSize = mDownloadTotalSize;
+            return true;
+        }
+        
         *failed = false;
         *totalSize = mDownloadTotalSize;
         *currentSize = mDownloadTotalSize;
