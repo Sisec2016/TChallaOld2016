@@ -10,7 +10,7 @@ using std::string;
 #include <mutex>
 #include <memory>
 #include "HISISDK.h"
-
+typedef void(CALLBACK *fPlayDataCallBack) (LONG lPlayHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, DWORD dwUser);
 
 extern HINSTANCE m_hINSTANCE;
 typedef BOOL(WINAPI *PJiuAn_DVR_Init) ();
@@ -25,6 +25,9 @@ typedef LONG(WINAPI *PJiuAn_DVR_PlayBackByTime) (LONG lUserID, LONG lChannel, PH
 typedef BOOL(WINAPI *PJiuAn_DVR_PlayBackControl) (LONG lPlayHandle, DWORD dwControlCode, DWORD dwInValue, DWORD *LPOutValue);
 typedef BOOL(WINAPI *PJiuAn_DVR_StopPlayBack) (LONG lPlayHandle);
 typedef LONG(WINAPI *PJiuAn_DVR_PlayBackByName)(LONG lUserID, char *sPlayBackFileName, HWND hWnd);
+typedef LONG(WINAPI *PJiuAn_DVR_StopPlayBackSave)(LONG lPlayHandle);
+typedef LONG(WINAPI *PJiuAn_DVR_PlayBackSaveData)(LONG lPlayHandle, char *sFileName);
+typedef LONG(WINAPI *PJiuAn_DVR_SetPlayDataCallBack)(LONG lPlayHandle, fPlayDataCallBack cbPlayDataCallBack, DWORD dwUser);
 typedef int  (WINAPI *PJiuAn_DVR_GetFileByTime)(int lUserID, int lChannel, PHISI_DVR_TIME lpStartTime, PHISI_DVR_TIME lpStopTime, char *sSavedFileName);
 typedef LONG(WINAPI *PJiuAn_DVR_GetFileByName)(LONG lUserID, char *sDVRFileName, char *sSavedFileName);
 typedef BOOL(WINAPI *PJiuAn_DVR_StopGetFile)(int lFileHandle);
@@ -42,6 +45,10 @@ extern PJiuAn_DVR_GetFileByTime pJiuAn_DVR_GetFileByTime;
 extern PJiuAn_DVR_GetFileByName pJiuAn_DVR_GetFileByName;
 extern PJiuAn_DVR_StopGetFile pJiuAn_DVR_StopGetFile;
 extern PJiuAn_DVR_PlayBackByName pJiuAn_DVR_PlayBackByName;
+extern PJiuAn_DVR_StopPlayBackSave pJiuAn_DVR_StopPlayBackSave;
+extern PJiuAn_DVR_PlayBackByTime pJiuAn_DVR_PlayBackByTime;
+extern PJiuAn_DVR_PlayBackSaveData pJiuAn_DVR_PlayBackSaveData;
+extern PJiuAn_DVR_SetPlayDataCallBack pJiuAn_DVR_SetPlayDataCallBack; 
 extern PJiuAn_DVR_StopPlayBack pJiuAn_DVR_StopPlayBack;
 extern PJiuAn_DVR_PlayBackControl pJiuAn_DVR_PlayBackControl;
 extern PJiuAn_DVR_GetLastError pJiuAn_DVR_GetLastError;
