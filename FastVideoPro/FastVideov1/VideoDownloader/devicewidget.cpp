@@ -452,9 +452,9 @@ void DeviceWidget::dealCancelAll(TaskWidget *task)
      mTreeWidget.dealCancelAll(task);
      CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("正在保存数据中..."), [=, this]()
     {
-//        device_lock_t lockInitTasks(mmtInitTask);
-//       device_lock_t lock(mMutexDownloadTask, std::chrono::milliseconds(DEFALUT_WAIT_TIME));
-        qDebug()<<"cancelDownloading";
+         if (!QSqlDatabase::database().transaction()){
+             return;
+         }
         bool cancelDownloading = (this->mpDownloadTask.get() != nullptr &&
                 this->mpDownloadTask->widget() == task);
         if (cancelDownloading)
@@ -489,6 +489,7 @@ void DeviceWidget::dealCancelAll(TaskWidget *task)
             }
             save(false);
         }
+        QSqlDatabase::database().commit();
         qDebug() << "cancelDownloading end"<<__FILE__<<__FUNCTION__<<__LINE__;
 
     }, [=, this](bool bCancel){

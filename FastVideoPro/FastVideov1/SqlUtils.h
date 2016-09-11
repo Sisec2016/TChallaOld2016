@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 #include <QString>
+#include <QByteArray>
 #include "../../VideoServer/log.h"
 
 using std::make_pair;
@@ -65,8 +66,10 @@ ostream& coutCreateColumnSqlType(ostream& os, const ColumnType& Column)
 }
 
 ostream& coutCreateColumnSqlType(ostream& os, const int& Column);
+ostream& coutCreateColumnSqlType(ostream& os, const qlonglong& Column);
 ostream& coutCreateColumnSqlType(ostream& os, const double& Column);
 ostream& coutCreateColumnSqlType(ostream& os, const float& Column);
+ostream& coutCreateColumnSqlType(ostream& os, const QByteArray& Column);
 
 template<typename ColumnType>
 ostream& printCreateColumnSql(ostream& os, const pair<const char*, ColumnType>& Column)
@@ -349,6 +352,7 @@ protected:
     static bool sInit;
     static QString sPreparedUpdate;
     static QString sPreparedInsert;
+    static QString sPreparedIDInsert;
     static QString sPreparedDelete;
     static QString sPreparedWhere;
     int mLNId;
@@ -466,6 +470,17 @@ public:
         printPrepearInsertSql(strstream, sTableName, vcColumnName);
         sPreparedInsert = strstream.str().c_str();
         sPreparedInsert += ";";
+
+        strstream.str("");
+        std::vector<std::string> vcInsertColumns(primaryColumns);
+        for (auto it = vcColumnName.begin(); it != vcColumnName.end(); it++)
+        {
+            vcInsertColumns.push_back(*it);
+        }
+        
+        printPrepearInsertSql(strstream, sTableName, vcInsertColumns);
+        sPreparedIDInsert = strstream.str().c_str();
+        sPreparedIDInsert += ";";
 //        qDebug()<<sPreparedInsert;
         strstream.str("");
         printPrepearDeleteSql(strstream, sTableName, primaryColumns);
@@ -492,6 +507,10 @@ public:
     {
         member = QueryResult.value(column).toInt();
     }
+    void loadData(qlonglong &member, const QSqlQuery &QueryResult, const char* column)
+    {
+        member = QueryResult.value(column).toLongLong();
+    }
     void loadData(double &member, QSqlQuery &QueryResult, const char* column)
     {
         member = QueryResult.value(column).toDouble();
@@ -506,6 +525,10 @@ public:
     {
         member = QueryResult.value(column).toString();
     }
+    void loadData(QByteArray &member, QSqlQuery &QueryResult, const char* column)
+    {
+        member = QueryResult.value(column).toBitArray();
+    }
     void loadData(double &member, QSqlQuery &QueryResult, int index)
     {
         member = QueryResult.value(index).toDouble();
@@ -513,6 +536,10 @@ public:
     void loadData(int &member, const QSqlQuery &QueryResult, int index)
     {
         member = QueryResult.value(index).toInt();
+    }
+    void loadData(qlonglong &member, const QSqlQuery &QueryResult, int index)
+    {
+        member = QueryResult.value(index).toLongLong();
     }
     void loadData(std::string &member, QSqlQuery &QueryResult, int index)
     {
@@ -522,6 +549,10 @@ public:
     void loadData(QString &member, QSqlQuery &QueryResult, int index)
     {
         member = QueryResult.value(index).toString();
+    }
+    void loadData(QByteArray &member, QSqlQuery &QueryResult, int index)
+    {
+        member = QueryResult.value(index).toByteArray();
     }
     bool isSaved()
     {
@@ -602,6 +633,8 @@ template<class Override>
 QString SqlTable<Override>::sPreparedUpdate;
 template<class Override>
 QString SqlTable<Override>::sPreparedInsert;
+template<class Override>
+QString SqlTable<Override>::sPreparedIDInsert;
 template<class Override>
 QString SqlTable<Override>::sPreparedDelete;
 template<class Override>

@@ -129,6 +129,7 @@ void initDb()
     TaskLog::createTable();
     LoginServerInfo::createTable();
     DownloadRow::createTable();
+    RecordFileInfo::createTable();
     DownloadTask::createTable();
 
     return;

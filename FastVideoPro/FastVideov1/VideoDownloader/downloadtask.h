@@ -23,6 +23,57 @@ typedef std::map<std::shared_ptr<videoserver>, std::set<channelid_t> > downloadS
 
 class DeviceWidget;
 
+struct RecordFileInfo : public SqlTable<RecordFileInfo>
+{
+    SERIAL_MEMMBER_HEAD()
+    
+    int channel;      //通道
+    qlonglong size;         //文件大小(byte)
+    QString  name;    //文件名称
+    qlonglong beginTime; //本地时间
+    qlonglong endTime;   //本地时间
+    QByteArray mPrivateData;   //私有数据
+    void setID(int nDownloadID){
+        this->mLNId = nDownloadID;
+    }
+    virtual bool insert()
+    {
+        QSqlQuery query;
+        query.clear();
+        if (mLNId != ID_NULL)
+        {
+            query.prepare(sPreparedIDInsert);
+        }
+        else{
+            query.prepare(sPreparedInsert);
+        }
+
+        bindValues(query);
+        if (mLNId != ID_NULL)
+        {
+            query.bindValue(":"ID_COLUMN, mLNId);
+        }
+        if (exec(query))
+        {
+            if (mLNId != ID_NULL){
+                return true;
+            }
+
+            if (exec(query, std::string("SELECT MAX(mLNId) id FROM ") + sTableName))
+            {
+                if (query.next())
+                {
+                    mLNId = query.value(0).toInt();
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+
 struct DownloadRow : public SqlTable<DownloadRow>
 {
     SERIAL_MEMMBER_HEAD()
@@ -57,7 +108,9 @@ struct DownloadRow : public SqlTable<DownloadRow>
         }
         return *this;
     }
-
+    bool save();
+    virtual void loaded();
+    virtual bool erase();
     channelid_t getChannel()
     {
         return f.channel;
@@ -87,15 +140,17 @@ public:
     qint32 row;
     QString mFileFullName;
     QString mRFPath;
-    RecordFile f;
+
     DownloadWidget* pDownloadWidget;
     std::shared_ptr<std::thread> mThread;
-    
+
     void setCancel();
     bool isCancel(){
         return mCancel;
     }
 private:
+    RecordFile f;
+
     bool mCancel;
 };
 

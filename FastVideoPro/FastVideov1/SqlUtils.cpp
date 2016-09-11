@@ -6,6 +6,11 @@ ostream& coutCreateColumnSqlType(ostream& os, const int& Column)
     return os;
 }
 
+ostream& coutCreateColumnSqlType(ostream& os, const qlonglong& Column)
+{
+    os << "BIGINT";
+    return os;
+}
 ostream& coutCreateColumnSqlType(ostream& os, const double& Column)
 {
     os << "DECIMAL (20, 10)";
@@ -17,6 +22,12 @@ ostream& coutCreateColumnSqlType(ostream& os, const float& Column)
     os << "DECIMAL (20, 10)";
     return os;
 }
+
+ostream& coutCreateColumnSqlType(ostream& os, const QByteArray& Column){
+    os << "BLOB";
+    return os;
+}
+
 
 ostream& coutCondtionValue(ostream& os, const char* Condition)
 {
