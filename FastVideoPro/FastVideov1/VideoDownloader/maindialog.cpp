@@ -296,10 +296,21 @@ void MainDialog::onDownloadTask(std::shared_ptr<DownloadTask> pDownloadTask)
     pDevice->initTaskWidget(pDownloadTask);
     CWaitDlg::waitForDoing(NULL, QString::fromLocal8Bit("正在加载下载通道中..."), [=]()
     {
+        bool strtTrans = QSqlDatabase::database().transaction();
+        pDownloadTask->mLoginInfoID = pDevice->getLoginInfo()->getLNId();
         pDownloadTask->save();
         pDevice->save(false);
+        if (strtTrans)
+        {
+            QSqlDatabase::database().commit();
+        }
         pDevice->addTask(pDownloadTask);
-    }, [=](bool bCancel){pDevice->save(true); ui->widgetDisable->lower();  });
+
+    }, [=](bool bCancel){
+        QSqlDatabase::database().transaction();
+        pDevice->save(true);
+        QSqlDatabase::database().commit();
+        ui->widgetDisable->lower();  });
 
     ui->widgetDisable->lower();
 }

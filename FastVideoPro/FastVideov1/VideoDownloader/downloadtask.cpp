@@ -5,6 +5,8 @@
 #include <QApplication>
 #include <QDir>
 
+
+SERIAL_MEMMBER_6(RecordFileInfo, channel, size, name, beginTime, endTime, mPrivateData)
 SERIAL_MEMMBER_4(DownloadRow, row, mFileFullName, taskID, mRFPath)
 
 void DownloadRow::setCancel(){
@@ -68,18 +70,67 @@ DownloadRow::~DownloadRow()
 //         mThread->join();
 //     }
 }
+bool DownloadRow::save(){
+    bool saveed = isSaved();
+    SqlTable<DownloadRow>::save();
+    if (!saveed)
+    {
+        RecordFileInfo rfi;
+        rfi.beginTime = f.beginTime;
+        rfi.channel = f.channel;
+        rfi.endTime = f.endTime;
+        rfi.mPrivateData = QByteArray::fromRawData((const char*)f.getPrivateData(), f.getPrivateDataSize());
+        rfi.name = QString::fromLocal8Bit(f.name.c_str());
+        rfi.size = f.size;
+        rfi.setID(getLNId());
+        rfi.insert();
+    }
+    return true;
+}
+
+void DownloadRow::loaded(){
+    auto pRFI = RecordFileInfo::get(getLNId());
+    qDebug() << getLNId();
+    if (pRFI)
+    {
+        qDebug() << getLNId();
+        f.beginTime = pRFI->beginTime;
+        f.channel = pRFI->channel;
+        f.endTime = pRFI->endTime;
+        f.setPrivateData(pRFI->mPrivateData.data(), pRFI->mPrivateData.size());
+        f.name = pRFI->name.toStdString();
+        f.size = pRFI->size;
+    }
+
+    pDownloadWidget = nullptr;
+
+}
+
+bool DownloadRow::erase()
+{
+        auto pRFI = RecordFileInfo::get(getLNId());
+        if (pRFI)
+        {
+            if (pRFI->erase())
+            {
+                return SqlTable<DownloadRow>::erase();
+            }
+            return false;
+        }
+        
+        return SqlTable<DownloadRow>::erase();
+}
 
 QDataStream & operator << (QDataStream &dataStream, DownloadRow &d)
 {
-    d.save();
-    dataStream<<d.f;
     return dataStream;
 }
 
 QDataStream & operator >> (QDataStream &dataStream, DownloadRow &d)
 {
-    dataStream>>d.f;
-    d.pDownloadWidget = nullptr;
+
+    //dataStream>>d.f;
+    
     return dataStream;
 }
 
@@ -405,6 +456,18 @@ void DownloadTask::subDownloadSize(qint64 size)
 }
 bool DownloadTask::save()
 {
+    msTotalSize = QString::number(mTotalSize);
+    msLastDownloadSize = QString::number(mLastDownloadSize);
+    msDownloadSize = QString::number(mDownloadSize);
+
+    if (mpTaskWidget)
+    {
+        mnprogressBar = mpTaskWidget->getProgress();
+    }
+
+    if (!SqlTable<DownloadTask>::save()){
+        return false;
+    }
 
     QFile file(getSaveFile());
     file.open(QIODevice::WriteOnly | QIODevice::Truncate);
@@ -418,6 +481,7 @@ bool DownloadTask::save()
         for (int i = 0; i < it->second.size(); i++)
         {
             it->second[i]->taskID = this->mLNId;
+            it->second[i]->save();
             out << *it->second[i];
         }
     }
@@ -433,6 +497,7 @@ bool DownloadTask::save()
                 subDownloadSize(it->second[i]->getDownloadWidget()->getDownloadSize());
             }
             it->second[i]->taskID = this->mLNId;
+            it->second[i]->save();
             out << *it->second[i];
         }
     }
@@ -443,20 +508,14 @@ bool DownloadTask::save()
         for (int i = 0; i < it->second.size(); i++)
         {
             it->second[i]->taskID = this->mLNId;
+            it->second[i]->save();
             out << *it->second[i];
         }
     }
 
     file.close();
     
-    msTotalSize = QString::number(mTotalSize);
-    msLastDownloadSize = QString::number(mLastDownloadSize);
-    msDownloadSize = QString::number(mDownloadSize);
 
-    if (mpTaskWidget)
-    {
-        mnprogressBar = mpTaskWidget->getProgress();
-    }
     
     return SqlTable<DownloadTask>::save();  
 }

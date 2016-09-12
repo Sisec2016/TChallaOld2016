@@ -180,10 +180,14 @@ void DeviceListWidget::loadLoginInfo()
 }
 void DeviceListWidget::save()
 {
+    if (!QSqlDatabase::database().transaction()){
+        return;
+    }
     saveLoginInfo();
     callForEachDevice([&](DeviceWidget* d){
         d->save();
     });
+    QSqlDatabase::database().commit();
 }
 
 void DeviceListWidget::load()
