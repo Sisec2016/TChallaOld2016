@@ -291,9 +291,9 @@ void FoundDeviceDialog::startLoginDlg(){
     this->accept();
 }
 void FoundDeviceDialog::onPushButtonOtherClicked(){
-
+    this->enableButton(false);
     ipConfigGuide();
-
+    this->enableButton(true);
 }
 
 
@@ -319,6 +319,7 @@ void FoundDeviceDialog::intelligentConfig(){
         }
         if (!*bResult)
         {
+            qDebug() << __FUNCTION__ << __LINE__;
             *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
             if (*bpCancel)
             {
@@ -348,6 +349,7 @@ void FoundDeviceDialog::intelligentConfig(){
             dlg.exec();
             if (dlg.isMannualConfig())
             {
+                
                 this->mannulConfigNet();
             }
         }
@@ -378,6 +380,7 @@ void FoundDeviceDialog::ipConfigGuide(){
         return;
     }
 
+    WindowUtils::getLocalIPs(mIPs);
     this->intelligentConfig();
 }
 

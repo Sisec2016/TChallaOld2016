@@ -252,12 +252,6 @@ int main(int argc, char *argv[])
     {
         WindowUtils::disableWindowMsg();
         checkDirectory();
-        qDebug() << "showMainDlgNoExcept";
-        QUdpSocket udp;
-        if (!udp.bind(PORT_VIDEO_MAIN, QAbstractSocket::DontShareAddress))
-        {
-            return 0;
-        }
         showMainDlgNoExcept(a);
         Verify::uninit();
     }

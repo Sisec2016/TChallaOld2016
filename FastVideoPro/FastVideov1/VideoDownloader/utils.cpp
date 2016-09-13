@@ -98,7 +98,8 @@ qint64 getIpNum(const QString& ipAddress) {
     qint64 c = ips.at(2).toULong();
     qint64 d = ips.at(3).toULong();
 
-    qint64 ipNum = a * 1000 * 1000 * 1000 + b * 1000 * 1000 + c * 1000 + d;
+    qint64 ipNum = a * 1000L * 1000L * 1000L + b * 1000 * 1000 + c * 1000 + d;
+    qDebug() << ipAddress << ipNum;
     return ipNum;
 }
 
@@ -107,7 +108,7 @@ bool isInner(qint64 userIp, qint64 begin, qint64 end){
 }
 bool Utils::isInnerIP(const QString& ipAddress){
     bool isInnerIp = false;
-    long ipNum = getIpNum(ipAddress);
+    qint64 ipNum = getIpNum(ipAddress);
     /**
     Ë½ÓÐIP£ºAÀà  10.0.0.0-10.255.255.255
     BÀà  172.16.0.0-172.31.255.255
