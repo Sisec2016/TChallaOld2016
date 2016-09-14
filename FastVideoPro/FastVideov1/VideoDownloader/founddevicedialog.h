@@ -42,6 +42,7 @@ private:
     Ui::FoundDeviceDialog *ui;
     std::vector<DeviceInfo> mDeviceInfos;
     std::vector< std::shared_ptr<LoginServerInfo> > mResults;
+    std::vector<QString> mIPs;
 };
 
 #endif // FoundDeviceDialog_H
