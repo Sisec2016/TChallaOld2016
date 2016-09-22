@@ -31,6 +31,7 @@ protected:
     void addToTableWidget(const DeviceInfo& d);
     void init();
     void mannulConfigNet();
+    void configOldNet();
     void intelligentConfig();
     void deepConfig();
     void startLoginDlg();
