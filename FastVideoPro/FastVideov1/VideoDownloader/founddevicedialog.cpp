@@ -302,7 +302,15 @@ void FoundDeviceDialog::mannulConfigNet(){
     netDlg_.setTitleName(QStringLiteral("网络配置"));
     netDlg_.exec();
 }
-
+void FoundDeviceDialog::configOldNet()
+{
+    if (this->mIPs.size() > 0)
+    {
+        QString sNet(this->mIPs[0].mid(0, this->mIPs[0].lastIndexOf(".") + 1));
+        qDebug() << __FUNCTION__ << __LINE__ << this->mIPs[0];
+        WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), this->mIPs[0], "255.255.255.0", sNet + "1", true);
+    }
+}
 void FoundDeviceDialog::intelligentConfig(){
     std::shared_ptr<QString> pIP = std::make_shared<QString>();
     std::shared_ptr<QString> pNetGate = std::make_shared<QString>();
@@ -315,6 +323,7 @@ void FoundDeviceDialog::intelligentConfig(){
         if (*bpCancel)
         {
             qDebug() << __FUNCTION__ << __LINE__;
+            this->configOldNet();
             return;
         }
         if (!*bResult)
@@ -324,17 +333,12 @@ void FoundDeviceDialog::intelligentConfig(){
             if (*bpCancel)
             {
                 qDebug() << __FUNCTION__ << __LINE__;
+                this->configOldNet();
                 return;
             }
-            if (*bResult)
-            {
-                if (!WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true))
-                {
-                    *bResult = false;
-                }
-            }
-        }
 
+        }
+        this->configOldNet();
     }, [=, this](bool bCancel){
         if (*bpCancel)
         {
@@ -352,6 +356,12 @@ void FoundDeviceDialog::intelligentConfig(){
                 
                 this->mannulConfigNet();
             }
+            else{
+                CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在设置IP中...."), [=]()
+                {
+                    WindowUtils::setNetConfig(WindowUtils::getLoacalNetName(), *pIP, "255.255.255.0", *pNetGate, true);
+                }, [](bool bCancel){});
+            }
         }
         else{
             if (UIUtils::showQuetionBox(IP_CONFIG_GUIDE_TITLE,
@@ -362,10 +372,12 @@ void FoundDeviceDialog::intelligentConfig(){
                 return;
             }
             else{
+
                 this->mannulConfigNet();
             }
 
         }
+
         this->startLoginDlg();
     }, bpCancel);
 }
@@ -381,6 +393,7 @@ void FoundDeviceDialog::ipConfigGuide(){
     }
 
     WindowUtils::getLocalIPs(mIPs);
+    qDebug()<<__FUNCTION__<<__LINE__<<mIPs.size();
     this->intelligentConfig();
 }
 

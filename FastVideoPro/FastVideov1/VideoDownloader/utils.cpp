@@ -99,7 +99,7 @@ qint64 getIpNum(const QString& ipAddress) {
     qint64 d = ips.at(3).toULong();
 
     qint64 ipNum = a * 1000L * 1000L * 1000L + b * 1000 * 1000 + c * 1000 + d;
-    qDebug() << ipAddress << ipNum;
+
     return ipNum;
 }
 

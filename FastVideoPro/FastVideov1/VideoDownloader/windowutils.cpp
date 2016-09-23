@@ -234,7 +234,7 @@ bool WindowUtils::setNetConfig(const QString& sName, const QString& sIP, const Q
         return true;
     }
     int maxPingTime = 1000 * 3;
-    ::Sleep(2000);
+    ::Sleep(1000);
     while (maxPingTime > 0 && !CPing::instance().Ping(sIP.toStdString().c_str(), 20)){
         ::Sleep(1000);
         maxPingTime -= 1000;
