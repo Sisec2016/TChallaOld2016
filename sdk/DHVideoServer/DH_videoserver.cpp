@@ -536,7 +536,11 @@ bool dh_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std
 			for (int i = 0; i < iMaxNum; i++)
 			{
 				item = ifileinfo[i];
-
+                if (item.size <= 0)
+                {
+                    continue;
+                }
+                     
 				timeDHToStd(&item.starttime, &sTm);
 				timeDHToStd(&item.endtime, &eTm);
 

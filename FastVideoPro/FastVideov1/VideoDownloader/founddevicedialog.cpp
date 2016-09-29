@@ -116,7 +116,8 @@ void FoundDeviceDialog::init(){
 
 }
 
-bool setNetwork(const QString& ipDevice){
+bool setNetwork(const QString& ipDevice, std::shared_ptr<bool> bpCancel){
+
     QString sNet(ipDevice.mid(0, ipDevice.lastIndexOf(".") + 1));
     std::vector<QString> ips;
     WindowUtils::getLocalIPs(ips);
@@ -131,13 +132,16 @@ bool setNetwork(const QString& ipDevice){
     QString ip;
     QString mask;
     QString netGate;
-    if (WindowUtils::setIPByDHCP(ip, mask, netGate)){
+    if (WindowUtils::setIPByDHCP(ip, mask, netGate, bpCancel)){
         if (ip.mid(0, ip.lastIndexOf(".") + 1) == sNet)
         {
             return true;
         }
     }
-
+    if (bpCancel && *bpCancel)
+    {
+        return false;
+    }
     QString sName = WindowUtils::getLoacalNetName();
     QString setIP;
     for (int i = 254; i > 1; i--)
@@ -145,7 +149,7 @@ bool setNetwork(const QString& ipDevice){
         setIP = sNet + QString::number(i);
         if (setIP != ipDevice)
         {
-            if (WindowUtils::setNetConfig(sName, setIP, "255.255.255.0", sNet + "1", true)){
+            if (WindowUtils::setNetConfig(sName, setIP, "255.255.255.0", sNet + "1", true, bpCancel)){
                 return true;
             }
         }
@@ -195,15 +199,18 @@ void FoundDeviceDialog::onLoginClicked()
         CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在初始化..."), [=, this]()
         {
             DeviceInfo& d = this->mDeviceInfos[row];
-            bool b = setNetwork(d.szIP.c_str());
+            bool b = setNetwork(d.szIP.c_str(), bpCancel);
             if (*bpCancel)
             {
-                qDebug() << __FUNCTION__ << __LINE__;
                 return;
             }
             if (!b)
             {
-                b = setNetwork(d.szIP.c_str());
+                b = setNetwork(d.szIP.c_str(), bpCancel);
+                if (*bpCancel)
+                {
+                    return;
+                }
             }
             if (!b)
             {
@@ -319,7 +326,7 @@ void FoundDeviceDialog::intelligentConfig(){
     std::shared_ptr<bool> bpCancel = std::make_shared<bool>(false);
     CWaitDlg::waitForDoing(this, QString::fromLocal8Bit("正在智能匹配，请稍等...."), [=, this]()
     {
-        *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate);
+        *bResult = WindowUtils::setIPByDHCP(*pIP, *pMask, *pNetGate, bpCancel);
         if (*bpCancel)
         {
             qDebug() << __FUNCTION__ << __LINE__;
@@ -329,7 +336,7 @@ void FoundDeviceDialog::intelligentConfig(){
         if (!*bResult)
         {
             qDebug() << __FUNCTION__ << __LINE__;
-            *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate);
+            *bResult = WindowUtils::getDirectDevice(*pIP, *pNetGate, bpCancel);
             if (*bpCancel)
             {
                 qDebug() << __FUNCTION__ << __LINE__;

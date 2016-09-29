@@ -215,12 +215,15 @@ void WindowUtils::copy(const QFileInfo& source, const QDir& dest, const QString&
         }
     }
 }
-bool WindowUtils::setNetConfig(const QString& sName, const QString& sIP, const QString& sMask, const QString& sGate, bool bWait){
+bool WindowUtils::setNetConfig(const QString& sName, const QString& sIP, const QString& sMask, const QString& sGate, bool bWait, std::shared_ptr<bool> bpCancel){
     QString mask = QString("mask=%1").arg(sMask);
     QString name = QString("name=\"%1\"").arg(sName);
     QString addr = QString("addr=%1").arg(sIP);
     QStringList argList = QStringList() << "interface" << "ip" << "set" << "address" << name << "source=static" << addr << mask;
-
+    if (bpCancel && *bpCancel)
+    {
+        return false;
+    }
     if (!sGate.isEmpty())
     {
         QString gateway = QString("gateway=%1").arg(sGate);
@@ -234,9 +237,17 @@ bool WindowUtils::setNetConfig(const QString& sName, const QString& sIP, const Q
         return true;
     }
     int maxPingTime = 1000 * 3;
-    ::Sleep(1000);
+    WindowUtils:sleep(1000, bpCancel);
+    if (bpCancel && *bpCancel)
+    {
+        return false;
+    }
     while (maxPingTime > 0 && !CPing::instance().Ping(sIP.toStdString().c_str(), 20)){
-        ::Sleep(1000);
+        WindowUtils::sleep(1000, bpCancel);
+        if (bpCancel && *bpCancel)
+        {
+            return false;
+        }
         maxPingTime -= 1000;
     }
     
@@ -270,7 +281,7 @@ typedef struct arppkt
 
 
 #define  INNDER_SPECIAL_IP "170.151.24.203"
-bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
+bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::shared_ptr<bool> bpCancel)
 {
     qDebug() << __FUNCTION__ << __LINE__;
     ip.clear();
@@ -289,53 +300,45 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
     struct pcap_pkthdr * header;
     const u_char * pkt_data;
     //打开日志文件
-
-    //当前所有可用的网络设备
-    if (pcap_findalldevs(&alldevs, errbuf) == -1)
+    if (bpCancel && *bpCancel)
     {
-        qDebug() << "Error in pcap_findalldevs:" << errbuf;
         return false;
     }
-
+    //当前所有可用的网络设备
+    if (pcap_findalldevs(&alldevs, errbuf) == -1 || (bpCancel && *bpCancel))
+    {
+        return false;
+    }
+    
     if (!alldevs)
     {
         qDebug() << "cannot find net device!  install WinPcap?";
         return false;
     }
 
-    qDebug() << __FUNCTION__ << __LINE__ << alldevs->description << alldevs->name;
-
-    if ((adhandle = pcap_open_live(alldevs->name, 65536, 1, 1000, errbuf)) == NULL)
+    if ((adhandle = pcap_open_live(alldevs->name, 65536, 1, 1000, errbuf)) == NULL || (bpCancel && *bpCancel))
     {
-        qDebug() << __FUNCTION__ << __LINE__ << "pcap_open_live failed!  not surpport by WinPcap ?" << alldevs->name;
         pcap_freealldevs(alldevs);
         return false;
     }
-    qDebug() << __FUNCTION__ << __LINE__;
-    if (pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL) {
-        qDebug() << __FUNCTION__ << __LINE__ << "pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL";
+
+    if (pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL || (bpCancel && *bpCancel)) {
         return false;
     }
-    qDebug() << __FUNCTION__ << __LINE__;
 
     netmask = ((struct sockaddr_in *)(alldevs->addresses->netmask))->sin_addr.S_un.S_addr;
     pcap_freealldevs(alldevs);
-    qDebug() << __FUNCTION__ << __LINE__;
 
-    //编译过滤器，只捕获ARP包
-    if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0)
+    if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0 || (bpCancel && *bpCancel))
     {
-        qDebug() << __FUNCTION__ << __LINE__ << "unable to compile the packet filter.Check the syntax.";
         return false;
     }
-    qDebug() << __FUNCTION__ << __LINE__;
-    //设置过滤器
-    if (pcap_setfilter(adhandle, &fcode) < 0)
+
+    if (pcap_setfilter(adhandle, &fcode) < 0 || (bpCancel && *bpCancel))
     {
-        qDebug() << __FUNCTION__ << __LINE__ << "Error setting the filter.";
         return false;
     }
-    qDebug() << __FUNCTION__ << __LINE__;
+
     std::vector<QString> IPs;
     getLocalIPs(IPs);
     const int nMaxSeconds = 30;
@@ -343,6 +346,10 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
     QString specialIP;
     while (true)
     {
+        if (bpCancel && *bpCancel)
+        {
+            return false;
+        }
         if (GetTickCount() - start > 30 * 1000)
         {
             qDebug() << __FUNCTION__ << __LINE__ << "arp time out";
@@ -432,8 +439,11 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate)
     return !ip.isEmpty();
 }
 
-bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QString>& otherIPS, int secondsWait){
-
+bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QString>& otherIPS, int secondsWait, std::shared_ptr<bool> bpCancel){
+    if (bpCancel && *bpCancel)
+    {
+        return false;
+    }
     ip.clear();
     struct tm * timeinfo;
     struct tm *ltime;
@@ -451,30 +461,26 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     const u_char * pkt_data;
 
     //当前所有可用的网络设备
-    if (pcap_findalldevs(&alldevs, errbuf) == -1)
+    if (pcap_findalldevs(&alldevs, errbuf) == -1 || (bpCancel && *bpCancel))
     {
-        qDebug() << "Error in pcap_findalldevs:" << errbuf;
         return false;
     }
 
     if (!alldevs)
     {
-        qDebug() << "cannot find net device!  install WinPcap?";
         return false;
     }
 
-    qDebug() << alldevs->description << alldevs->name;
 	QString uuid = GetNICUuidByHumanReadableName(WindowUtils::getLoacalNetName());
 	QString pcap_name = ConvertNICUUIDtoPcapName(alldevs, uuid);
 
-	if ((adhandle = pcap_open_live(pcap_name.toStdString().data(), 65536, 1, 1000, errbuf)) == NULL)
+    if ((adhandle = pcap_open_live(pcap_name.toStdString().data(), 65536, 1, 1000, errbuf)) == NULL || (bpCancel && *bpCancel))
     {
-        qDebug() << QString("kevin : pcap_open_live failed!  not surpport by WinPcap ? alldev->name : %1").arg(alldevs->name);
         pcap_freealldevs(alldevs);
         return false;
     }
 
-    if (pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL) {
+    if (pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL || (bpCancel && *bpCancel)) {
         qDebug() << "kevin : pcap_datalink(adhandle) != DLT_EN10MB || alldevs->addresses == NULL";
         return false;
     }
@@ -485,7 +491,7 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     std::map<QString, std::set<QString>> mpDestSource;
 
     //编译过滤器，只捕获ARP包
-    if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0)
+    if (pcap_compile(adhandle, &fcode, packet_filter, 1, netmask) < 0 || (bpCancel && *bpCancel))
     {
         qDebug() << "unable to compile the packet filter.Check the syntax.";
         return false;
@@ -504,6 +510,9 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
     const int MAX_WAIT_OTHER_IP_SECONDS = 10;
     while (true)
     {
+        if (bpCancel && *bpCancel){
+            return false;
+        }
         if (GetTickCount() - start > secondsWait * 1000)
         {
             qDebug() << "arp time out";
@@ -652,15 +661,20 @@ bool WindowUtils::getDirectDevice(QString& ip, QString& netGate, std::set<QStrin
 
     return !ip.isEmpty();
 }
-bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
+bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate, std::shared_ptr<bool> bpCancel){
     qDebug() << __FUNCTION__ << __LINE__;
     QString sName = WindowUtils::getLoacalNetName();
     WindowUtils::setNetDhcp(sName);
     std::vector<QString> ips;
     int maxPingTime = 1000 * 3;
-    ::Sleep(2000);
+    WindowUtils::sleep(2000, bpCancel);
     for (WindowUtils::getLocalIPs(sName, ips); ips.size() == 0 && maxPingTime > 0; WindowUtils::getLocalIPs(sName, ips)){
-        ::Sleep(1000);
+        if (bpCancel && *bpCancel)
+        {
+            return false;
+        }
+
+        WindowUtils::sleep(1000, bpCancel);
         maxPingTime -= 1000;
     }
     bool r = false;
@@ -683,14 +697,18 @@ bool WindowUtils::setIPByDHCP(QString& ip, QString& mask, QString& netGate){
             _IP_ADAPTER_INFO* pNext = pIpAdapterInfo;
             while (pNext && (!r))
             {
+                if (bpCancel && *bpCancel)
+                {
+                    return false;
+                }
                 for (IP_ADDR_STRING *pIpAddrString = &(pNext->IpAddressList);
                     pIpAddrString != NULL && (!r); pIpAddrString = pIpAddrString->Next){
                     if (*ips.begin() == pIpAddrString->IpAddress.String)
                     {
-                        if (!WindowUtils::setNetConfig(sName, *ips.begin(), pIpAddrString->IpMask.String, pNext->GatewayList.IpAddress.String, true))
-                        {
-                            break;
-                        }
+//                         if (!WindowUtils::setNetConfig(sName, *ips.begin(), pIpAddrString->IpMask.String, pNext->GatewayList.IpAddress.String, true))
+//                         {
+//                             break;
+//                         }
                         ip = *ips.begin();
                         mask = pIpAddrString->IpMask.String;
                         netGate = pNext->GatewayList.IpAddress.String;
@@ -815,4 +833,17 @@ void WindowUtils::disableWindowMsg(){
     QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\Windows Error Reporting", QSettings::NativeFormat);
     reg.setValue("Disabled", 1);
     reg.setValue("DontShowUI", 1);
+}
+
+void WindowUtils::sleep(int milliSeconds, std::shared_ptr<bool> bpCancel){
+    if (!bpCancel)
+    {
+        ::Sleep(milliSeconds);
+    }
+    else{
+        while (milliSeconds > 0 && !*bpCancel){
+            ::Sleep(10);
+            milliSeconds -= 10;
+        }
+    }
 }
