@@ -331,6 +331,7 @@ void ZhongWei_videoserver::onFinishDownload(const QString& sError){
     if (sError.isEmpty())
     {
         //mDownloadSize = mDownloadTotalSize;
+        g_log.AddLog(QString("onDownloadData:%1-----%2").arg(__FUNCTION__).arg(__LINE__));
     }
     m_bDownloadFinished = true;
     mLastDownloadSize = 0;
@@ -752,13 +753,12 @@ bool ZhongWei_videoserver::getPlayBackPos(__int64 playbackHandle, __int32* pos)
 
 bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSize, __int64* currentSize, bool* failed)
 {
-
+    *failed = false;
 	if (m_bDownloadFinished)
 	{
         if (mLastDownloadSize != mDownloadSize)
         {
             mLastDownloadSize = ++mDownloadSize;
-            *failed = false;
             *totalSize = mDownloadTotalSize;
             *currentSize = mDownloadTotalSize;
             return true;
@@ -782,7 +782,7 @@ bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSiz
 
     *totalSize = mDownloadTotalSize;
     *currentSize = mDownloadSize;
-    if (mDownloadSize / mDownloadTotalSize >= 94)
+    if (mDownloadSize * 100 / mDownloadTotalSize >= 94)
     {
         *currentSize = (mDownloadTotalSize * 94) / 100;
         *currentSize += g_iPos++;
