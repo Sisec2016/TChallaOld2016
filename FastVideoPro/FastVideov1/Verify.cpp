@@ -4,7 +4,7 @@
 #include "VerifyDialog.h"
 #include "windowutils.h"
 #include "settings.h"
-//#define  VERIFY_VERSION
+#define  VERIFY_VERSION
 
 
 

@@ -6,6 +6,7 @@
 #include <qnamespace.h>
 #include "singleapllication.h"
 #include "customEvent.h"
+#include <qdebug.h>
 
 #define WIDTH_MAIN 1024
 #define HEIGHT_MAIN 768
