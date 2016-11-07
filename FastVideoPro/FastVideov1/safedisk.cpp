@@ -41,7 +41,7 @@ bool SafeDisk::init(){
     if (!m_bInit){
         if (0 != LoadSAGESSD_dll())
         {
-            qDebug()<<"0 != LoadSAGESSD_dll()";
+            qDebug() << "0 != LoadSAGESSD_dll()";
             return false;
         }
 
@@ -50,14 +50,15 @@ bool SafeDisk::init(){
         }
 
         char szSSDDeviceName[MAX_SAGE_SSD_COUNT][32];		//SSD设备物理盘名称
-        UINT32 nSSDDeviceNum ;//SSD 设备个数
-        UINT32 retValue = EnumSageSSDDev( szSSDDeviceName , nSSDDeviceNum ); //获取所有的澜盾SSD
+        UINT32 nSSDDeviceNum;//SSD 设备个数
+        UINT32 retValue = EnumSageSSDDev(szSSDDeviceName, nSSDDeviceNum); //获取所有的澜盾SSD
         if (0 != retValue)
         {
-            qDebug()<<QStringLiteral("未找到澜盾加密SSD！");
+            qDebug() << QStringLiteral("未找到澜盾加密SSD！");
             QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("未找到澜盾加密SSD！"));
             return false;
-        }else if (1 < nSSDDeviceNum)
+        }
+        else if (1 < nSSDDeviceNum)
         {
             QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("检测到多个澜盾加密SSD，请拔出其他SSD"));
             return false;
@@ -74,19 +75,22 @@ bool SafeDisk::init(){
 #define MYWM_MOUNT_VOLUME_FINISH						(WM_APP + 2)
 bool SafeDisk::nativeEvent(void *message){
     MSG* msg = reinterpret_cast<MSG*>(message);
+    qDebug() << __FUNCTION__ << __LINE__;
     if (msg != nullptr){
+        qDebug() << __FUNCTION__ << __LINE__ << msg->message;
         switch (msg->message) {
         case MYWM_CREATE_VOLUME_FINISH:
-            qDebug() << __FUNCTION__ <<" "<<__LINE__ << " "<< msg->wParam;
+            qDebug() << __FUNCTION__ << " " << __LINE__ << " " << msg->wParam;
             m_nProcessState = msg->wParam;
             SetEvent(m_hEventCreate);
             break;
         case MYWM_MOUNT_VOLUME_FINISH:
-            qDebug() << __FUNCTION__ <<" "<<__LINE__ << " "<< msg->wParam;
+            qDebug() << __FUNCTION__ << " " << __LINE__ << " " << msg->wParam;
             m_nProcessStateMount = msg->wParam;
             SetEvent(m_hEventMount);
             break;
         default:
+
             break;
         }
     }
@@ -120,9 +124,9 @@ bool SafeDisk::login(const QString& sPassword){
         return false;
     }
     //获取当前SSD信息
-    ZeroMemory( (void*)&m_safeDiskInfo , sizeof( SafeDiskInfo ) ) ;
-    int retValue = GetSafeDiskInfoFromDeviceA_SageAPI(m_szDeviceName , &m_safeDiskInfo ) ;
-    if ( 0 != retValue )
+    ZeroMemory((void*)&m_safeDiskInfo, sizeof(SafeDiskInfo));
+    int retValue = GetSafeDiskInfoFromDeviceA_SageAPI(m_szDeviceName, &m_safeDiskInfo);
+    if (0 != retValue)
     {
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("获取SSD信息失败！"));
         return false;
@@ -130,9 +134,9 @@ bool SafeDisk::login(const QString& sPassword){
 
 
 
-    memset( m_szPSN , 0x00 , 32 ) ;
-    retValue = GetSageSSDPsn( m_szDeviceName, m_szPSN ) ;
-    if (  0 != retValue )
+    memset(m_szPSN, 0x00, 32);
+    retValue = GetSageSSDPsn(m_szDeviceName, m_szPSN);
+    if (0 != retValue)
     {
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("获取PSN失败！"));
         return false;
@@ -144,7 +148,7 @@ bool SafeDisk::login(const QString& sPassword){
 
 bool SafeDisk::Mount(const QWidget& wd){
     if (!m_bLogin){
-        qDebug()<<"please login first";
+        qDebug() << "please login first";
         return false;
     }
     ZeroMemory((void*)&m_secDiskInfo, sizeof(SecurityDiskInfo));
@@ -153,7 +157,7 @@ bool SafeDisk::Mount(const QWidget& wd){
     {
         qDebug() << (QString(QStringLiteral("当前PC上创建了%1个安全区！")).arg(m_secDiskInfo.m_nVirDiskCnt));
     }
-    qDebug()<< QStringLiteral("Mount");
+    qDebug() << QStringLiteral("Mount");
     if (0 != retValue || m_secDiskInfo.m_nVirDiskCnt == 0)//
     {
         ZeroMemory((void*)&m_secDiskInfo, sizeof(SecurityDiskInfo));
@@ -162,83 +166,106 @@ bool SafeDisk::Mount(const QWidget& wd){
             return false;
         }
     }
-    qDebug()<< __FUNCTION__<<"  "<<__LINE__;
+    qDebug() << __FUNCTION__ << "  " << __LINE__;
     QString mountExe = QApplication::applicationDirPath() + "/MountVolume_Client.exe";
     mountExe.replace("/", "\\");
-    for ( UINT i = 0 , j = 1 ; i < MAX_VIRDISK_NUM  ; i++)
+    std::shared_ptr<bool> bCanGoOn = std::make_shared<bool>(false);
+    std::shared_ptr<bool> bFailed = std::make_shared<bool>(true);
+    HWND h = (HWND)wd.winId();
+    CWaitDlg::waitForDoing((QWidget*)&wd, QString::fromLocal8Bit("正在挂载安全区中..."), [=, this]()
     {
-        if ( EXIST_MARK != m_secDiskInfo.m_VirDiskInfo[i].m_IsExist)//如果标志位不存在则跳过本次循环
+        for (UINT i = 0, j = 1; i < MAX_VIRDISK_NUM; i++)
         {
-            continue;
-        }
-
-        MountSecurityDiskParam aMountParam ;
-        aMountParam.hwnd = (HWND)wd.winId();
-        int n = strlen((char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath); //获取str的字符数
-        int len = MultiByteToWideChar(CP_ACP, 0, (char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath , n , NULL, 0 );
-        WCHAR *pWChar = new WCHAR[len + 1]; //以字节为单位
-        MultiByteToWideChar(CP_ACP, 0, (char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath , n , pWChar, len );
-        pWChar[len] = '\0'; //多字节字符以'\0'结束
-        memcpy( aMountParam.wDiskImageFilePath , (void*)pWChar , VDISK_NAME_LEN*2 );
-        delete[] pWChar;
-
-        memcpy( aMountParam.szKey , (BYTE*)m_safeDiskInfo.m_szKey , 32) ;
-        aMountParam.nKeyLength = sizeof( m_safeDiskInfo.m_szKey ) ;
-
-        m_hEventMount = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-        UINT32 retValue = MountSecurityDiskW_SageAPI( mountExe.toStdWString().c_str(), aMountParam , L'M') ;
-        if (0 != retValue)
-        {
-            CloseHandle( m_hEventMount );
-            return 1 == retValue;
-        }
-
-        std::shared_ptr<bool> bCanGoOn = std::make_shared<bool>(false);
-        CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("正在挂载安全区中..."), [&]()
-        {
-            retValue = WaitForSingleObject(m_hEventMount, INFINITE) ;
-            *bCanGoOn = true;
-        }, [](bool){});
-
-        while (!(*bCanGoOn)){
-            ::Sleep(500);
-        }
-
-        CloseHandle( m_hEventMount );
-        switch ( retValue )
-        {
-        case WAIT_OBJECT_0:
-            if ( 2 == m_nProcessStateMount)
+            qDebug() << __FUNCTION__ << __LINE__;
+            if (EXIST_MARK != m_secDiskInfo.m_VirDiskInfo[i].m_IsExist)//如果标志位不存在则跳过本次循环
             {
-                m_cMountedDevice = 'M';
-                m_secDiskInfo.m_VirDiskInfo[i].m_nIsMount = 1 ;
-                m_secDiskInfo.m_VirDiskInfo[i].m_chDiskLetter = 'M';
+                qDebug() << __FUNCTION__ << __LINE__;
+                continue;
             }
-            else{
-                m_secDiskInfo.m_nVirDiskCnt--;
-                if (m_secDiskInfo.m_nVirDiskCnt < 0)
+
+            MountSecurityDiskParam aMountParam;
+            aMountParam.hwnd = h;
+            int n = strlen((char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath); //获取str的字符数
+            int len = MultiByteToWideChar(CP_ACP, 0, (char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath, n, NULL, 0);
+            WCHAR *pWChar = new WCHAR[len + 1]; //以字节为单位
+            MultiByteToWideChar(CP_ACP, 0, (char*)m_secDiskInfo.m_VirDiskInfo[i].m_chFilePath, n, pWChar, len);
+            pWChar[len] = '\0'; //多字节字符以'\0'结束
+            memcpy(aMountParam.wDiskImageFilePath, (void*)pWChar, VDISK_NAME_LEN * 2);
+            delete[] pWChar;
+            qDebug() << __FUNCTION__ << __LINE__;
+            memcpy(aMountParam.szKey, (BYTE*)m_safeDiskInfo.m_szKey, 32);
+            aMountParam.nKeyLength = sizeof(m_safeDiskInfo.m_szKey);
+            qDebug() << __FUNCTION__ << __LINE__;
+            m_hEventMount = CreateEvent(NULL, FALSE, FALSE, NULL);
+            qDebug() << __FUNCTION__ << __LINE__;
+            UINT32 retValue = MountSecurityDiskW_SageAPI(mountExe.toStdWString().c_str(), aMountParam, L'M');
+            if (0 != retValue)
+            {
+                *bFailed = false;
+                qDebug() << __FUNCTION__ << __LINE__;
+                CloseHandle(m_hEventMount);
+                *bCanGoOn = true;
+                return;
+            }
+            qDebug() << __FUNCTION__ << __LINE__;
+            retValue = WaitForSingleObject(m_hEventMount, 80000);
+            qDebug() << __FUNCTION__ << __LINE__;
+
+            CloseHandle(m_hEventMount);
+            switch (retValue)
+            {
+            case WAIT_OBJECT_0:
+                if (2 == m_nProcessStateMount)
                 {
-                    m_secDiskInfo.m_nVirDiskCnt = 0;
+                    m_cMountedDevice = 'M';
+                    m_secDiskInfo.m_VirDiskInfo[i].m_nIsMount = 1;
+                    m_secDiskInfo.m_VirDiskInfo[i].m_chDiskLetter = 'M';
                 }
+                else{
+                    m_secDiskInfo.m_nVirDiskCnt--;
+                    if (m_secDiskInfo.m_nVirDiskCnt < 0)
+                    {
+                        m_secDiskInfo.m_nVirDiskCnt = 0;
+                    }
+                }
+                m_nProcessStateMount = MESSAGE_NO_COME;
+                *bFailed = false;
+                qDebug() << __FUNCTION__ << "  " << __LINE__ ;
+                *bCanGoOn = true;
+                return; //break the loop
+            case SAGE_API_ERR_LETTER_NO_EXIST:
+                qDebug() << __FUNCTION__ << "  " << __LINE__ ;
+                *bCanGoOn = true;
+                return;
+            default:
+                DWORD nErr = GetLastError();
+                m_secDiskInfo.m_VirDiskInfo[i].m_nIsMount = 0;
+                m_secDiskInfo.m_VirDiskInfo[i].m_chDiskLetter = 0;
+                qDebug() << __FUNCTION__ << "  " << __LINE__ << "error:" << nErr;
+                *bCanGoOn = true; 
+                *bFailed = nErr != 0;
+                return; // unexpected failure
             }
-            m_nProcessStateMount = MESSAGE_NO_COME;
-            break; //break the loop
-        case SAGE_API_ERR_LETTER_NO_EXIST:
-            QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("无法获取系统可用盘符，部分安全区无法挂载，\r\n您可以尝试重启电脑操作！"));
-            return false;
-        default:
-            DWORD nErr = GetLastError();
-            m_secDiskInfo.m_VirDiskInfo[i].m_nIsMount = 0 ;
-            m_secDiskInfo.m_VirDiskInfo[i].m_chDiskLetter = 0 ;
-            qDebug() << __FUNCTION__ << "  " << __LINE__ << "error:" << nErr;
-            break; // unexpected failure
+
+            j++;
         }
+        *bCanGoOn = true;
+    }, [=,this](bool){
+        if (*bFailed){
+            QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("无法获取系统可用盘符，部分安全区无法挂载，\r\n您可以尝试重启电脑操作！"));
+        }
+        *bCanGoOn = true;
+    });
+    
 
-        j++;
+    while (!(*bCanGoOn)){
+        qDebug() << __FUNCTION__ << __LINE__;
+        ::Sleep(500);
     }
-
-    SetSecurityDiskInfoA_SageAPI( m_szDeviceName, m_safeDiskInfo.m_nPCNumber, SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo);//修改本PC上的安全区信息
+    if (*bFailed){
+        return false;
+    }
+    SetSecurityDiskInfoA_SageAPI(m_szDeviceName, m_safeDiskInfo.m_nPCNumber, SECURITY_DISK_INFO_LEN_SECTOR, &m_secDiskInfo);//修改本PC上的安全区信息
     return true;
 
 }
@@ -252,36 +279,36 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     QString createExe = QApplication::applicationDirPath() + "/CreateVolume_Client.exe";
     createExe.replace("/", "\\");
     VirDiskInfo& vdi = m_secDiskInfo.m_VirDiskInfo[0];
-    vdi.m_nIsMount = 0x01 ;
+    vdi.m_nIsMount = 0x01;
     //创建安全区镜像存储文件夹
     QDir d(DISK_LETTER_DATA"/VultureSafeArea");
     if (!d.exists())
     {
         d.mkpath(DISK_LETTER_DATA"/VultureSafeArea");
-        SetFileAttributesA( DISK_LETTER_DATA"\\VultureSafeArea" , FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM ); //隐藏
+        SetFileAttributesA(DISK_LETTER_DATA"\\VultureSafeArea", FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM); //隐藏
     }
 
 
     UINT32 nRandomNum = QTime::currentTime().msec();
     sprintf_s((char*)vdi.m_chFilePath, VDISK_NAME_LEN, "%s\\VultureSafeArea\\%s_%dfdisk.img",
-        DISK_LETTER_DATA, m_szPSN , nRandomNum );
+        DISK_LETTER_DATA, m_szPSN, nRandomNum);
 
     CHAR chLetter = 'L';
-    *pRetValue = GetVailLunA_SageAPI(&chLetter , 'M');//获取一个可用盘符
-    if (0 != *pRetValue )
+    *pRetValue = GetVailLunA_SageAPI(&chLetter, 'M');//获取一个可用盘符
+    if (0 != *pRetValue)
     {
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("无法获取系统可用盘符，请重启电脑后操作！"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
     }
-    vdi.m_chDiskLetter = chLetter ;
+    vdi.m_chDiskLetter = chLetter;
 
-    CreateSecurityDiskParam securityDiskParam ;
+    CreateSecurityDiskParam securityDiskParam;
     securityDiskParam.hwnd = (HWND)wd.winId();
-    securityDiskParam.iDriverNo = chLetter - 65 ;
+    securityDiskParam.iDriverNo = chLetter - 65;
 
     ULARGE_INTEGER FreeAv, TotalBytes, FreeBytes;
-    if (!GetDiskFreeSpaceExA(DISK_LETTER_DATA ,&FreeAv, &TotalBytes, &FreeBytes))
+    if (!GetDiskFreeSpaceExA(DISK_LETTER_DATA, &FreeAv, &TotalBytes, &FreeBytes))
     {
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("需要有D盘分区来创建安全区！"));
         *pRetValue = RETURN_FAILED;
@@ -290,22 +317,22 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
 
     securityDiskParam.nDiskCapacity = ((double)FreeBytes.QuadPart) / 1024 / 1024;
     int n = strlen((char*)vdi.m_chFilePath); //获取str的字符数
-    int len = MultiByteToWideChar(CP_ACP, 0, (char*)vdi.m_chFilePath , n , NULL, 0 );
+    int len = MultiByteToWideChar(CP_ACP, 0, (char*)vdi.m_chFilePath, n, NULL, 0);
     WCHAR *pWChar = new WCHAR[len + 1]; //以字节为单位
-    MultiByteToWideChar(CP_ACP, 0, (char*)vdi.m_chFilePath , n , pWChar, len );
+    MultiByteToWideChar(CP_ACP, 0, (char*)vdi.m_chFilePath, n, pWChar, len);
     pWChar[len] = '\0'; //多字节字符以'\0'结束
-    memcpy(securityDiskParam.wDiskImageFilePath , (void*)pWChar , VDISK_NAME_LEN*2 );
+    memcpy(securityDiskParam.wDiskImageFilePath, (void*)pWChar, VDISK_NAME_LEN * 2);
     delete[] pWChar;
 
     securityDiskParam.nDiskSysType = FILESYS_FAT;
     securityDiskParam.bQuickFormate = TRUE;
-    memcpy(securityDiskParam.szKey , m_safeDiskInfo.m_szKey , 32 ) ;
-    securityDiskParam.nKeyLength = sizeof(m_safeDiskInfo.m_szKey) ;
+    memcpy(securityDiskParam.szKey, m_safeDiskInfo.m_szKey, 32);
+    securityDiskParam.nKeyLength = sizeof(m_safeDiskInfo.m_szKey);
 
     m_hEventCreate = CreateEvent(NULL, FALSE, FALSE, NULL);
-    qDebug()<<__FUNCTION__<<" "<<__LINE__<<" "<<createExe<<" "<<QString::fromWCharArray(securityDiskParam.wDiskImageFilePath)<<" "<<securityDiskParam.iDriverNo
-              <<" "<<securityDiskParam.nDiskCapacity;
-    *pRetValue = CreateSecurityDiskW_SageAPI(createExe.toStdWString().c_str() , securityDiskParam) ;
+    qDebug() << __FUNCTION__ << " " << __LINE__ << " " << createExe << " " << QString::fromWCharArray(securityDiskParam.wDiskImageFilePath) << " " << securityDiskParam.iDriverNo
+        << " " << securityDiskParam.nDiskCapacity;
+    *pRetValue = CreateSecurityDiskW_SageAPI(createExe.toStdWString().c_str(), securityDiskParam);
     if (*pRetValue == 0)
     {
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("创建安全区进程出错！"));
@@ -315,7 +342,7 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
 
     CWaitDlg::waitForDoing(nullptr, QString::fromLocal8Bit("正在创建安全区中..."), [=]()
     {
-        *pRetValue = WaitForSingleObject(m_hEventCreate, 80000) ;
+        *pRetValue = WaitForSingleObject(m_hEventCreate, 80000);
         UnMountAllVolume();
         *bCanGoOn = true;
     }, [](bool){});
@@ -324,14 +351,14 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
         ::Sleep(500);
     }
 
-    switch ( *pRetValue )
+    switch (*pRetValue)
     {
     case WAIT_OBJECT_0:
         // hProcess所代表的进程在80秒内结束
-        if (m_nProcessState != 0 )
+        if (m_nProcessState != 0)
         {
             m_nProcessState = MESSAGE_NO_COME;
-            GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//获取USB设备信息
+            GetSafeDiskInfoFromDeviceA_SageAPI(m_szDeviceName, &m_safeDiskInfo);//获取USB设备信息
             *pRetValue = RETURN_FAILED;
             QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("创建失败！"));
             goto EXIT2;
@@ -340,7 +367,7 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     case WAIT_TIMEOUT:
         // 等待时间超过80秒
         m_nProcessState = MESSAGE_NO_COME;
-        GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//获取USB设备信息
+        GetSafeDiskInfoFromDeviceA_SageAPI(m_szDeviceName, &m_safeDiskInfo);//获取USB设备信息
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("创建出错，超时返回！"));
         *pRetValue = RETURN_FAILED;
         goto EXIT2;
@@ -348,7 +375,7 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
     case WAIT_FAILED:
         // 函数调用失败，比如传递了一个无效的句柄
         m_nProcessState = MESSAGE_NO_COME;
-        GetSafeDiskInfoFromDeviceA_SageAPI( m_szDeviceName , &m_safeDiskInfo);//获取USB设备信息
+        GetSafeDiskInfoFromDeviceA_SageAPI(m_szDeviceName, &m_safeDiskInfo);//获取USB设备信息
 
         QMessageBox::information(nullptr, QStringLiteral("信息"), QStringLiteral("创建失败，出错返回！"));
         *pRetValue = RETURN_FAILED;
@@ -356,32 +383,32 @@ bool SafeDisk::CreateSafeDisk(const QWidget& wd)
         break;
     }
 
-    qDebug()<<__FUNCTION__<<" "<<__LINE__;
-    m_safeDiskInfo.m_nCurIndex = m_safeDiskInfo.m_nPCNumber ;
-    m_safeDiskInfo.m_nBlockIndex[m_safeDiskInfo.m_nPCNumber] = EXIST_MARK ;
-    SetSafeDiskInfoA_SageAPI( m_szDeviceName , &m_safeDiskInfo );//修改U盘信息
+    qDebug() << __FUNCTION__ << " " << __LINE__;
+    m_safeDiskInfo.m_nCurIndex = m_safeDiskInfo.m_nPCNumber;
+    m_safeDiskInfo.m_nBlockIndex[m_safeDiskInfo.m_nPCNumber] = EXIST_MARK;
+    SetSafeDiskInfoA_SageAPI(m_szDeviceName, &m_safeDiskInfo);//修改U盘信息
 
 
     //修改卷区名称
-//    USES_CONVERSION ;
+    //    USES_CONVERSION ;
     char strTemp[32];
     sprintf(strTemp, "%c:\\", chLetter);
-    SetVolumeLabelA(strTemp , (char*)vdi.m_chDiskName );
+    SetVolumeLabelA(strTemp, (char*)vdi.m_chDiskName);
 
     ++m_secDiskInfo.m_nVirDiskCnt;
-    vdi.m_IsExist = EXIST_MARK ;
-    memcpy( m_secDiskInfo.m_szPSN , m_szPSN , 32 ) ;
-    SetSecurityDiskInfoA_SageAPI( m_szDeviceName, m_safeDiskInfo.m_nPCNumber ,
-        SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo );//修改本PC上的安全区信息
+    vdi.m_IsExist = EXIST_MARK;
+    memcpy(m_secDiskInfo.m_szPSN, m_szPSN, 32);
+    SetSecurityDiskInfoA_SageAPI(m_szDeviceName, m_safeDiskInfo.m_nPCNumber,
+        SECURITY_DISK_INFO_LEN_SECTOR, &m_secDiskInfo);//修改本PC上的安全区信息
     *pRetValue = securityDiskParam.iDriverNo;
-    qDebug()<<__FUNCTION__<<" "<<__LINE__;
+    qDebug() << __FUNCTION__ << " " << __LINE__;
 EXIT2:
     CloseHandle(m_hEventCreate);
     m_hEventCreate = NULL;
-    if ( m_secDiskInfo.m_nVirDiskCnt > 0 ) //安全区不存在时不需要更新配置数据
+    if (m_secDiskInfo.m_nVirDiskCnt > 0) //安全区不存在时不需要更新配置数据
     {
-        GetSecurityDiskInfoFromDeviceA_SageAPI( m_szDeviceName , m_safeDiskInfo.m_nPCNumber ,
-            SECURITY_DISK_INFO_LEN_SECTOR , &m_secDiskInfo ) ;
+        GetSecurityDiskInfoFromDeviceA_SageAPI(m_szDeviceName, m_safeDiskInfo.m_nPCNumber,
+            SECURITY_DISK_INFO_LEN_SECTOR, &m_secDiskInfo);
     }
 
 EXIT1:
@@ -393,21 +420,21 @@ void SafeDisk::unMountAll(){
 bool SafeDisk::MyDriverAttach()
 {
     //判断操作系统32 、64
-    BOOL bWow64 = TRUE ;
-    typedef BOOL (__stdcall *LPFN_ISWOW64PROCESS ) (HANDLE hProcess,PBOOL Wow64Process);
+    BOOL bWow64 = TRUE;
+    typedef BOOL(__stdcall *LPFN_ISWOW64PROCESS) (HANDLE hProcess, PBOOL Wow64Process);
     LPFN_ISWOW64PROCESS fnIsWow64Process;
-    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress (GetModuleHandleA("kernel32"), "IsWow64Process");
+    fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process");
 
     if (fnIsWow64Process != NULL)
     {
-        if (!fnIsWow64Process (GetCurrentProcess(), &bWow64)){
+        if (!fnIsWow64Process(GetCurrentProcess(), &bWow64)){
             bWow64 = FALSE;
         }
     }
 
     QString createDriver = QApplication::applicationDirPath();
     createDriver.replace("/", "\\");
-    if ( bWow64 )
+    if (bWow64)
     {
         createDriver += "\\sagedisks-x64.sys";
     }
@@ -416,15 +443,15 @@ bool SafeDisk::MyDriverAttach()
         createDriver += "\\sagedisks.sys";
     }
 
-    UINT32 retValue = MyDriverAttachW_SageAPI((WCHAR*)createDriver.toStdWString().c_str() );
-    if ( 0 != retValue)
+    UINT32 retValue = MyDriverAttachW_SageAPI((WCHAR*)createDriver.toStdWString().c_str());
+    if (0 != retValue)
     {
-        qDebug()<<QStringLiteral("澜盾驱动安装或加载失败！路径：")<<createDriver;
+        qDebug() << QStringLiteral("澜盾驱动安装或加载失败！路径：") << createDriver;
         return false;
     }
     else
     {
-         qDebug()<<QStringLiteral("澜盾驱动安装或加载成功！路径：")<<createDriver;
-         return true;
+        qDebug() << QStringLiteral("澜盾驱动安装或加载成功！路径：") << createDriver;
+        return true;
     }
 }
