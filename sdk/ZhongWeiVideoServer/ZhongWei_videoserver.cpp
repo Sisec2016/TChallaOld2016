@@ -40,9 +40,9 @@ bool g_bDecoding = false;
 __int64 g_iTotalSize = 0;
 __int64 g_fileRealSize = 0;
 HWND g_hWnd = NULL;
-float g_iBitRate = (397 * 1024 / 160);//文件大小/文件时间长度秒
+float g_iBitRate =  1024 * 1024;//文件大小/文件时间长度秒
 int g_iPos = 0;
-int g_iTimeLen = 1600;
+int g_iTimeLen = 230;
 
 
 
