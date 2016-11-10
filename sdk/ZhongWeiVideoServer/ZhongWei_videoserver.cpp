@@ -40,9 +40,9 @@ bool g_bDecoding = false;
 __int64 g_iTotalSize = 0;
 __int64 g_fileRealSize = 0;
 HWND g_hWnd = NULL;
-float g_iBitRate = (397 * 1024 / 160);//文件大小/文件时间长度秒
+float g_iBitRate =  1024 * 1024;//文件大小/文件时间长度秒
 int g_iPos = 0;
-int g_iTimeLen = 1600;
+int g_iTimeLen = 230;
 
 
 
@@ -397,6 +397,11 @@ bool ZhongWei_videoserver::logout()
 bool ZhongWei_videoserver::GetRecordFileList(std::vector<RecordFile>& files, const std::vector<int>& channelVec, __time64_t timeStart,
                                                        __time64_t timeEnd)
 {
+    if (m_pRecFile != NULL)
+    {
+        m_sLastError = "请等下载完查询!";
+        return false;
+    }
     if (!this->hasLogin())
 	{
 		m_sLastError = "请先登录!";
@@ -782,10 +787,19 @@ bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSiz
 
     *totalSize = mDownloadTotalSize;
     *currentSize = mDownloadSize;
+<<<<<<< HEAD
+    if (mDownloadSize * 100 / mDownloadTotalSize >= 99)
+=======
     if (mDownloadSize * 100 / mDownloadTotalSize >= 94)
+>>>>>>> master
+    {
+        *currentSize = (mDownloadTotalSize * 99) / 100;
+        *currentSize += g_iPos++;
+    }
+    else if (mDownloadSize * 100 / mDownloadTotalSize >= 94)
     {
         *currentSize = (mDownloadTotalSize * 94) / 100;
-        *currentSize += g_iPos++;
+        *currentSize += g_iPos++ * 1024;
     }
     else
     {
