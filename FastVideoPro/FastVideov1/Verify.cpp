@@ -6,14 +6,12 @@
 #include "settings.h"
 #define  VERIFY_VERSION
 
-
-
 const char* Verify::version()
 {
 #ifdef VERIFY_VERSION
-    return "2.0.3";
+    return "2.0.5";
 #else
-    return "1.3.6.0.2";
+    return "1.3.6.0.5";
 
 #endif
 }

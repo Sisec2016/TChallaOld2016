@@ -80,7 +80,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\work\downloadVideo\bin\FastVideo.exe</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>wpcap.lib;ws2_32.lib;VirDisk_SageAPI.lib;diskid32.lib;libprotobuf.lib;RCF.lib;cryptopp.lib;qtmain.lib;Qt5Core.lib;Qt5Sql.lib;Qt5Gui.lib;Qt5Network.lib;Qt5Xml.lib;iphlpapi.lib;Qt5Widgets.lib;boostlib/libboost_log_setup-vc120-mt-1_57.lib;boostlib/libboost_log-vc120-mt-1_57.lib;boostlib/libboost_thread-vc120-mt-1_57.lib;boostlib/libboost_system-vc120-mt-1_57.lib;boostlib/libboost_date_time-vc120-mt-1_57.lib;boostlib/libboost_chrono-vc120-mt-1_57.lib;boostlib/libboost_filesystem-vc120-mt-1_57.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1642,7 +1642,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_Win32="5.3" MocOptions="" />
+      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_Win32="$(DefaultQtVersion)" MocOptions="" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

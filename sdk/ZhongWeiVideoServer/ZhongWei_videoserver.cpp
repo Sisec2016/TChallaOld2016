@@ -787,7 +787,11 @@ bool ZhongWei_videoserver::getDownloadPos(download_handle_t h, __int64* totalSiz
 
     *totalSize = mDownloadTotalSize;
     *currentSize = mDownloadSize;
+<<<<<<< HEAD
     if (mDownloadSize * 100 / mDownloadTotalSize >= 99)
+=======
+    if (mDownloadSize * 100 / mDownloadTotalSize >= 94)
+>>>>>>> master
     {
         *currentSize = (mDownloadTotalSize * 99) / 100;
         *currentSize += g_iPos++;
